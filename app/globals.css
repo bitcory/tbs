@@ -17,7 +17,19 @@ body {
   background: var(--background);
   font-family: var(--font-paperlogy), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  body {
+    overflow: hidden;
+  }
+}
+
+/* Prevent iOS auto-zoom on input focus (triggers when font-size < 16px) */
+@supports (-webkit-touch-callout: none) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
 }
 
 /* Utility fade-in animation */

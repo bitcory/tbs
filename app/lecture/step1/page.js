@@ -311,6 +311,15 @@ export default function Step1Page() {
               핀터레스트
             </a>
             <a
+              href="https://grok.com/"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-white text-sm font-bold transition-colors"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              Grok 바로가기
+            </a>
+            <a
               href="https://gemini.google.com/"
               target="_blank"
               rel="noreferrer"
