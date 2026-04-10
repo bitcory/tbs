@@ -200,25 +200,25 @@ export default function Step1Page() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
       {/* Header */}
-      <header className="sticky top-0 z-30 bg-zinc-900/90 backdrop-blur-xl border-b border-white/[0.06] flex items-center px-5 h-16 gap-3">
+      <header className="sticky top-0 z-30 bg-zinc-900/90 backdrop-blur-xl border-b border-white/[0.06] flex items-center px-3 sm:px-5 h-16 gap-2 sm:gap-3">
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-base font-bold text-emerald-400 tracking-wider">TOOLB LAB</span>
+          <span className="text-sm sm:text-base font-bold text-emerald-400 tracking-wider">TOOLB LAB</span>
         </Link>
-        <span className="text-zinc-700">/</span>
-        <span className="text-sm text-zinc-400">
+        <span className="text-zinc-700 hidden sm:inline">/</span>
+        <span className="text-sm text-zinc-400 hidden sm:inline truncate">
           <span className="text-zinc-100 font-bold">1단계</span> 마스터 이미지 만들기
         </span>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
           <button
             onClick={() => { setUploadOpen(true); setUploadError(''); setJsonInput(''); }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold transition-colors"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-bold transition-colors"
           >
             <Upload className="w-3.5 h-3.5" />
-            JSON 업로드
+            <span className="hidden sm:inline">JSON </span>업로드
           </button>
           <Link
             href="/"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300 text-sm font-bold transition-colors"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300 text-xs sm:text-sm font-bold transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             홈
@@ -226,9 +226,9 @@ export default function Step1Page() {
         </div>
       </header>
 
-      <div className="flex" style={{ height: 'calc(100vh - 64px)' }}>
+      <div className="flex flex-col md:flex-row md:h-[calc(100vh-64px)]">
         {/* Sidebar */}
-        <aside className="w-[300px] flex-shrink-0 border-r border-white/[0.06] bg-zinc-900/40 overflow-y-auto">
+        <aside className="w-full md:w-[300px] flex-shrink-0 border-b md:border-b-0 md:border-r border-white/[0.06] bg-zinc-900/40 md:overflow-y-auto">
           {/* Template info */}
           <div className="p-4 border-b border-white/[0.06]">
             <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-zinc-500">
@@ -329,7 +329,7 @@ export default function Step1Page() {
         </aside>
 
         {/* Main */}
-        <main className="flex-1 min-w-0 flex flex-col overflow-hidden">
+        <main className="flex-1 min-w-0 flex flex-col md:overflow-hidden">
           {sections.length > 0 && (
             <div className="flex-shrink-0 px-4 py-3 border-b border-white/[0.06] bg-zinc-900/40">
               <div className="flex items-center justify-between mb-1.5">
