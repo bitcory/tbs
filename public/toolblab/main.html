@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOOLB LAB</title>
+  <style>
+    @font-face {
+      font-family: 'Paperlogy';
+      src: url('fonts/Paperlogy-1Thin.ttf') format('truetype');
+      font-weight: 100;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Paperlogy';
+      src: url('fonts/Paperlogy-2ExtraLight.ttf') format('truetype');
+      font-weight: 200;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Paperlogy';
+      src: url('fonts/Paperlogy-3Light.ttf') format('truetype');
+      font-weight: 300;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Paperlogy';
+      src: url('fonts/Paperlogy-4Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Paperlogy';
+      src: url('fonts/Paperlogy-5Medium.ttf') format('truetype');
+      font-weight: 500;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Paperlogy';
+      src: url('fonts/Paperlogy-6SemiBold.ttf') format('truetype');
+      font-weight: 600;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Paperlogy';
+      src: url('fonts/Paperlogy-7Bold.ttf') format('truetype');
+      font-weight: 700;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Paperlogy';
+      src: url('fonts/Paperlogy-8ExtraBold.ttf') format('truetype');
+      font-weight: 800;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Paperlogy';
+      src: url('fonts/Paperlogy-9Black.ttf') format('truetype');
+      font-weight: 900;
+      font-display: swap;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      background: #f8fafc;
+    }
+
+    body {
+      font-family: 'Paperlogy', sans-serif;
+      color: #0f172a;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ════════════════════════════
+       HERO SECTION
+    ════════════════════════════ */
+    .hero {
+      position: relative;
+      padding: 84px 24px 110px;
+      background: linear-gradient(135deg, #016837 0%, #00996D 45%, #00B380 100%);
+      color: #fff;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      left: -10%;
+      right: -10%;
+      bottom: -1px;
+      height: 70px;
+      background: #f8fafc;
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    }
+
+    .hero-content {
+      position: relative;
+      max-width: 900px;
+      margin: 0 auto;
+      z-index: 2;
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 100px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+      margin-bottom: 22px;
+    }
+
+    .hero-title {
+      font-size: clamp(30px, 4.6vw, 54px);
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      margin-bottom: 18px;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(14px, 1.4vw, 18px);
+      font-weight: 400;
+      line-height: 1.6;
+      opacity: 0.92;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    /* ════════════════════════════
+       CARDS — HORIZONTAL SCROLL
+    ════════════════════════════ */
+    .cards-section {
+      position: relative;
+      margin-top: -50px;
+      padding: 0 0 14px;
+      z-index: 3;
+    }
+
+    .cards-track {
+      display: flex;
+      gap: 22px;
+      overflow-x: auto;
+      overflow-y: visible;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      padding: 16px max(24px, calc(50% - 170px)) 28px;
+      scrollbar-width: none;
+    }
+
+    .cards-track::-webkit-scrollbar {
+      display: none;
+    }
+
+    .step-card {
+      flex: 0 0 320px;
+      scroll-snap-align: center;
+      background: #fff;
+      border-radius: 22px;
+      padding: 22px 22px 24px;
+      border: 2px solid transparent;
+      box-shadow: 0 18px 42px rgba(15, 23, 42, 0.12);
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    .step-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 26px 56px rgba(0, 153, 109, 0.22);
+    }
+
+    .step-card.active {
+      border-color: #00B380;
+      box-shadow: 0 26px 60px rgba(0, 153, 109, 0.32);
+      transform: translateY(-6px);
+    }
+
+    .step-card-check {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 24px;
+      height: 24px;
+      border-radius: 7px;
+      border: 2px solid #cbd5e1;
+      background: #fff;
+      transition: all 0.25s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .step-card-check svg {
+      width: 14px;
+      height: 14px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .step-card.active .step-card-check {
+      background: linear-gradient(135deg, #68D970, #00996D);
+      border-color: #00996D;
+    }
+
+    .step-card.active .step-card-check svg {
+      opacity: 1;
+    }
+
+    .step-card-visual {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1.35;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .step-card-visual::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+    }
+
+    .step-card-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-card-number {
+      position: relative;
+      z-index: 1;
+      font-size: 64px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+    }
+
+    .visual-step1 {
+      background: linear-gradient(135deg, #68D970, #00B380);
+    }
+
+    .visual-step2 {
+      background: linear-gradient(135deg, #00B380, #016837);
+    }
+
+    .visual-step3 {
+      background: linear-gradient(135deg, #00996D, #013D24);
+    }
+
+    .visual-step4 {
+      background: linear-gradient(135deg, #1E293B, #00996D);
+    }
+
+    .visual-step5 {
+      background: linear-gradient(135deg, #00B380, #68E571);
+    }
+
+    .step-card-label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #00996D;
+      margin-bottom: 6px;
+    }
+
+    .step-card-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.4;
+    }
+
+    .step-card-status {
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+      padding: 3px 10px;
+      border-radius: 100px;
+      background: #f1f5f9;
+    }
+
+    /* ════════════════════════════
+       CTA
+    ════════════════════════════ */
+    .cta-row {
+      text-align: center;
+      padding: 8px 24px 32px;
+    }
+
+    .cta-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 17px 38px;
+      background: linear-gradient(112.34deg, #68D970 -38.67%, #00996D 99.56%);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      border-radius: 100px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 14px 32px rgba(0, 153, 109, 0.32);
+    }
+
+    .cta-primary:hover:not(:disabled) {
+      opacity: 0.94;
+      transform: translateY(-2px);
+      box-shadow: 0 18px 38px rgba(0, 153, 109, 0.4);
+    }
+
+    .cta-primary:disabled {
+      background: #cbd5e1;
+      box-shadow: none;
+      cursor: not-allowed;
+      color: #fff;
+    }
+
+    .cta-watch {
+      display: block;
+      margin: 14px auto 0;
+      background: none;
+      border: none;
+      color: #475569;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    /* ════════════════════════════
+       VIDEO PANEL
+    ════════════════════════════ */
+    .video-panel {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 24px 80px;
+    }
+
+    .video-panel-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .video-panel-eyebrow {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #fff;
+      background: linear-gradient(112.34deg, #68D970 -38.67%, #00996D 99.56%);
+      padding: 6px 12px;
+      border-radius: 100px;
+    }
+
+    .video-panel-title {
+      font-size: clamp(20px, 2.4vw, 28px);
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .video-section {
+      margin-bottom: 36px;
+    }
+
+    .video-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .video-section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .video-section-title::before {
+      content: '';
+      width: 4px;
+      height: 16px;
+      border-radius: 2px;
+      background: linear-gradient(180deg, #68D970, #00996D);
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .video-slot {
+      background: #0f172a;
+      border-radius: 16px;
+      overflow: hidden;
+      aspect-ratio: 16/9;
+      position: relative;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+    }
+
+    .video-slot video,
+    .video-slot iframe {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border: 0;
+    }
+
+    .video-slot-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: #94a3b8;
+      font-size: 13px;
+      font-weight: 600;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    }
+
+    .video-slot-placeholder svg {
+      width: 56px;
+      height: 56px;
+      opacity: 0.55;
+    }
+
+    .video-slot-placeholder span {
+      letter-spacing: 0.04em;
+    }
+
+    /* ════════════════════════════
+       RESPONSIVE
+    ════════════════════════════ */
+    @media (max-width: 900px) {
+      .hero {
+        padding: 60px 20px 90px;
+      }
+
+      .step-card {
+        flex: 0 0 280px;
+      }
+
+      .cards-track {
+        padding-left: max(20px, calc(50% - 150px));
+        padding-right: max(20px, calc(50% - 150px));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .step-card {
+        flex: 0 0 78vw;
+      }
+
+      .cards-track {
+        padding-left: 11vw;
+        padding-right: 11vw;
+        gap: 16px;
+      }
+
+      .video-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .video-panel {
+        padding: 20px 18px 60px;
+      }
+    }
+
+    /* ════════════════════════════
+       ACCESS CODE MODAL
+    ════════════════════════════ */
+    .access-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      animation: modalFadeIn 0.2s ease;
+    }
+
+    .access-modal-overlay.active {
+      display: flex;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .access-modal {
+      background: #fff;
+      border-radius: 20px;
+      padding: 36px 32px 28px;
+      width: min(92vw, 380px);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+      position: relative;
+      animation: modalSlideUp 0.25s ease;
+    }
+
+    @keyframes modalSlideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .access-modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: #f1f5f9;
+      color: #475569;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      font-family: inherit;
+    }
+
+    .access-modal-close:hover {
+      background: #e2e8f0;
+    }
+
+    .access-modal-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0F172A;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+
+    .access-modal-desc {
+      font-size: 13px;
+      color: #64748b;
+      text-align: center;
+      margin-bottom: 22px;
+      line-height: 1.5;
+    }
+
+    .access-modal-input {
+      width: 100%;
+      padding: 14px 18px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 700;
+      text-align: center;
+      letter-spacing: 0.2em;
+      color: #0F172A;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: inherit;
+    }
+
+    .access-modal-input:focus {
+      border-color: #00996D;
+    }
+
+    .access-modal-input.error {
+      border-color: #ef4444;
+      animation: shake 0.4s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    .access-modal-error {
+      font-size: 12px;
+      color: #ef4444;
+      text-align: center;
+      margin-top: 8px;
+      min-height: 16px;
+      font-weight: 600;
+    }
+
+    .access-modal-submit {
+      width: 100%;
+      margin-top: 14px;
+      padding: 14px;
+      background: linear-gradient(112.34deg, #68D970 -38.67%, #00996D 99.56%);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      font-family: inherit;
+      letter-spacing: 0.02em;
+    }
+
+    .access-modal-submit:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="page">
+
+    <!-- ───────── HERO ───────── -->
+    <section class="hero">
+      <div class="hero-content">
+        <span class="hero-eyebrow">TB STUDY</span>
+        <h1 class="hero-title">영상 제작의 모든 것,<br />한 곳에서 마스터하세요</h1>
+        <p class="hero-subtitle">단계별 커리큘럼으로 완성하는 프리미엄 영상 클래스. 무엇부터 배우고 싶으신가요?</p>
+      </div>
+    </section>
+
+    <!-- ───────── CARD CAROUSEL ───────── -->
+    <section class="cards-section">
+      <div class="cards-track" id="cardsTrack">
+
+        <button type="button" class="step-card active" data-step="step1">
+          <div class="step-card-check">
+            <svg viewBox="0 0 14 14" fill="none">
+              <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <div class="step-card-visual visual-step1">
+            <span class="step-card-number">1</span>
+          </div>
+          <p class="step-card-label">Step 1</p>
+          <p class="step-card-title">마스터 이미지 만들기</p>
+        </button>
+
+        <button type="button" class="step-card" data-step="step2">
+          <div class="step-card-check">
+            <svg viewBox="0 0 14 14" fill="none">
+              <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <div class="step-card-visual visual-step2">
+            <span class="step-card-number">2</span>
+          </div>
+          <p class="step-card-label">Step 2</p>
+          <p class="step-card-title">뮤직영상 만들기</p>
+        </button>
+
+        <button type="button" class="step-card" data-step="step3">
+          <div class="step-card-check">
+            <svg viewBox="0 0 14 14" fill="none">
+              <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <div class="step-card-visual visual-step3">
+            <img src="/images/3class.jpg?v=4" alt="씨네마틱 인트로 영상" />
+          </div>
+          <p class="step-card-label">Step 3</p>
+          <p class="step-card-title">인트로영상 만들기</p>
+        </button>
+
+        <button type="button" class="step-card" data-step="step4">
+          <div class="step-card-check">
+            <svg viewBox="0 0 14 14" fill="none">
+              <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <div class="step-card-visual visual-step4">
+            <span class="step-card-number">4</span>
+          </div>
+          <p class="step-card-label">Step 4</p>
+          <p class="step-card-title">광고영상 제작</p>
+          <span class="step-card-status">준비중</span>
+        </button>
+
+        <button type="button" class="step-card" data-step="step5">
+          <div class="step-card-check">
+            <svg viewBox="0 0 14 14" fill="none">
+              <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <div class="step-card-visual visual-step5">
+            <span class="step-card-number">5</span>
+          </div>
+          <p class="step-card-label">Step 5</p>
+          <p class="step-card-title">유튜브 수익화과정</p>
+          <span class="step-card-status">준비중</span>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- ───────── CTA ───────── -->
+    <div class="cta-row">
+      <button type="button" class="cta-primary" id="ctaPrimary" onclick="startCurrentStep()">
+        시작하기 →
+      </button>
+      <button type="button" class="cta-watch" onclick="scrollToVideos()">아래에서 미리보기 영상 확인</button>
+    </div>
+
+    <!-- ───────── VIDEO PANEL ───────── -->
+    <section class="video-panel" id="videoPanel">
+      <div class="video-panel-header">
+        <span class="video-panel-eyebrow" id="videoPanelEyebrow">Step 1</span>
+        <h2 class="video-panel-title" id="videoPanelTitle">마스터 이미지 만들기</h2>
+      </div>
+
+      <div class="video-section">
+        <h3 class="video-section-title">이론 영상</h3>
+        <div class="video-grid">
+          <div class="video-slot">
+            <div class="video-slot-placeholder">
+              <svg viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" />
+                <path d="M10 8.5L15.5 12L10 15.5V8.5Z" fill="currentColor" />
+              </svg>
+              <span>영상 1</span>
+            </div>
+          </div>
+          <div class="video-slot">
+            <div class="video-slot-placeholder">
+              <svg viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" />
+                <path d="M10 8.5L15.5 12L10 15.5V8.5Z" fill="currentColor" />
+              </svg>
+              <span>영상 2</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="video-section">
+        <h3 class="video-section-title">실습 영상</h3>
+        <div class="video-grid">
+          <div class="video-slot">
+            <div class="video-slot-placeholder">
+              <svg viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" />
+                <path d="M10 8.5L15.5 12L10 15.5V8.5Z" fill="currentColor" />
+              </svg>
+              <span>영상 1</span>
+            </div>
+          </div>
+          <div class="video-slot">
+            <div class="video-slot-placeholder">
+              <svg viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" />
+                <path d="M10 8.5L15.5 12L10 15.5V8.5Z" fill="currentColor" />
+              </svg>
+              <span>영상 2</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ───────── ACCESS CODE MODAL ───────── -->
+  <div class="access-modal-overlay" id="accessModal" onclick="handleOverlayClick(event)">
+    <div class="access-modal" onclick="event.stopPropagation()">
+      <button type="button" class="access-modal-close" onclick="closeAccessModal()" aria-label="닫기">×</button>
+      <h3 class="access-modal-title">접속코드 입력</h3>
+      <p class="access-modal-desc" id="accessModalDesc">강의를 시작하려면<br />접속코드를 입력해주세요.</p>
+      <input type="text" class="access-modal-input" id="accessCodeInput" placeholder="접속코드" maxlength="20"
+        autocomplete="off" onkeydown="handleKeyDown(event)" oninput="clearError()" />
+      <div class="access-modal-error" id="accessCodeError"></div>
+      <button type="button" class="access-modal-submit" onclick="submitAccessCode()">확인</button>
+    </div>
+  </div>
+
+  <script>
+    /* ──────────────── STEP DATA ──────────────── */
+    const STEPS = {
+      step1: { label: 'Step 1', title: '마스터 이미지 만들기', url: '/lecture/step1', code: null,   ready: true },
+      step2: { label: 'Step 2', title: '뮤직영상 만들기',     url: '/lecture/step2', code: '0410', ready: true },
+      step3: { label: 'Step 3', title: '인트로영상 만들기',   url: '/lecture/step3', code: '0411', ready: true },
+      step4: { label: 'Step 4', title: '광고영상 제작',       url: null,             code: null,   ready: false },
+      step5: { label: 'Step 5', title: '유튜브 수익화과정',   url: null,             code: null,   ready: false },
+    };
+
+    let currentStep = 'step1';
+
+    /* ──────────────── CARD SELECTION ──────────────── */
+    function selectStep(step) {
+      if (!STEPS[step]) return;
+      currentStep = step;
+
+      document.querySelectorAll('.step-card').forEach(card => {
+        card.classList.toggle('active', card.dataset.step === step);
+      });
+
+      const data = STEPS[step];
+      document.getElementById('videoPanelEyebrow').textContent = data.label;
+      document.getElementById('videoPanelTitle').textContent = data.title;
+
+      const cta = document.getElementById('ctaPrimary');
+      if (data.ready) {
+        cta.disabled = false;
+        cta.textContent = '시작하기 →';
+      } else {
+        cta.disabled = true;
+        cta.textContent = '준비중';
+      }
+
+      // Smoothly scroll the selected card into the center of the carousel
+      const activeCard = document.querySelector(`.step-card[data-step="${step}"]`);
+      if (activeCard) {
+        activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+
+    function startCurrentStep() {
+      const data = STEPS[currentStep];
+      if (!data || !data.ready) return;
+      if (data.code) {
+        openAccessModal(currentStep);
+      } else if (data.url) {
+        navigateTop(data.url);
+      }
+    }
+
+    function scrollToVideos() {
+      document.getElementById('videoPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function navigateTop(url) {
+      if (window.top && window.top !== window.self) {
+        window.top.location.href = url;
+      } else {
+        window.location.href = url;
+      }
+    }
+
+    /* ──────────────── ACCESS CODE MODAL ──────────────── */
+    let pendingStep = null;
+
+    function openAccessModal(step) {
+      pendingStep = step;
+      const data = STEPS[step];
+      const desc = document.getElementById('accessModalDesc');
+      desc.innerHTML = `${data.label} 강의를 시작하려면<br />접속코드를 입력해주세요.`;
+
+      const modal = document.getElementById('accessModal');
+      modal.classList.add('active');
+      const input = document.getElementById('accessCodeInput');
+      input.value = '';
+      clearError();
+      setTimeout(() => input.focus(), 50);
+    }
+
+    function closeAccessModal() {
+      document.getElementById('accessModal').classList.remove('active');
+      pendingStep = null;
+      clearError();
+    }
+
+    function handleOverlayClick(e) {
+      if (e.target.id === 'accessModal') closeAccessModal();
+    }
+
+    function handleKeyDown(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submitAccessCode();
+      } else if (e.key === 'Escape') {
+        closeAccessModal();
+      }
+    }
+
+    function clearError() {
+      const input = document.getElementById('accessCodeInput');
+      const error = document.getElementById('accessCodeError');
+      input.classList.remove('error');
+      error.textContent = '';
+    }
+
+    function showError(msg) {
+      const input = document.getElementById('accessCodeInput');
+      const error = document.getElementById('accessCodeError');
+      input.classList.add('error');
+      error.textContent = msg;
+    }
+
+    function submitAccessCode() {
+      const input = document.getElementById('accessCodeInput');
+      const value = input.value.trim();
+      if (!value) {
+        showError('접속코드를 입력해주세요.');
+        return;
+      }
+      const data = STEPS[pendingStep];
+      if (!data || !data.code || !data.url) {
+        showError('알 수 없는 단계입니다.');
+        return;
+      }
+      if (value === data.code) {
+        navigateTop(data.url);
+      } else {
+        showError('접속코드가 올바르지 않습니다.');
+      }
+    }
+
+    /* ──────────────── INIT ──────────────── */
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.step-card').forEach(card => {
+        card.addEventListener('click', () => selectStep(card.dataset.step));
+      });
+      selectStep('step1');
+    });
+  </script>
+
+</body>
+
+</html>
