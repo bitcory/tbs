@@ -1028,35 +1028,54 @@
         }, { passive: false });
 
         // Drag-to-scroll (mouse / pen / touch via Pointer Events)
+        let dragCaptured = false;
+        const DRAG_THRESHOLD = 6;
+
         const onPointerDown = (e) => {
           // Only primary button for mouse
           if (e.pointerType === 'mouse' && e.button !== 0) return;
           isDragging = true;
+          dragCaptured = false;
           dragMoved = 0;
           dragStartX = e.clientX;
           dragStartScrollLeft = track.scrollLeft;
-          track.style.cursor = 'grabbing';
-          track.style.scrollSnapType = 'none';
-          // Disable smooth scroll while dragging so it follows the cursor 1:1
-          track.style.scrollBehavior = 'auto';
-          try { track.setPointerCapture(e.pointerId); } catch (_) {}
+          // Don't capture pointer yet — only after threshold is exceeded.
+          // This way pure clicks still bubble normally to the card click handler.
         };
 
         const onPointerMove = (e) => {
           if (!isDragging) return;
           const dx = e.clientX - dragStartX;
           dragMoved = Math.max(dragMoved, Math.abs(dx));
-          track.scrollLeft = dragStartScrollLeft - dx;
+          if (!dragCaptured && dragMoved > DRAG_THRESHOLD) {
+            // Threshold passed — start the actual drag
+            dragCaptured = true;
+            track.style.cursor = 'grabbing';
+            track.style.scrollSnapType = 'none';
+            track.style.scrollBehavior = 'auto';
+            try { track.setPointerCapture(e.pointerId); } catch (_) {}
+          }
+          if (dragCaptured) {
+            track.scrollLeft = dragStartScrollLeft - dx;
+          }
         };
 
         const onPointerUp = (e) => {
           if (!isDragging) return;
           isDragging = false;
-          track.style.cursor = '';
-          track.style.scrollBehavior = '';
-          // Re-enable snap; it will snap to the nearest card
-          track.style.scrollSnapType = 'x mandatory';
-          try { track.releasePointerCapture(e.pointerId); } catch (_) {}
+          if (dragCaptured) {
+            track.style.cursor = '';
+            track.style.scrollBehavior = '';
+            track.style.scrollSnapType = 'x mandatory';
+            try { track.releasePointerCapture(e.pointerId); } catch (_) {}
+          } else {
+            // Pure click — fallback selection in case the native click event
+            // doesn't reach the card (e.g., pointer-capture edge cases)
+            const el = document.elementFromPoint(e.clientX, e.clientY);
+            const card = el && el.closest && el.closest('.step-card');
+            if (card && card.dataset.step) selectStep(card.dataset.step);
+          }
+          dragCaptured = false;
         };
 
         track.addEventListener('pointerdown', onPointerDown);
