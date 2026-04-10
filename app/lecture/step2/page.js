@@ -4,8 +4,11 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft, Upload, Copy, Clipboard, ExternalLink, Gem, X,
-  Clapperboard, Image as ImageIcon, Film, Layers, Palette, List, Music, Scissors,
+  Clapperboard, Image as ImageIcon, Film, Layers, Palette, List, Music, Scissors, Droplets, Wrench,
 } from 'lucide-react';
+import dynamic from 'next/dynamic';
+const FrameExtractor = dynamic(() => import('@/app/components/FrameExtractor'), { ssr: false });
+const WatermarkRemover = dynamic(() => import('@/app/components/WatermarkRemover'), { ssr: false });
 
 const CACHE_KEY = 'toolb_step2_storyboard';
 
@@ -194,6 +197,7 @@ export default function Step2Page() {
   const [uploadError, setUploadError] = useState('');
   const [toast, setToast] = useState('');
   const [hydrated, setHydrated] = useState(false);
+  const [toolView, setToolView] = useState(null);
   const [pendingScrollId, setPendingScrollId] = useState(null);
   const sceneRefs = useRef({});
 
@@ -355,74 +359,43 @@ export default function Step2Page() {
                     <span className="text-sm text-zinc-100 font-bold flex-1">{storyboard.meta.subject_type}</span>
                   </div>
                 )}
-                {storyboard.meta.mood && (
-                  <div className="flex items-start gap-2">
-                    <span className="text-sm text-zinc-500 font-medium w-14 pt-0.5">무드</span>
-                    <span className="text-sm text-zinc-100 font-bold flex-1">{storyboard.meta.mood}</span>
-                  </div>
-                )}
-                {storyboard.meta.style && (
-                  <div className="flex items-start gap-2">
-                    <span className="text-sm text-zinc-500 font-medium w-14 pt-0.5">스타일</span>
-                    <span className="text-sm text-zinc-100 font-bold flex-1 line-clamp-2">{storyboard.meta.style}</span>
-                  </div>
-                )}
-                {storyboard.meta.color_palette?.length > 0 && (
-                  <div className="flex items-start gap-2 pt-1">
-                    <span className="text-sm text-zinc-500 font-medium w-14 pt-0.5 flex items-center gap-1">
-                      <Palette className="w-3 h-3" /> 팔레트
-                    </span>
-                    <div className="flex flex-wrap gap-1 flex-1">
-                      {storyboard.meta.color_palette.map((c, i) => (
-                        <span
-                          key={i}
-                          className="w-5 h-5 rounded border border-white/[0.1]"
-                          style={{ background: c }}
-                          title={c}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             ) : (
               <p className="text-[13px] text-zinc-600">JSON을 업로드하면 표시됩니다.</p>
             )}
           </div>
 
-          {/* Scene list */}
-          {storyboard && (
-            <div className="p-4 border-b border-white/[0.06]">
-              <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-zinc-500">
-                <List className="w-3.5 h-3.5" />
-                씬 목록 ({storyboard.scenes.length})
-              </div>
-              <div className="space-y-0.5 max-h-[40vh] overflow-y-auto">
-                {storyboard.scenes.map((scene) => {
-                  const actIdx = ACTS.indexOf(scene.act);
-                  const tc = ACT_COLORS[actIdx] || ACT_COLORS[0];
-                  return (
-                    <button
-                      key={scene.id}
-                      onClick={() => scrollToScene(scene.id)}
-                      className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-sm font-semibold text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-100 transition-colors text-left"
-                    >
-                      <span className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-white/[0.04] border border-white/[0.06] text-zinc-300 flex-shrink-0">
-                        #{String(scene.scene_number).padStart(2, '0')}
-                      </span>
-                      <span className="truncate flex-1">{scene.title}</span>
-                      <span
-                        className="text-[11px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0"
-                        style={{ background: `${tc.dot}25`, color: tc.dot }}
-                      >
-                        {scene.act}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
+          {/* Tools */}
+          <div className="p-4 border-b border-white/[0.06]">
+            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-zinc-500">
+              <Wrench className="w-3.5 h-3.5" />
+              도구
             </div>
-          )}
+            <div className="space-y-1">
+              <button
+                onClick={() => setToolView(toolView === 'frame-extractor' ? null : 'frame-extractor')}
+                className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm font-bold border-l-2 transition-colors ${
+                  toolView === 'frame-extractor'
+                    ? 'bg-amber-500/10 border-amber-500 text-amber-300'
+                    : 'border-transparent text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-100'
+                }`}
+              >
+                <Film className="w-4 h-4" />
+                프레임추출기
+              </button>
+              <button
+                onClick={() => setToolView(toolView === 'watermark-remover' ? null : 'watermark-remover')}
+                className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm font-bold border-l-2 transition-colors ${
+                  toolView === 'watermark-remover'
+                    ? 'bg-violet-500/10 border-violet-500 text-violet-300'
+                    : 'border-transparent text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-100'
+                }`}
+              >
+                <Droplets className="w-4 h-4" />
+                워터마크제거
+              </button>
+            </div>
+          </div>
 
           {/* Gem guide */}
           <div className="p-4 space-y-2">
@@ -451,6 +424,17 @@ export default function Step2Page() {
               핀터레스트
             </a>
             <a
+              href="https://gemini.google.com/"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold transition-colors"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M11.04 19.32Q12 18.72 12.84 17.76Q13.68 16.8 14.04 15.6H11.04V19.32ZM9 19.68V15.6H5.58Q6.18 17.04 7.32 18.06Q8.46 19.08 9 19.68ZM5.1 14.4H9V10.2H4.62Q4.44 10.8 4.38 11.28Q4.32 11.76 4.32 12.24Q4.32 13.08 4.5 13.68Q4.68 14.28 5.1 14.4ZM10.2 14.4H13.8V10.2H10.2V14.4ZM14.4 9H19.08Q18.72 8.04 18.12 7.2Q17.52 6.36 16.74 5.7Q15.72 6.48 14.88 7.08Q14.04 7.68 14.4 9ZM9 9H13.44Q13.08 7.68 12.36 6.6Q11.64 5.52 10.68 4.68Q9.72 5.52 9 6.6Q8.28 7.68 9 9ZM4.92 9H9.36Q9 8.04 8.7 7.2Q8.4 6.36 7.98 5.64Q7.08 6.24 6.36 7.08Q5.64 7.92 4.92 9ZM12 21.6Q10.68 21.6 9.42 21.12Q8.16 20.64 7.14 19.86Q6.12 19.08 5.34 18.06Q4.56 17.04 4.08 15.78Q3.6 14.52 3.6 13.2Q3.6 10.68 5.04 8.64Q6.48 6.6 8.76 5.52Q8.16 4.56 7.68 3.48Q7.2 2.4 6.96 1.2H8.16Q8.4 2.16 8.76 3.06Q9.12 3.96 9.6 4.68Q10.32 4.2 11.16 3.96Q12 3.72 12 3.72Q12 3.72 12.84 3.96Q13.68 4.2 14.4 4.68Q14.88 3.96 15.24 3.06Q15.6 2.16 15.84 1.2H17.04Q16.8 2.4 16.32 3.48Q15.84 4.56 15.24 5.52Q17.52 6.6 18.96 8.64Q20.4 10.68 20.4 13.2Q20.4 14.52 19.92 15.78Q19.44 17.04 18.66 18.06Q17.88 19.08 16.86 19.86Q15.84 20.64 14.58 21.12Q13.32 21.6 12 21.6Z" />
+              </svg>
+              제미나이
+            </a>
+            <a
               href="https://splitter.aitoolb.com/"
               target="_blank"
               rel="noreferrer"
@@ -468,12 +452,25 @@ export default function Step2Page() {
               <Music className="w-4 h-4" />
               음악만들기
             </a>
+            <a
+              href="https://grok.com/"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-white text-sm font-bold transition-colors"
+            >
+              <ExternalLink className="w-4 h-4" />
+              Grok 바로가기
+            </a>
           </div>
         </aside>
 
         {/* Main */}
         <main className="flex-1 min-w-0 flex flex-col md:overflow-hidden">
-          {!storyboard ? (
+          {toolView === 'frame-extractor' ? (
+            <FrameExtractor accentColor="#f59e0b" />
+          ) : toolView === 'watermark-remover' ? (
+            <WatermarkRemover accentColor="#8b5cf6" />
+          ) : !storyboard ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-10">
               <div className="w-20 h-20 mb-5 rounded-full flex items-center justify-center bg-white/[0.04] border border-white/[0.06]">
                 <Clapperboard className="w-10 h-10 text-zinc-600" />
