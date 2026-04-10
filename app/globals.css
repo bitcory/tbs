@@ -12,10 +12,6 @@ body {
   height: 100%;
 }
 
-html {
-  zoom: 0.8;
-}
-
 body {
   color: var(--foreground);
   background: var(--background);
