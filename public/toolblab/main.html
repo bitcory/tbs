@@ -173,11 +173,11 @@
 
     .cards-track {
       display: flex;
-      gap: 22px;
+      gap: 18px;
       overflow-x: auto;
       scroll-snap-type: x mandatory;
       scroll-behavior: smooth;
-      padding: 40px max(24px, calc(50% - 170px)) 40px;
+      padding: 30px max(24px, calc(50% - 130px)) 30px;
       scrollbar-width: none;
     }
 
@@ -186,13 +186,13 @@
     }
 
     .step-card {
-      flex: 0 0 320px;
+      flex: 0 0 240px;
       scroll-snap-align: center;
       background: #fff;
-      border-radius: 22px;
-      padding: 44px 22px 24px;
+      border-radius: 18px;
+      padding: 36px 18px 20px;
       border: 2px solid transparent;
-      box-shadow: 0 18px 42px rgba(15, 23, 42, 0.12);
+      box-shadow: 0 14px 36px rgba(15, 23, 42, 0.12);
       cursor: pointer;
       text-align: left;
       font-family: inherit;
@@ -231,8 +231,8 @@
 
     .step-card-check {
       position: absolute;
-      top: 12px;
-      right: 18px;
+      top: 8px;
+      right: 14px;
       width: 24px;
       height: 24px;
       border-radius: 7px;
@@ -264,9 +264,9 @@
       position: relative;
       width: 100%;
       aspect-ratio: 1.35;
-      border-radius: 16px;
+      border-radius: 12px;
       overflow: hidden;
-      margin-bottom: 18px;
+      margin-bottom: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -329,7 +329,7 @@
     }
 
     .step-card-title {
-      font-size: 17px;
+      font-size: 15px;
       font-weight: 700;
       color: #0f172a;
       line-height: 1.4;
@@ -351,7 +351,7 @@
     ════════════════════════════ */
     .cta-row {
       text-align: center;
-      padding: 8px 24px 32px;
+      padding: 4px 24px 24px;
     }
 
     .cta-primary {
@@ -468,8 +468,10 @@
     }
 
     .video-grid.single-col {
-      grid-template-columns: 1fr;
-      max-width: 720px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
     }
 
     .video-slot {
@@ -483,13 +485,16 @@
 
     .video-grid.single-col .video-slot {
       aspect-ratio: auto;
+      width: auto;
+      max-width: 100%;
     }
 
     .video-grid.single-col .video-slot video {
-      width: 100%;
+      display: block;
+      width: auto;
       height: auto;
+      max-width: 100%;
       max-height: 80vh;
-      object-fit: contain;
     }
 
     .video-slot video,
@@ -534,24 +539,24 @@
       }
 
       .step-card {
-        flex: 0 0 280px;
+        flex: 0 0 220px;
       }
 
       .cards-track {
-        padding-left: max(20px, calc(50% - 150px));
-        padding-right: max(20px, calc(50% - 150px));
+        padding-left: max(20px, calc(50% - 120px));
+        padding-right: max(20px, calc(50% - 120px));
       }
     }
 
     @media (max-width: 640px) {
       .step-card {
-        flex: 0 0 78vw;
+        flex: 0 0 65vw;
       }
 
       .cards-track {
-        padding-left: 11vw;
-        padding-right: 11vw;
-        gap: 16px;
+        padding-left: 17vw;
+        padding-right: 17vw;
+        gap: 14px;
       }
 
       .video-grid {
@@ -866,7 +871,7 @@
           title: '뮤직영상 미리보기',
           items: [
             { type: 'video', src: 'https://www.dropbox.com/scl/fi/yuu422j08cwsdb4f9dtbn/ED334F8B-B0CF-4A63-8B30-1B298765E6AC_video.MP4?rlkey=7qjv80w77a6qnhmmx2hxzyzxn&st=5m4j3mh2&raw=1' },
-            { type: 'placeholder', label: '영상 2' },
+            { type: 'video', src: 'https://www.dropbox.com/scl/fi/sprxx6bx1n1fax0osnpu0/.mp4?rlkey=bzvwjmb02j0v40i7ju90y3axd&st=pz8x7xn2&raw=1' },
           ],
         },
         {
@@ -882,7 +887,7 @@
           title: '인트로 영상',
           items: [
             { type: 'video', src: 'https://www.dropbox.com/scl/fi/zoxv7mrxgiykvycw98uzr/64FD93FB-9842-4116-A7CE-B6B6A26F6619_video.MP4?rlkey=4y5km1fa7slcw9vr8sdcqxsf5&st=wnlnkl49&raw=1' },
-            { type: 'placeholder', label: '영상 2' },
+            { type: 'video', src: 'https://www.dropbox.com/scl/fi/rgzsn6qqbz0cmwf0hhh8a/2.mp4?rlkey=cjpdtlfg0m05ta2v0hts68bov&st=n7oqdozj&raw=1' },
           ],
         },
         {
@@ -957,7 +962,7 @@
         }
         if (item.type === 'video') {
           const poster = item.poster ? ` poster="${item.poster}"` : '';
-          return `<video src="${item.src}"${poster} controls preload="metadata" playsinline style="width:100%;height:100%;object-fit:cover;display:block;background:#000;"></video>`;
+          return `<video src="${item.src}"${poster} controls preload="metadata" playsinline></video>`;
         }
         return `<div class="video-slot-placeholder">${placeholderSvg}<span>${item.label || ''}</span></div>`;
       };
