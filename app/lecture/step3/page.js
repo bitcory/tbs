@@ -420,15 +420,6 @@ export default function Step3Page() {
               제미나이
             </a>
             <a
-              href="https://gemini.google.com/gem/1Wy6XhDIfeb1rO9AiYYDMdc6-wDoixF60?usp=sharing"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-lg bg-rose-500 hover:bg-rose-400 text-white text-sm font-bold transition-colors"
-            >
-              <Music className="w-4 h-4" />
-              음악만들기
-            </a>
-            <a
               href="https://grok.com/"
               target="_blank"
               rel="noreferrer"
@@ -436,6 +427,15 @@ export default function Step3Page() {
             >
               <ExternalLink className="w-4 h-4" />
               Grok 바로가기
+            </a>
+            <a
+              href="https://gemini.google.com/gem/1Wy6XhDIfeb1rO9AiYYDMdc6-wDoixF60?usp=sharing"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-lg bg-rose-500 hover:bg-rose-400 text-white text-sm font-bold transition-colors"
+            >
+              <Music className="w-4 h-4" />
+              음악만들기
             </a>
           </div>
         </aside>
