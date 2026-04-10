@@ -17,7 +17,7 @@ const paperlogy = localFont({
 });
 
 // ─── Site constants ─────────────────────────────────────
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://tbstudy.vercel.app';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://tbs.aitoolb.com';
 const SITE_NAME = 'TB STUDY';
 const SITE_TITLE = 'TB STUDY - AI 영상 제작 학습실';
 const SITE_DESCRIPTION =
