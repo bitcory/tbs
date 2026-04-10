@@ -451,6 +451,11 @@
       gap: 16px;
     }
 
+    .video-grid.single-col {
+      grid-template-columns: 1fr;
+      max-width: 720px;
+    }
+
     .video-slot {
       background: #0f172a;
       border-radius: 16px;
@@ -458,6 +463,17 @@
       aspect-ratio: 16/9;
       position: relative;
       box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+    }
+
+    .video-grid.single-col .video-slot {
+      aspect-ratio: auto;
+    }
+
+    .video-grid.single-col .video-slot video {
+      width: 100%;
+      height: auto;
+      max-height: 80vh;
+      object-fit: contain;
     }
 
     .video-slot video,
@@ -779,53 +795,7 @@
         <h2 class="video-panel-title" id="videoPanelTitle">마스터 이미지 만들기</h2>
       </div>
 
-      <div class="video-section">
-        <h3 class="video-section-title">이론 영상</h3>
-        <div class="video-grid">
-          <div class="video-slot">
-            <div class="video-slot-placeholder">
-              <svg viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" />
-                <path d="M10 8.5L15.5 12L10 15.5V8.5Z" fill="currentColor" />
-              </svg>
-              <span>영상 1</span>
-            </div>
-          </div>
-          <div class="video-slot">
-            <div class="video-slot-placeholder">
-              <svg viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" />
-                <path d="M10 8.5L15.5 12L10 15.5V8.5Z" fill="currentColor" />
-              </svg>
-              <span>영상 2</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="video-section">
-        <h3 class="video-section-title">실습 영상</h3>
-        <div class="video-grid">
-          <div class="video-slot">
-            <div class="video-slot-placeholder">
-              <svg viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" />
-                <path d="M10 8.5L15.5 12L10 15.5V8.5Z" fill="currentColor" />
-              </svg>
-              <span>영상 1</span>
-            </div>
-          </div>
-          <div class="video-slot">
-            <div class="video-slot-placeholder">
-              <svg viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" />
-                <path d="M10 8.5L15.5 12L10 15.5V8.5Z" fill="currentColor" />
-              </svg>
-              <span>영상 2</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div id="videoSectionsContainer"></div>
     </section>
 
   </main>
@@ -853,6 +823,79 @@
       step5: { label: 'Step 5', title: '유튜브 수익화과정',   url: null,             code: null,   ready: false },
     };
 
+    /* Per-step media for the panel below.
+       Supported item types:
+         - { type: 'image', src, alt }      → <img>
+         - { type: 'video', src, poster? }  → <video controls>
+         - { type: 'placeholder', label }   → empty slot with play icon */
+    const STEP_MEDIA = {
+      step1: [
+        {
+          title: '캐릭터 & 컨셉 시안',
+          items: [
+            { type: 'image', src: '/images/step1/character-sheet.png', alt: '캐릭터 시트' },
+            { type: 'image', src: '/images/step1/sample-2.png',         alt: '컨셉 시안' },
+          ],
+        },
+        {
+          title: '마스터 이미지 & 작업물',
+          items: [
+            { type: 'image', src: '/images/step1/sample-1.png', alt: '작업물 샘플' },
+            { type: 'image', src: '/images/step1/master.png',   alt: '마스터 이미지' },
+          ],
+        },
+      ],
+      step2: [
+        {
+          title: '뮤직영상 미리보기',
+          items: [
+            { type: 'video', src: 'https://www.dropbox.com/scl/fi/yuu422j08cwsdb4f9dtbn/ED334F8B-B0CF-4A63-8B30-1B298765E6AC_video.MP4?rlkey=7qjv80w77a6qnhmmx2hxzyzxn&st=5m4j3mh2&raw=1' },
+            { type: 'placeholder', label: '영상 2' },
+          ],
+        },
+        {
+          title: '실습 영상',
+          items: [
+            { type: 'placeholder', label: '영상 1' },
+            { type: 'placeholder', label: '영상 2' },
+          ],
+        },
+      ],
+      step3: [
+        {
+          title: '인트로 영상',
+          items: [
+            { type: 'video', src: 'https://www.dropbox.com/scl/fi/zoxv7mrxgiykvycw98uzr/64FD93FB-9842-4116-A7CE-B6B6A26F6619_video.MP4?rlkey=4y5km1fa7slcw9vr8sdcqxsf5&st=wnlnkl49&raw=1' },
+            { type: 'placeholder', label: '영상 2' },
+          ],
+        },
+        {
+          title: '실습 영상',
+          items: [
+            { type: 'placeholder', label: '영상 1' },
+            { type: 'placeholder', label: '영상 2' },
+          ],
+        },
+      ],
+    };
+
+      step5: [
+        {
+          title: '영상 모아보기',
+          layout: 'single',
+          items: [
+            { type: 'video', src: 'https://www.dropbox.com/scl/fi/eq6sqon5ew823djthwfsu/E3FD3A0C-CAAB-4AA1-A4A4-52CE3BDEC876_video.MP4?rlkey=y4yzfvrgzzc4y6d84zwgggb75&st=1me9wr60&raw=1' },
+          ],
+        },
+      ],
+    };
+
+    /* Default video panel layout for steps that don't have media yet */
+    const DEFAULT_MEDIA = [
+      { title: '이론 영상', items: [{ type: 'placeholder', label: '영상 1' }, { type: 'placeholder', label: '영상 2' }] },
+      { title: '실습 영상', items: [{ type: 'placeholder', label: '영상 1' }, { type: 'placeholder', label: '영상 2' }] },
+    ];
+
     let currentStep = 'step1';
 
     /* ──────────────── CARD SELECTION ──────────────── */
@@ -877,9 +920,45 @@
         cta.textContent = '준비중';
       }
 
+      // Render the per-step media panel below
+      renderMediaPanel(step);
+
       // Smoothly center the selected card horizontally inside the track
       // (without affecting the page's vertical scroll)
       centerCardInTrack(step);
+    }
+
+    function renderMediaPanel(step) {
+      const container = document.getElementById('videoSectionsContainer');
+      if (!container) return;
+      const sections = STEP_MEDIA[step] || DEFAULT_MEDIA;
+      const placeholderSvg = `
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" />
+          <path d="M10 8.5L15.5 12L10 15.5V8.5Z" fill="currentColor" />
+        </svg>`;
+      const renderItem = (item) => {
+        if (item.type === 'image') {
+          return `<img src="${item.src}" alt="${item.alt || ''}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;" draggable="false" />`;
+        }
+        if (item.type === 'video') {
+          const poster = item.poster ? ` poster="${item.poster}"` : '';
+          return `<video src="${item.src}"${poster} controls preload="metadata" playsinline style="width:100%;height:100%;object-fit:cover;display:block;background:#000;"></video>`;
+        }
+        return `<div class="video-slot-placeholder">${placeholderSvg}<span>${item.label || ''}</span></div>`;
+      };
+      container.innerHTML = sections.map(section => {
+        const gridClass = section.layout === 'single' ? 'video-grid single-col' : 'video-grid';
+        return `
+          <div class="video-section">
+            <h3 class="video-section-title">${section.title}</h3>
+            <div class="${gridClass}">
+              ${section.items.map(item => `
+                <div class="video-slot">${renderItem(item)}</div>
+              `).join('')}
+            </div>
+          </div>`;
+      }).join('');
     }
 
     function centerCardInTrack(step) {
@@ -1016,15 +1095,7 @@
       });
       selectStep('step1');
 
-      // Mouse wheel → horizontal scroll on the cards track
       if (track) {
-        track.addEventListener('wheel', (e) => {
-          // Translate vertical wheel into horizontal scroll
-          if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-            e.preventDefault();
-            track.scrollLeft += e.deltaY;
-          }
-        }, { passive: false });
 
         // Drag-to-scroll (mouse / pen / touch via Pointer Events)
         let dragCaptured = false;
