@@ -302,82 +302,154 @@ export default function Step2Page() {
   const allVideoPrompts = storyboard ? storyboard.scenes.map(s => s.prompts.video.prompt).join('\n\n') : '';
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100">
-      {/* Header */}
-      <header className="sticky top-0 z-30 bg-zinc-900/90 backdrop-blur-xl border-b border-white/[0.06] flex items-center px-3 sm:px-5 h-16 gap-2 sm:gap-3">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-sm sm:text-base font-bold text-emerald-400 tracking-wider">TOOLB LAB</span>
+    <div className="min-h-screen bg-[#f8fafc] text-[#0f172a]">
+      <style jsx global>{`
+        .tb-hero {
+          position: relative;
+          padding: 28px 20px 72px;
+          background: linear-gradient(135deg, #016837 0%, #00996D 45%, #00B380 100%);
+          color: #fff;
+          text-align: center;
+          overflow: hidden;
+        }
+        .tb-hero::before {
+          content: '';
+          position: absolute; inset: 0;
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
+          mix-blend-mode: overlay;
+          pointer-events: none;
+        }
+        .tb-hero::after {
+          content: '';
+          position: absolute; left: -10%; right: -10%; bottom: -1px;
+          height: 60px;
+          background: #f8fafc;
+          border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+        }
+        .tb-hero-glow {
+          position: absolute; top: -40px; right: -60px; width: 260px; height: 260px;
+          background: radial-gradient(circle, rgba(255,255,255,0.22), transparent 60%);
+          filter: blur(30px);
+          pointer-events: none;
+        }
+        .tb-hero-eyebrow {
+          display: inline-block;
+          font-size: 11px; font-weight: 800;
+          letter-spacing: 0.28em; text-transform: uppercase;
+          padding: 6px 14px; border-radius: 100px;
+          background: rgba(255,255,255,0.16);
+          border: 1px solid rgba(255,255,255,0.35);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          margin-bottom: 14px;
+        }
+        .tb-hero-title {
+          font-size: clamp(26px, 7vw, 34px);
+          font-weight: 900;
+          line-height: 1.2;
+          letter-spacing: -0.01em;
+          position: relative;
+          z-index: 2;
+        }
+        .tb-glass-bar {
+          position: relative; z-index: 3;
+          margin: -22px 16px 0;
+          padding: 10px 14px;
+          display: flex; align-items: center; gap: 10px;
+          background: rgba(255,255,255,0.7);
+          border: 1px solid rgba(255,255,255,0.9);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border-radius: 100px;
+          box-shadow: 0 18px 40px rgba(15, 23, 42, 0.1);
+        }
+        .tb-pill-primary {
+          background: linear-gradient(112.34deg, #68D970 -38.67%, #00996D 99.56%);
+          color: #fff;
+          box-shadow: 0 10px 24px rgba(0, 153, 109, 0.3);
+        }
+        .tb-pill-primary:hover { opacity: 0.94; }
+        .tb-pill-ghost {
+          background: #fff;
+          color: #334155;
+          border: 1px solid #e2e8f0;
+        }
+        .tb-pill-ghost:hover { background: #f1f5f9; }
+      `}</style>
+
+      {/* Hero */}
+      <section className="tb-hero">
+        <div className="tb-hero-glow" />
+        <span className="tb-hero-eyebrow">TB STUDY · STEP 2</span>
+        <h1 className="tb-hero-title">뮤직영상 만들기</h1>
+      </section>
+
+      {/* Glass bar */}
+      <div className="tb-glass-bar">
+        <Link href="/" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full tb-pill-ghost text-xs sm:text-sm font-bold transition">
+          <ArrowLeft className="w-3.5 h-3.5" />
+          홈
         </Link>
-        <span className="text-zinc-700 hidden sm:inline">/</span>
-        <span className="text-sm text-zinc-400 hidden sm:inline truncate">
-          <span className="text-zinc-100 font-bold">2단계</span> 1분 영상 만들기
-        </span>
-        <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+        <span className="text-[11px] font-bold tracking-[0.18em] text-[#00996D] uppercase hidden sm:inline">TOOLB LAB</span>
+        <div className="ml-auto flex items-center gap-2">
           <button
             onClick={() => { setUploadOpen(true); setUploadError(''); setJsonInput(''); }}
-            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 text-xs sm:text-sm font-bold transition-colors"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full tb-pill-primary text-xs sm:text-sm font-bold transition"
           >
-            <Upload className="w-4 h-4" />
+            <Upload className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">JSON </span>업로드
           </button>
-          <Link
-            href="/"
-            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300 text-xs sm:text-sm font-bold transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            홈
-          </Link>
         </div>
-      </header>
+      </div>
 
-      <div className="flex flex-col md:flex-row md:h-[calc(100vh-64px)]">
+      <div className="flex flex-col md:flex-row md:h-[calc(100vh-220px)] w-full px-4 pt-6 gap-4 2xl:px-6">
         {/* Sidebar */}
-        <aside className="w-full md:w-[300px] flex-shrink-0 border-b md:border-b-0 md:border-r border-white/[0.06] bg-zinc-900/40 md:overflow-y-auto">
+        <aside className="w-full md:w-[300px] flex-shrink-0 bg-white border border-[#e2e8f0] rounded-2xl shadow-[0_8px_24px_rgba(15,23,42,0.06)] md:overflow-y-auto">
           {/* Storyboard meta */}
-          <div className="p-4 border-b border-white/[0.06]">
-            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-zinc-500">
+          <div className="p-4 border-b border-[#e2e8f0]">
+            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#64748b]">
               <Clapperboard className="w-3.5 h-3.5" />
               스토리보드 정보
             </div>
             {storyboard ? (
               <div className="space-y-1.5">
                 <div className="flex items-start gap-2">
-                  <span className="text-sm text-zinc-500 font-medium w-14 pt-0.5">제목</span>
-                  <span className="text-sm text-zinc-100 font-bold flex-1 break-all">{storyboard.title}</span>
+                  <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">제목</span>
+                  <span className="text-sm text-[#0f172a] font-bold flex-1 break-all">{storyboard.title}</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-sm text-zinc-500 font-medium w-14 pt-0.5">씬 수</span>
-                  <span className="text-sm text-zinc-100 font-bold flex-1">{storyboard.meta.total_scenes}개</span>
+                  <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">씬 수</span>
+                  <span className="text-sm text-[#0f172a] font-bold flex-1">{storyboard.meta.total_scenes}개</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-sm text-zinc-500 font-medium w-14 pt-0.5">비율</span>
-                  <span className="text-sm text-zinc-100 font-bold flex-1">{storyboard.meta.aspect_ratio}</span>
+                  <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">비율</span>
+                  <span className="text-sm text-[#0f172a] font-bold flex-1">{storyboard.meta.aspect_ratio}</span>
                 </div>
                 {storyboard.meta.subject_type && (
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-zinc-500 font-medium w-14 pt-0.5">피사체</span>
-                    <span className="text-sm text-zinc-100 font-bold flex-1">{storyboard.meta.subject_type}</span>
+                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">피사체</span>
+                    <span className="text-sm text-[#0f172a] font-bold flex-1">{storyboard.meta.subject_type}</span>
                   </div>
                 )}
               </div>
             ) : (
-              <p className="text-[13px] text-zinc-600">JSON을 업로드하면 표시됩니다.</p>
+              <p className="text-[13px] text-[#64748b]">JSON을 업로드하면 표시됩니다.</p>
             )}
           </div>
 
           {/* Tools */}
-          <div className="p-4 border-b border-white/[0.06]">
-            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-zinc-500">
+          <div className="p-4 border-b border-[#e2e8f0]">
+            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#64748b]">
               <Wrench className="w-3.5 h-3.5" />
               도구
             </div>
             <div className="space-y-1">
               <button
                 onClick={() => setToolView(toolView === 'frame-extractor' ? null : 'frame-extractor')}
-                className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm font-bold border-l-2 transition-colors ${
+                className={`w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition ${
                   toolView === 'frame-extractor'
-                    ? 'bg-amber-500/10 border-amber-500 text-amber-300'
-                    : 'border-transparent text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-100'
+                    ? 'tb-pill-primary'
+                    : 'text-[#334155] bg-[#f1f5f9] hover:bg-[#e2e8f0]'
                 }`}
               >
                 <Film className="w-4 h-4" />
@@ -385,10 +457,10 @@ export default function Step2Page() {
               </button>
               <button
                 onClick={() => setToolView(toolView === 'watermark-remover' ? null : 'watermark-remover')}
-                className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm font-bold border-l-2 transition-colors ${
+                className={`w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition ${
                   toolView === 'watermark-remover'
-                    ? 'bg-violet-500/10 border-violet-500 text-violet-300'
-                    : 'border-transparent text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-100'
+                    ? 'tb-pill-primary'
+                    : 'text-[#334155] bg-[#f1f5f9] hover:bg-[#e2e8f0]'
                 }`}
               >
                 <Droplets className="w-4 h-4" />
@@ -399,7 +471,7 @@ export default function Step2Page() {
 
           {/* Gem guide */}
           <div className="p-4 space-y-2">
-            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-zinc-500">
+            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#64748b]">
               <Gem className="w-3.5 h-3.5" />
               젬 가이드
             </div>
@@ -407,18 +479,18 @@ export default function Step2Page() {
               href="https://gemini.google.com/gem/1iYuCK_8NICPr2WZAw8Eggsy1_dT2lHhm?usp=sharing"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 text-sm font-bold transition-colors"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full tb-pill-primary text-sm font-bold transition"
             >
-              <ExternalLink className="w-4 h-4" />
+              <ExternalLink className="w-3.5 h-3.5" />
               2단계 젬 가이드 열기
             </a>
             <a
               href="https://kr.pinterest.com/"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm font-bold transition-colors"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#E60023] hover:opacity-90 text-white text-sm font-bold transition"
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z" />
               </svg>
               핀터레스트
@@ -427,9 +499,9 @@ export default function Step2Page() {
               href="https://gemini.google.com/"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold transition-colors"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#1a73e8] hover:opacity-90 text-white text-sm font-bold transition"
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M11.04 19.32Q12 18.72 12.84 17.76Q13.68 16.8 14.04 15.6H11.04V19.32ZM9 19.68V15.6H5.58Q6.18 17.04 7.32 18.06Q8.46 19.08 9 19.68ZM5.1 14.4H9V10.2H4.62Q4.44 10.8 4.38 11.28Q4.32 11.76 4.32 12.24Q4.32 13.08 4.5 13.68Q4.68 14.28 5.1 14.4ZM10.2 14.4H13.8V10.2H10.2V14.4ZM14.4 9H19.08Q18.72 8.04 18.12 7.2Q17.52 6.36 16.74 5.7Q15.72 6.48 14.88 7.08Q14.04 7.68 14.4 9ZM9 9H13.44Q13.08 7.68 12.36 6.6Q11.64 5.52 10.68 4.68Q9.72 5.52 9 6.6Q8.28 7.68 9 9ZM4.92 9H9.36Q9 8.04 8.7 7.2Q8.4 6.36 7.98 5.64Q7.08 6.24 6.36 7.08Q5.64 7.92 4.92 9ZM12 21.6Q10.68 21.6 9.42 21.12Q8.16 20.64 7.14 19.86Q6.12 19.08 5.34 18.06Q4.56 17.04 4.08 15.78Q3.6 14.52 3.6 13.2Q3.6 10.68 5.04 8.64Q6.48 6.6 8.76 5.52Q8.16 4.56 7.68 3.48Q7.2 2.4 6.96 1.2H8.16Q8.4 2.16 8.76 3.06Q9.12 3.96 9.6 4.68Q10.32 4.2 11.16 3.96Q12 3.72 12 3.72Q12 3.72 12.84 3.96Q13.68 4.2 14.4 4.68Q14.88 3.96 15.24 3.06Q15.6 2.16 15.84 1.2H17.04Q16.8 2.4 16.32 3.48Q15.84 4.56 15.24 5.52Q17.52 6.6 18.96 8.64Q20.4 10.68 20.4 13.2Q20.4 14.52 19.92 15.78Q19.44 17.04 18.66 18.06Q17.88 19.08 16.86 19.86Q15.84 20.64 14.58 21.12Q13.32 21.6 12 21.6Z" />
               </svg>
               제미나이
@@ -438,81 +510,81 @@ export default function Step2Page() {
               href="https://splitter.aitoolb.com/"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-white text-sm font-bold transition-colors"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#0ea5e9] hover:opacity-90 text-white text-sm font-bold transition"
             >
-              <Scissors className="w-4 h-4" />
+              <Scissors className="w-3.5 h-3.5" />
               이미지분할기
             </a>
             <a
               href="https://grok.com/"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-white text-sm font-bold transition-colors"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#0f172a] hover:opacity-90 text-white text-sm font-bold transition"
             >
-              <ExternalLink className="w-4 h-4" />
+              <ExternalLink className="w-3.5 h-3.5" />
               Grok 바로가기
             </a>
             <a
               href="https://gemini.google.com/gem/1Wy6XhDIfeb1rO9AiYYDMdc6-wDoixF60?usp=sharing"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-lg bg-rose-500 hover:bg-rose-400 text-white text-sm font-bold transition-colors"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#f43f5e] hover:opacity-90 text-white text-sm font-bold transition"
             >
-              <Music className="w-4 h-4" />
+              <Music className="w-3.5 h-3.5" />
               음악만들기
             </a>
           </div>
         </aside>
 
         {/* Main */}
-        <main className="flex-1 min-w-0 flex flex-col md:overflow-hidden">
+        <main className="flex-1 min-w-0 flex flex-col md:overflow-hidden bg-white border border-[#e2e8f0] rounded-2xl shadow-[0_8px_24px_rgba(15,23,42,0.06)]">
           {toolView === 'frame-extractor' ? (
-            <FrameExtractor accentColor="#f59e0b" />
+            <FrameExtractor accentColor="#00996D" />
           ) : toolView === 'watermark-remover' ? (
-            <WatermarkRemover accentColor="#8b5cf6" />
+            <WatermarkRemover accentColor="#00996D" />
           ) : !storyboard ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-10">
-              <div className="w-20 h-20 mb-5 rounded-full flex items-center justify-center bg-white/[0.04] border border-white/[0.06]">
-                <Clapperboard className="w-10 h-10 text-zinc-600" />
+              <div className="w-20 h-20 mb-5 rounded-full flex items-center justify-center bg-[#ecfdf5] border border-[#e2e8f0]">
+                <Clapperboard className="w-10 h-10 text-[#00996D]" />
               </div>
-              <h3 className="text-lg font-bold text-zinc-100 mb-2">스토리보드가 없습니다</h3>
-              <p className="text-sm text-zinc-500 mb-5 leading-relaxed">
+              <h3 className="text-lg font-bold text-[#0f172a] mb-2">스토리보드가 없습니다</h3>
+              <p className="text-sm text-[#64748b] mb-5 leading-relaxed">
                 스토리보드 JSON을 업로드하여<br />
                 이미지/영상 프롬프트를 확인하세요.
               </p>
               <button
                 onClick={() => { setUploadOpen(true); setUploadError(''); }}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 text-sm font-bold transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full tb-pill-primary text-sm font-bold transition"
               >
-                <Upload className="w-4 h-4" />
+                <Upload className="w-3.5 h-3.5" />
                 스토리보드 JSON 업로드
               </button>
             </div>
           ) : (
             <>
               {/* Top bulk-copy bar */}
-              <div className="flex-shrink-0 px-4 py-3 border-b border-white/[0.06] bg-zinc-900/40 flex items-center justify-between gap-3">
+              <div className="flex-shrink-0 px-4 py-3 border-b border-[#e2e8f0] bg-[#ecfdf5]/40 rounded-t-2xl flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 min-w-0">
-                  <Clapperboard className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                  <h2 className="text-base font-black text-zinc-100 uppercase truncate">{storyboard.title}</h2>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-white/[0.04] border border-white/[0.06] text-zinc-400 flex-shrink-0">
+                  <Clapperboard className="w-4 h-4 text-[#00996D] flex-shrink-0" />
+                  <h2 className="text-base font-black text-[#0f172a] uppercase truncate">{storyboard.title}</h2>
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#64748b] flex-shrink-0">
                     {storyboard.meta.total_scenes}씬
                   </span>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-white/[0.04] border border-white/[0.06] text-zinc-400 flex-shrink-0">
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#64748b] flex-shrink-0">
                     {storyboard.meta.aspect_ratio}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <button
                     onClick={() => copyText(allImagePrompts)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-sm font-bold transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full tb-pill-primary text-sm font-bold transition"
                   >
                     <ImageIcon className="w-3.5 h-3.5" />
                     이미지 전체
                   </button>
                   <button
                     onClick={() => copyText(allVideoPrompts)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 text-sm font-bold transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[#334155] text-sm font-bold transition"
                   >
                     <Film className="w-3.5 h-3.5" />
                     영상 전체
@@ -521,7 +593,7 @@ export default function Step2Page() {
               </div>
 
               {/* Act tab bar */}
-              <div className="flex-shrink-0 flex border-b border-white/[0.06] bg-zinc-900/30 overflow-x-auto">
+              <div className="flex-shrink-0 flex gap-1.5 p-3 border-b border-[#e2e8f0] bg-white overflow-x-auto">
                 {ACTS.map((act, i) => {
                   const tc = ACT_COLORS[i];
                   const count = scenesByAct[i].length;
@@ -530,21 +602,20 @@ export default function Step2Page() {
                     <button
                       key={act}
                       onClick={() => setActiveAct(i)}
-                      className={`flex items-center gap-2 px-5 py-3 text-sm font-bold whitespace-nowrap border-b-2 transition-colors ${isActive
-                        ? 'text-zinc-100 bg-zinc-900/50'
-                        : 'text-zinc-500 border-transparent hover:text-zinc-300 hover:bg-white/[0.02]'
+                      className={`flex items-center gap-2 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${isActive
+                        ? 'tb-pill-primary'
+                        : 'text-[#64748b] bg-[#f1f5f9] hover:bg-[#e2e8f0]'
                         }`}
-                      style={isActive ? { borderBottomColor: tc.dot } : undefined}
                     >
                       <span
-                        className="w-2 h-2 rounded-full"
-                        style={{ background: tc.dot, opacity: isActive ? 1 : 0.4 }}
+                        className="w-1.5 h-1.5 rounded-full"
+                        style={{ background: isActive ? '#fff' : tc.dot, opacity: isActive ? 1 : 0.6 }}
                       />
                       {act}
                       {count > 0 && (
                         <span
                           className="text-[11px] font-bold px-1.5 py-0.5 rounded-full"
-                          style={{ background: `${tc.dot}25`, color: tc.dot }}
+                          style={isActive ? { background: 'rgba(255,255,255,0.25)', color: '#fff' } : { background: `${tc.dot}25`, color: tc.dot }}
                         >
                           {count}
                         </span>
@@ -557,7 +628,7 @@ export default function Step2Page() {
               {/* Scene cards */}
               <div className="flex-1 overflow-y-auto p-5 space-y-5">
                 {scenesByAct[activeAct].length === 0 ? (
-                  <div className="text-center py-10 text-zinc-600 text-sm">
+                  <div className="text-center py-10 text-[#64748b] text-sm">
                     이 구간에 해당하는 씬이 없습니다.
                   </div>
                 ) : (
@@ -567,30 +638,30 @@ export default function Step2Page() {
                       <div
                         key={scene.id}
                         ref={(el) => { sceneRefs.current[scene.id] = el; }}
-                        className="rounded-xl overflow-hidden border border-white/[0.06] bg-zinc-900/50 transition-all"
+                        className="rounded-2xl overflow-hidden border border-[#e2e8f0] bg-white shadow-[0_2px_8px_rgba(15,23,42,0.04)] transition-all"
                       >
                         {/* Scene header */}
                         <div
-                          className="px-4 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3"
+                          className="px-4 py-3 border-b border-[#e2e8f0] flex items-center justify-between gap-3"
                           style={{ background: `${tc.dot}10` }}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
                             <span
-                              className="text-[12px] font-black px-2 py-0.5 rounded"
+                              className="text-[12px] font-black px-2 py-0.5 rounded-full"
                               style={{ background: `${tc.dot}25`, color: tc.dot }}
                             >
                               #{String(scene.scene_number).padStart(2, '0')}
                             </span>
-                            <span className="text-base font-bold text-zinc-100 truncate">{scene.title}</span>
+                            <span className="text-base font-bold text-[#0f172a] truncate">{scene.title}</span>
                           </div>
                           <div className="flex items-center gap-1.5 flex-shrink-0">
                             {scene.camera.shot_type && (
-                              <span className="text-[11px] uppercase font-bold px-2 py-0.5 rounded border border-white/[0.08] bg-white/[0.04] text-zinc-300">
+                              <span className="text-[11px] uppercase font-bold px-2 py-0.5 rounded-full border border-[#e2e8f0] bg-white text-[#334155]">
                                 {scene.camera.shot_type}
                               </span>
                             )}
                             {scene.camera.movement && (
-                              <span className="text-[11px] uppercase font-bold px-2 py-0.5 rounded border border-white/[0.08] bg-white/[0.04] text-zinc-300">
+                              <span className="text-[11px] uppercase font-bold px-2 py-0.5 rounded-full border border-[#e2e8f0] bg-white text-[#334155]">
                                 {scene.camera.movement}
                               </span>
                             )}
@@ -598,22 +669,22 @@ export default function Step2Page() {
                         </div>
 
                         {/* Scene info */}
-                        <div className="px-4 py-3 border-b border-white/[0.06] space-y-2">
-                          <p className="text-sm text-zinc-300 leading-relaxed">{scene.description}</p>
+                        <div className="px-4 py-3 border-b border-[#e2e8f0] space-y-2">
+                          <p className="text-sm text-[#334155] leading-relaxed">{scene.description}</p>
                           <div className="flex flex-wrap gap-1.5">
                             {scene.emotion && (
-                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/[0.06] text-zinc-400">
-                                감정: <span className="text-zinc-200">{scene.emotion}</span>
+                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#f1f5f9] border border-[#e2e8f0] text-[#64748b]">
+                                감정: <span className="text-[#0f172a]">{scene.emotion}</span>
                               </span>
                             )}
                             {scene.key_visual && (
-                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/[0.06] text-zinc-400">
-                                핵심: <span className="text-zinc-200">{scene.key_visual}</span>
+                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#f1f5f9] border border-[#e2e8f0] text-[#64748b]">
+                                핵심: <span className="text-[#0f172a]">{scene.key_visual}</span>
                               </span>
                             )}
                             {scene.camera.lighting && (
-                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/[0.06] text-zinc-400">
-                                조명: <span className="text-zinc-200">{scene.camera.lighting.slice(0, 50)}{scene.camera.lighting.length > 50 ? '…' : ''}</span>
+                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#f1f5f9] border border-[#e2e8f0] text-[#64748b]">
+                                조명: <span className="text-[#0f172a]">{scene.camera.lighting.slice(0, 50)}{scene.camera.lighting.length > 50 ? '…' : ''}</span>
                               </span>
                             )}
                           </div>
@@ -622,18 +693,18 @@ export default function Step2Page() {
                         {/* Image / Video prompts side by side */}
                         <div className="flex flex-col md:flex-row">
                           {/* Image prompt */}
-                          <div className="flex-1 p-4 border-b md:border-b-0 md:border-r border-white/[0.06] min-w-0">
+                          <div className="flex-1 p-4 border-b md:border-b-0 md:border-r border-[#e2e8f0] min-w-0">
                             <div className="flex items-center justify-between mb-2">
                               <div className="flex items-center gap-1.5 min-w-0">
-                                <ImageIcon className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
-                                <span className="text-[11px] uppercase tracking-wider text-zinc-500 font-bold">이미지 프롬프트</span>
-                                <span className="text-[11px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 font-bold">
+                                <ImageIcon className="w-3.5 h-3.5 text-[#00996D] flex-shrink-0" />
+                                <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">이미지 프롬프트</span>
+                                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#ecfdf5] text-[#00996D] font-bold">
                                   {scene.prompts.image.tool}
                                 </span>
                               </div>
                               <button
                                 onClick={() => copyText(scene.prompts.image.prompt)}
-                                className="flex items-center gap-1 px-2 py-0.5 rounded bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-[11px] font-bold text-zinc-400 transition-colors flex-shrink-0"
+                                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] transition flex-shrink-0"
                               >
                                 <Copy className="w-3 h-3" />
                                 복사
@@ -643,28 +714,28 @@ export default function Step2Page() {
                               value={scene.prompts.image.prompt}
                               onChange={(e) => updateImagePrompt(scene.id, e.target.value)}
                               rows={5}
-                              className="w-full min-h-[100px] resize-y bg-zinc-950/60 border border-white/[0.06] rounded-lg p-2.5 text-[13px] leading-relaxed font-mono text-zinc-200 focus:outline-none focus:border-emerald-500/50"
+                              className="w-full min-h-[100px] resize-y bg-white border border-[#e2e8f0] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
                             />
                           </div>
 
                           {/* Video prompt */}
-                          <div className="flex-1 p-4 bg-white/[0.02] min-w-0">
+                          <div className="flex-1 p-4 bg-[#f8fafc] min-w-0">
                             <div className="flex items-center justify-between mb-2">
                               <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
-                                <Film className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
-                                <span className="text-[11px] uppercase tracking-wider text-zinc-500 font-bold">영상 프롬프트</span>
-                                <span className="text-[11px] px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-300 font-bold">
+                                <Film className="w-3.5 h-3.5 text-[#f43f5e] flex-shrink-0" />
+                                <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">영상 프롬프트</span>
+                                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#fee2e2] text-[#b91c1c] font-bold">
                                   {scene.prompts.video.tool} · {scene.prompts.video.duration}s
                                 </span>
                                 {scene.prompts.video.motion_type && (
-                                  <span className="text-[11px] px-1.5 py-0.5 rounded bg-purple-500/15 text-purple-300 font-bold">
+                                  <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#ede9fe] text-[#6d28d9] font-bold">
                                     {scene.prompts.video.motion_type}
                                   </span>
                                 )}
                               </div>
                               <button
                                 onClick={() => copyText(scene.prompts.video.prompt)}
-                                className="flex items-center gap-1 px-2 py-0.5 rounded bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-[11px] font-bold text-zinc-400 transition-colors flex-shrink-0"
+                                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] transition flex-shrink-0"
                               >
                                 <Copy className="w-3 h-3" />
                                 복사
@@ -674,7 +745,7 @@ export default function Step2Page() {
                               value={scene.prompts.video.prompt}
                               onChange={(e) => updateVideoPrompt(scene.id, e.target.value)}
                               rows={5}
-                              className="w-full min-h-[100px] resize-y bg-zinc-950/60 border border-white/[0.06] rounded-lg p-2.5 text-[13px] leading-relaxed font-mono text-zinc-200 focus:outline-none focus:border-rose-500/50"
+                              className="w-full min-h-[100px] resize-y bg-white border border-[#e2e8f0] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
                             />
                           </div>
                         </div>
@@ -691,49 +762,49 @@ export default function Step2Page() {
       {/* Upload Modal */}
       {uploadOpen && (
         <div
-          className="fixed inset-0 z-[300] flex items-center justify-center bg-black/70 backdrop-blur-sm"
+          className="fixed inset-0 z-[300] flex items-center justify-center bg-[#0f172a]/60 backdrop-blur-md"
           onClick={() => setUploadOpen(false)}
         >
           <div
-            className="bg-zinc-900 rounded-2xl border border-white/[0.08] shadow-2xl w-[640px] max-w-[95vw] max-h-[80vh] flex flex-col"
+            className="bg-white rounded-2xl border border-[#e2e8f0] shadow-[0_24px_60px_rgba(15,23,42,0.25)] w-[640px] max-w-[95vw] max-h-[80vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
-              <span className="text-base font-bold text-zinc-100 uppercase tracking-wider">스토리보드 JSON 업로드</span>
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#e2e8f0]">
+              <span className="text-base font-bold text-[#0f172a] uppercase tracking-wider">스토리보드 JSON 업로드</span>
               <button
                 onClick={() => setUploadOpen(false)}
-                className="w-7 h-7 flex items-center justify-center rounded hover:bg-white/[0.06] text-zinc-400"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#475569] transition"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-5 space-y-3 min-h-0">
-              <p className="text-sm text-zinc-400 leading-relaxed">
-                스토리보드 JSON을 붙여넣으세요. <code className="bg-white/[0.04] px-1.5 py-0.5 rounded text-amber-400 font-mono text-[12px]">scenes</code> 배열이 포함되어야 합니다.
-                마크다운 코드블록(```) 래핑과 <code className="bg-white/[0.04] px-1.5 py-0.5 rounded text-amber-400 font-mono text-[12px]">{`{ "storyboard": ... }`}</code> 래퍼도 자동 처리됩니다.
+              <p className="text-sm text-[#64748b] leading-relaxed">
+                스토리보드 JSON을 붙여넣으세요. <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">scenes</code> 배열이 포함되어야 합니다.
+                마크다운 코드블록(```) 래핑과 <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">{`{ "storyboard": ... }`}</code> 래퍼도 자동 처리됩니다.
               </p>
               <textarea
                 value={jsonInput}
                 onChange={(e) => setJsonInput(e.target.value)}
-                className="w-full h-[260px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-lg bg-zinc-950 border border-white/[0.06] text-zinc-200 focus:outline-none focus:border-amber-500/50"
+                className="w-full h-[260px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
                 placeholder='{"title": "...", "meta": {...}, "scenes": [...]}'
               />
               {uploadError && (
-                <div className="text-sm text-red-300 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2 font-semibold">
+                <div className="text-sm text-[#b91c1c] bg-[#fee2e2] border border-[#fca5a5] rounded-xl px-3 py-2 font-semibold">
                   {uploadError}
                 </div>
               )}
             </div>
-            <div className="flex justify-end gap-2 px-5 py-3 border-t border-white/[0.06]">
+            <div className="flex justify-end gap-2 px-5 py-3 border-t border-[#e2e8f0]">
               <button
                 onClick={() => setUploadOpen(false)}
-                className="px-4 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300 text-sm font-bold transition-colors"
+                className="px-4 py-1.5 rounded-full tb-pill-ghost text-sm font-bold transition"
               >
                 취소
               </button>
               <button
                 onClick={loadJson}
-                className="px-4 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 text-sm font-bold transition-colors"
+                className="px-4 py-1.5 rounded-full tb-pill-primary text-sm font-bold transition"
               >
                 불러오기
               </button>
@@ -744,7 +815,7 @@ export default function Step2Page() {
 
       {/* Toast */}
       {toast && (
-        <div className="fixed bottom-5 right-5 z-[400] bg-amber-400 text-zinc-950 px-4 py-2.5 rounded-lg shadow-2xl text-sm font-bold animate-fadeIn">
+        <div className="fixed bottom-5 right-5 z-[400] px-4 py-2.5 rounded-full text-sm font-bold animate-fadeIn tb-pill-primary">
           {toast}
         </div>
       )}
