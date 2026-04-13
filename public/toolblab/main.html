@@ -166,7 +166,7 @@
     ════════════════════════════ */
     .cards-section {
       position: relative;
-      margin-top: -50px;
+      margin-top: 8px;
       padding: 0 0 14px;
       z-index: 3;
     }
@@ -711,6 +711,189 @@
     .access-modal-submit:hover {
       opacity: 0.9;
     }
+
+    /* ════════════════════════════
+       CLASS TABS
+    ════════════════════════════ */
+    .class-tabs {
+      position: relative;
+      z-index: 3;
+      max-width: 720px;
+      margin: -28px auto 0;
+      padding: 0 20px;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .class-tab {
+      flex: 1;
+      max-width: 200px;
+      padding: 14px 10px;
+      border: none;
+      background: #fff;
+      color: #64748b;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+      transition: transform 0.2s, box-shadow 0.25s, color 0.25s, background 0.25s;
+    }
+
+    .class-tab:hover:not(.active) {
+      transform: translateY(-2px);
+      color: #00996D;
+    }
+
+    .class-tab.active {
+      background: linear-gradient(112.34deg, #68D970 -38.67%, #00996D 99.56%);
+      color: #fff;
+      box-shadow: 0 16px 36px rgba(0, 153, 109, 0.35);
+    }
+
+    .class-view { display: none; }
+    .class-view.active { display: block; }
+
+    /* ZERO CLASS — blog list */
+    .zero-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 36px 24px 80px;
+    }
+
+    .zero-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .zero-header h2 {
+      font-size: clamp(22px, 2.8vw, 30px);
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+
+    .zero-header p {
+      font-size: 14px;
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    .zero-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 18px;
+    }
+
+    .zero-card {
+      background: #fff;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+      padding: 0;
+    }
+
+    .zero-card:hover {
+      transform: translateY(-4px);
+      border-color: #00B380;
+      box-shadow: 0 20px 40px rgba(0, 153, 109, 0.18);
+    }
+
+    .zero-card-thumb {
+      aspect-ratio: 16/9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      color: #fff;
+      font-weight: 900;
+    }
+
+    .zero-card-thumb.gmail {
+      background: linear-gradient(135deg, #EA4335, #FBBC05);
+    }
+
+    .zero-card-thumb.capcut {
+      background: linear-gradient(135deg, #0f172a, #00B380);
+    }
+
+    .zero-card-body {
+      padding: 18px 20px 22px;
+    }
+
+    .zero-card-cat {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #00996D;
+      margin-bottom: 8px;
+    }
+
+    .zero-card-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    .zero-card-desc {
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.5;
+    }
+
+    /* PRO CLASS — coming soon */
+    .pro-wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 80px 24px 120px;
+      text-align: center;
+    }
+
+    .pro-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      background: linear-gradient(112.34deg, #68D970 -38.67%, #00996D 99.56%);
+      color: #fff;
+      border-radius: 100px;
+      margin-bottom: 20px;
+    }
+
+    .pro-wrap h2 {
+      font-size: clamp(26px, 3.4vw, 36px);
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 14px;
+    }
+
+    .pro-wrap p {
+      font-size: 15px;
+      color: #64748b;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 640px) {
+      .class-tabs { gap: 6px; padding: 0 14px; }
+      .class-tab { font-size: 11px; padding: 12px 6px; }
+      .zero-list { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 
@@ -726,6 +909,53 @@
         <p class="hero-subtitle">단계별 커리큘럼으로 완성하는 프리미엄 영상 클래스.<br />무엇부터 배우고 싶으신가요?</p>
       </div>
     </section>
+
+    <!-- ───────── CLASS TABS ───────── -->
+    <nav class="class-tabs" role="tablist">
+      <button type="button" class="class-tab" data-class="zero" onclick="selectClass('zero')">ZERO CLASS</button>
+      <button type="button" class="class-tab active" data-class="up" onclick="selectClass('up')">UP CLASS</button>
+      <button type="button" class="class-tab" data-class="pro" onclick="selectClass('pro')">PRO CLASS</button>
+    </nav>
+
+    <!-- ───────── ZERO CLASS VIEW ───────── -->
+    <div class="class-view" id="view-zero">
+      <div class="zero-wrap">
+        <div class="zero-header">
+          <h2>시작 전 준비 과정</h2>
+          <p>영상 제작에 앞서 꼭 필요한 기본 세팅을 하나씩 따라해보세요.</p>
+        </div>
+        <div class="zero-list">
+          <button type="button" class="zero-card" onclick="openZeroPost('gmail')">
+            <div class="zero-card-thumb gmail">M</div>
+            <div class="zero-card-body">
+              <p class="zero-card-cat">STEP 01 · 계정</p>
+              <h3 class="zero-card-title">구글 메일 만들기</h3>
+              <p class="zero-card-desc">AI 툴 가입·유튜브 운영에 필수인 구글 계정을 만드는 방법.</p>
+            </div>
+          </button>
+          <button type="button" class="zero-card" onclick="openZeroPost('capcut')">
+            <div class="zero-card-thumb capcut">▶</div>
+            <div class="zero-card-body">
+              <p class="zero-card-cat">STEP 02 · 툴 설치</p>
+              <h3 class="zero-card-title">캡컷(CapCut) 설치하기</h3>
+              <p class="zero-card-desc">무료 영상 편집 툴 캡컷을 PC/모바일에 설치하는 방법.</p>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───────── PRO CLASS VIEW ───────── -->
+    <div class="class-view" id="view-pro">
+      <div class="pro-wrap">
+        <span class="pro-badge">Coming Soon</span>
+        <h2>PRO CLASS</h2>
+        <p>전문가를 위한 심화 과정을 준비 중입니다.<br />곧 만나보실 수 있습니다.</p>
+      </div>
+    </div>
+
+    <!-- ───────── UP CLASS VIEW ───────── -->
+    <div class="class-view active" id="view-up">
 
     <!-- ───────── CARD CAROUSEL ───────── -->
     <section class="cards-section">
@@ -818,6 +1048,8 @@
 
       <div id="videoSectionsContainer"></div>
     </section>
+
+    </div><!-- /#view-up -->
 
   </main>
 
@@ -916,6 +1148,21 @@
     ];
 
     let currentStep = 'step1';
+
+    /* ──────────────── CLASS TABS ──────────────── */
+    function selectClass(cls) {
+      document.querySelectorAll('.class-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.class === cls);
+      });
+      document.querySelectorAll('.class-view').forEach(v => {
+        v.classList.toggle('active', v.id === `view-${cls}`);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openZeroPost(slug) {
+      navigateTop(`/zero/${slug}`);
+    }
 
     /* ──────────────── CARD SELECTION ──────────────── */
     function selectStep(step) {
