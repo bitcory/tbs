@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Upload, Copy, Clipboard, ExternalLink, Gem, X, Layers, List, Info, Film, Droplets, Wrench } from 'lucide-react';
+import { ArrowLeft, Upload, Copy, Clipboard, ExternalLink, Gem, X, Layers, List, Info, Film, Droplets, Wrench, Mic } from 'lucide-react';
 import dynamic from 'next/dynamic';
 const FrameExtractor = dynamic(() => import('@/app/components/FrameExtractor'), { ssr: false });
 const WatermarkRemover = dynamic(() => import('@/app/components/WatermarkRemover'), { ssr: false });
@@ -112,6 +112,26 @@ export default function Step1Page() {
   const [toast, setToast] = useState('');
   const [hydrated, setHydrated] = useState(false);
   const [toolView, setToolView] = useState(null);
+  const [speakPromptOpen, setSpeakPromptOpen] = useState(false);
+
+  const SPEAK_PROMPT = `The character is a native Korean speaker.
+All dialogue must be spoken in Korean ONLY.
+English is strictly prohibited.
+Voice requirements:
+- Native Korean pronunciation
+- Natural Korean intonation and rhythm
+- No foreign accent
+- Sounds like a professional Korean voice actor
+Dialogue (Korean only):
+Korean man "안녕? 나는 툴비야."
+"이 세상의 주인공은 나야. 어떠케 생가케?"
+"우리 모험을 떠나볼까?."
+Performance:
+- Natural pauses
+- Realistic emotions
+- Not robotic
+- Not exaggerated
+Subtitles, title, text is strictly prohibited.`;
   const promptRef = useRef(null);
 
   // Load cache on mount
@@ -403,6 +423,21 @@ export default function Step1Page() {
               Grok 바로가기
             </a>
           </div>
+
+          {/* Speak prompt */}
+          <div className="p-4 border-t border-[#e2e8f0]">
+            <button
+              onClick={() => setSpeakPromptOpen(true)}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-full text-sm font-bold transition text-white hover:opacity-90"
+              style={{
+                background: 'linear-gradient(112.34deg, #A855F7 -38.67%, #6D28D9 99.56%)',
+                boxShadow: '0 10px 24px rgba(109, 40, 217, 0.3)',
+              }}
+            >
+              <Mic className="w-4 h-4" />
+              말하는 프롬프트
+            </button>
+          </div>
         </aside>
 
         {/* Main */}
@@ -606,6 +641,58 @@ export default function Step1Page() {
                 className="px-4 py-1.5 rounded-full tb-pill-primary text-sm font-bold transition"
               >
                 불러오기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Speak Prompt Modal */}
+      {speakPromptOpen && (
+        <div
+          className="fixed inset-0 z-[300] flex items-center justify-center bg-[#0f172a]/60 backdrop-blur-md"
+          onClick={() => setSpeakPromptOpen(false)}
+        >
+          <div
+            className="bg-white rounded-2xl border border-[#e2e8f0] shadow-[0_24px_60px_rgba(15,23,42,0.25)] w-[640px] max-w-[95vw] max-h-[85vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#e2e8f0]">
+              <span className="text-base font-bold text-[#0f172a] uppercase tracking-wider flex items-center gap-2">
+                <Mic className="w-4 h-4 text-[#7C3AED]" />
+                말하는 프롬프트
+              </span>
+              <button
+                onClick={() => setSpeakPromptOpen(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#475569] transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-5 space-y-3 min-h-0">
+              <textarea
+                value={SPEAK_PROMPT}
+                readOnly
+                className="w-full h-[420px] resize-none font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
+              />
+            </div>
+            <div className="flex justify-end gap-2 px-5 py-3 border-t border-[#e2e8f0]">
+              <button
+                onClick={() => setSpeakPromptOpen(false)}
+                className="px-4 py-1.5 rounded-full tb-pill-ghost text-sm font-bold transition"
+              >
+                닫기
+              </button>
+              <button
+                onClick={() => copyText(SPEAK_PROMPT)}
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-bold transition text-white hover:opacity-90"
+                style={{
+                  background: 'linear-gradient(112.34deg, #A855F7 -38.67%, #6D28D9 99.56%)',
+                  boxShadow: '0 10px 24px rgba(109, 40, 217, 0.3)',
+                }}
+              >
+                <Copy className="w-3.5 h-3.5" />
+                복사하기
               </button>
             </div>
           </div>
