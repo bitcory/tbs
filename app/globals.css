@@ -23,6 +23,14 @@ body {
   body {
     overflow: hidden;
   }
+  body:has(.auth-scroll) {
+    overflow: auto;
+  }
+}
+
+body:has(.auth-scroll) {
+  color: #0f172a;
+  background: #f8fafc;
 }
 
 /* Prevent iOS auto-zoom on input focus (triggers when font-size < 16px) */

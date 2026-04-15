@@ -899,6 +899,11 @@
 
 <body>
 
+  <a href="/mypage" target="_top" id="userLink"
+     style="position:fixed;top:16px;right:20px;z-index:999;padding:8px 14px;border:1px solid rgba(255,255,255,0.2);border-radius:999px;color:#fff;background:rgba(0,0,0,0.4);backdrop-filter:blur(8px);font-size:13px;text-decoration:none;font-weight:500;">
+    마이페이지
+  </a>
+
   <main class="page">
 
     <!-- ───────── HERO ───────── -->
@@ -1069,11 +1074,11 @@
   <script>
     /* ──────────────── STEP DATA ──────────────── */
     const STEPS = {
-      step1: { label: 'Step 1', title: '마스터 이미지 만들기', url: '/lecture/step1', code: null,   ready: true },
-      step2: { label: 'Step 2', title: '뮤직영상 만들기',     url: '/lecture/step2', code: '0410', ready: true },
-      step3: { label: 'Step 3', title: '인트로영상 만들기',   url: '/lecture/step3', code: '0411', ready: true },
-      step4: { label: 'Step 4', title: '광고영상 제작',       url: null,             code: null,   ready: false },
-      step5: { label: 'Step 5', title: '유튜브 수익화과정',   url: null,             code: null,   ready: false },
+      step1: { label: 'Step 1', title: '마스터 이미지 만들기', url: '/lecture/step1', ready: true },
+      step2: { label: 'Step 2', title: '뮤직영상 만들기',     url: '/lecture/step2', ready: true },
+      step3: { label: 'Step 3', title: '인트로영상 만들기',   url: '/lecture/step3', ready: true },
+      step4: { label: 'Step 4', title: '광고영상 제작',       url: null,             ready: false },
+      step5: { label: 'Step 5', title: '유튜브 수익화과정',   url: null,             ready: false },
     };
 
     /* Per-step media for the panel below.
@@ -1240,12 +1245,8 @@
 
     function startCurrentStep() {
       const data = STEPS[currentStep];
-      if (!data || !data.ready) return;
-      if (data.code) {
-        openAccessModal(currentStep);
-      } else if (data.url) {
-        navigateTop(data.url);
-      }
+      if (!data || !data.ready || !data.url) return;
+      navigateTop(data.url);
     }
 
     function scrollToVideos() {
