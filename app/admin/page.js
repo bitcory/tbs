@@ -32,7 +32,7 @@ export default async function AdminPage() {
         </div>
       </section>
 
-      <div style={{ ...S.pageWrap, maxWidth: "100%", padding: "28px 32px 80px", marginTop: -48, position: "relative", color: "#0f172a" }}>
+      <div style={{ ...S.pageWrap, maxWidth: "100%", padding: "28px 16px 80px", marginTop: -48, position: "relative", color: "#0f172a" }}>
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginBottom: 16 }}>
           <Link href="/mypage" style={S.ghostBtn}>마이페이지</Link>
           <Link href="/" style={S.ghostBtn}>← 홈으로</Link>
@@ -123,5 +123,5 @@ export default async function AdminPage() {
   );
 }
 
-const th = { textAlign: "left", padding: "14px 16px", fontWeight: 700, fontSize: 12, letterSpacing: "0.05em", textTransform: "uppercase", color: "#64748b" };
-const td = { padding: "14px 16px", verticalAlign: "middle", color: "#0f172a" };
+const th = { textAlign: "left", padding: "14px 12px", fontWeight: 700, fontSize: 12, letterSpacing: "0.05em", textTransform: "uppercase", color: "#64748b", whiteSpace: "nowrap" };
+const td = { padding: "14px 12px", verticalAlign: "middle", color: "#0f172a", whiteSpace: "nowrap" };
