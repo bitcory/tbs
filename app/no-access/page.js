@@ -24,8 +24,8 @@ export default async function NoAccessPage({ searchParams }) {
             마이페이지에서 권한 현황을 확인할 수 있습니다.
           </p>
           <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-            <Link href="/mypage" style={S.primaryPill}>마이페이지</Link>
-            <Link href="/" style={S.ghostBtn}>홈으로</Link>
+            <Link href="/mypage" className="glass-hoverable" style={S.primaryPill}>마이페이지</Link>
+            <Link href="/" className="glass-hoverable" style={S.ghostBtn}>홈으로</Link>
           </div>
         </div>
       </div>

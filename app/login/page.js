@@ -26,7 +26,7 @@ export default async function LoginPage() {
               await signIn("kakao", { redirectTo: "/onboarding" });
             }}
           >
-            <button type="submit" style={S.kakaoBtn}>
+            <button type="submit" className="glass-hoverable" style={S.kakaoBtn}>
               <span style={{ fontSize: 18 }}>💬</span>
               카카오로 3초만에 시작하기
             </button>

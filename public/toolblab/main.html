@@ -355,36 +355,64 @@
     }
 
     .cta-primary {
+      position: relative;
       display: inline-flex;
       align-items: center;
       gap: 10px;
       padding: 17px 38px;
-      background: linear-gradient(112.34deg, #68D970 -38.67%, #00996D 99.56%);
+      background: linear-gradient(135deg, rgba(104,217,112,0.95) 0%, rgba(0,153,109,0.92) 100%);
       color: #fff;
       font-size: 15px;
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: 0.02em;
       border-radius: 100px;
       text-decoration: none;
-      border: none;
+      border: 1.5px solid rgba(0, 153, 109, 0.35);
       cursor: pointer;
       font-family: inherit;
-      transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 14px 32px rgba(0, 153, 109, 0.32);
+      backdrop-filter: blur(18px) saturate(180%);
+      -webkit-backdrop-filter: blur(18px) saturate(180%);
+      box-shadow:
+        0 10px 28px rgba(0, 153, 109, 0.18),
+        0 0 0 1px rgba(255, 255, 255, 0.6) inset,
+        inset 2px 2px 1px 0 rgba(255, 255, 255, 0.85),
+        inset -1px -1px 1px 1px rgba(255, 255, 255, 0.5);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2), box-shadow 0.3s ease, background 0.3s;
+    }
+
+    .cta-primary::before {
+      content: '';
+      position: absolute;
+      inset: -12px -40px;
+      z-index: -1;
+      background: radial-gradient(ellipse at center, rgba(0, 179, 128, 0.35) 0%, rgba(0, 179, 128, 0) 70%);
+      filter: blur(16px);
+      pointer-events: none;
     }
 
     .cta-primary:hover:not(:disabled) {
-      opacity: 0.94;
-      transform: translateY(-2px);
-      box-shadow: 0 18px 38px rgba(0, 153, 109, 0.4);
+      transform: translateY(-2px) scale(1.03);
+      background: rgba(255, 255, 255, 0.5);
+      color: #00774f;
+      box-shadow:
+        0 18px 42px rgba(0, 153, 109, 0.3),
+        inset 2px 2px 1px 0 rgba(255, 255, 255, 0.95),
+        inset -1px -1px 1px 1px rgba(255, 255, 255, 0.6);
+    }
+
+    .cta-primary:active:not(:disabled) {
+      transform: translateY(0) scale(0.98);
     }
 
     .cta-primary:disabled {
-      background: #cbd5e1;
+      background: rgba(203, 213, 225, 0.4);
       box-shadow: none;
       cursor: not-allowed;
-      color: #fff;
+      color: #94a3b8;
+      border-color: rgba(255, 255, 255, 0.4);
     }
+
+    .cta-primary:disabled::before { display: none; }
 
     .cta-watch {
       display: block;
@@ -713,6 +741,168 @@
     }
 
     /* ════════════════════════════
+       SUB-SELECT MODAL
+    ════════════════════════════ */
+    .sub-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      animation: modalFadeIn 0.2s ease;
+      padding: 20px;
+    }
+    .sub-modal-overlay.active { display: flex; }
+
+    .sub-modal {
+      background: #fff;
+      border-radius: 24px;
+      padding: 32px 28px 24px;
+      width: min(94vw, 460px);
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
+      position: relative;
+      animation: modalSlideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.4);
+    }
+
+    .sub-modal-close {
+      position: absolute;
+      top: 14px; right: 14px;
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      border: none;
+      background: #f1f5f9;
+      color: #475569;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-family: inherit;
+      transition: background 0.2s;
+    }
+    .sub-modal-close:hover { background: #e2e8f0; }
+
+    .sub-modal-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0F172A;
+      margin-bottom: 6px;
+      text-align: center;
+      padding-right: 30px;
+    }
+
+    .sub-modal-desc {
+      font-size: 13px;
+      color: #64748b;
+      text-align: center;
+      margin-bottom: 22px;
+      line-height: 1.5;
+    }
+
+    .sub-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .sub-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 16px 18px;
+      border-radius: 16px;
+      border: 2px solid #e2e8f0;
+      background: #fff;
+      cursor: pointer;
+      text-align: left;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 2.2), border-color 0.25s, box-shadow 0.25s, background 0.25s;
+      font-family: inherit;
+    }
+
+    .sub-option:hover {
+      border-color: #00B380;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(0, 153, 109, 0.12);
+    }
+
+    .sub-option.selected {
+      border-color: #00B380;
+      background: linear-gradient(135deg, rgba(104,217,112,0.08) 0%, rgba(0,153,109,0.1) 100%);
+      box-shadow: 0 12px 28px rgba(0, 153, 109, 0.2), inset 0 0 0 1px rgba(0, 179, 128, 0.35);
+    }
+
+    .sub-option-body { flex: 1; min-width: 0; }
+
+    .sub-option-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 3px;
+    }
+    .sub-option-desc {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .sub-option-check {
+      flex-shrink: 0;
+      width: 26px; height: 26px;
+      border-radius: 8px;
+      border: 2px solid #cbd5e1;
+      background: #fff;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.25s;
+    }
+    .sub-option-check svg {
+      width: 14px; height: 14px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .sub-option.selected .sub-option-check {
+      background: linear-gradient(135deg, #68D970 0%, #00996D 100%);
+      border-color: transparent;
+    }
+    .sub-option.selected .sub-option-check svg { opacity: 1; }
+
+    .sub-modal-submit {
+      width: 100%;
+      padding: 15px 18px;
+      background: rgba(255, 255, 255, 0.4);
+      color: #00774f;
+      font-size: 15px;
+      font-weight: 800;
+      border: 1.5px solid rgba(0, 153, 109, 0.35);
+      border-radius: 14px;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 0.02em;
+      backdrop-filter: blur(18px) saturate(180%);
+      -webkit-backdrop-filter: blur(18px) saturate(180%);
+      box-shadow:
+        0 10px 28px rgba(0, 153, 109, 0.22),
+        inset 2px 2px 1px 0 rgba(255, 255, 255, 0.85),
+        inset -1px -1px 1px 1px rgba(255, 255, 255, 0.5);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2), box-shadow 0.3s, background 0.3s;
+    }
+    .sub-modal-submit:not(:disabled):hover {
+      transform: translateY(-1px) scale(1.02);
+      background: rgba(255, 255, 255, 0.55);
+    }
+    .sub-modal-submit:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      background: rgba(203, 213, 225, 0.3);
+      color: #94a3b8;
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: none;
+    }
+
+    /* ════════════════════════════
        CLASS TABS
     ════════════════════════════ */
     .class-tabs {
@@ -727,11 +917,12 @@
     }
 
     .class-tab {
+      position: relative;
       flex: 1;
       max-width: 200px;
       padding: 14px 10px;
-      border: none;
-      background: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.55);
       color: #64748b;
       font-family: inherit;
       font-size: 13px;
@@ -740,19 +931,33 @@
       text-transform: uppercase;
       border-radius: 14px;
       cursor: pointer;
-      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
-      transition: transform 0.2s, box-shadow 0.25s, color 0.25s, background 0.25s;
+      backdrop-filter: blur(14px) saturate(140%);
+      -webkit-backdrop-filter: blur(14px) saturate(140%);
+      box-shadow:
+        0 10px 28px rgba(15, 23, 42, 0.08),
+        inset 1.5px 1.5px 0.5px 0 rgba(255, 255, 255, 0.85),
+        inset -1px -1px 0.5px 1px rgba(255, 255, 255, 0.45);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2), box-shadow 0.3s ease, color 0.25s, background 0.25s;
     }
 
     .class-tab:hover:not(.active) {
-      transform: translateY(-2px);
+      transform: translateY(-2px) scale(1.03);
       color: #00996D;
+      background: rgba(255, 255, 255, 0.75);
+    }
+
+    .class-tab:active:not(.active) {
+      transform: translateY(0) scale(0.98);
     }
 
     .class-tab.active {
-      background: linear-gradient(112.34deg, #68D970 -38.67%, #00996D 99.56%);
+      background: linear-gradient(135deg, rgba(104,217,112,0.95) 0%, rgba(0,153,109,0.92) 100%);
       color: #fff;
-      box-shadow: 0 16px 36px rgba(0, 153, 109, 0.35);
+      border-color: rgba(255, 255, 255, 0.45);
+      box-shadow:
+        0 16px 36px rgba(0, 153, 109, 0.35),
+        inset 1.5px 1.5px 0.5px 0 rgba(255, 255, 255, 0.55),
+        inset -1px -1px 0.5px 1px rgba(255, 255, 255, 0.25);
     }
 
     .class-view { display: none; }
@@ -984,20 +1189,7 @@
             <img src="/images/2class.png" alt="Step 2 뮤직영상" />
           </div>
           <p class="step-card-label">Step 2</p>
-          <p class="step-card-title">뮤직영상 만들기</p>
-        </button>
-
-        <button type="button" class="step-card" data-step="step3">
-          <div class="step-card-check">
-            <svg viewBox="0 0 14 14" fill="none">
-              <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </div>
-          <div class="step-card-visual visual-step3">
-            <img src="/images/3class.jpg" alt="Step 3 인트로영상" />
-          </div>
-          <p class="step-card-label">Step 3</p>
-          <p class="step-card-title">인트로영상 만들기</p>
+          <p class="step-card-title">영상 제작하기</p>
         </button>
 
         <button type="button" class="step-card" data-step="step4">
@@ -1053,27 +1245,34 @@
 
   </main>
 
-  <!-- ───────── ACCESS CODE MODAL ───────── -->
-  <div class="access-modal-overlay" id="accessModal" onclick="handleOverlayClick(event)">
-    <div class="access-modal" onclick="event.stopPropagation()">
-      <button type="button" class="access-modal-close" onclick="closeAccessModal()" aria-label="닫기">×</button>
-      <h3 class="access-modal-title">접속코드 입력</h3>
-      <p class="access-modal-desc" id="accessModalDesc">강의를 시작하려면<br />접속코드를 입력해주세요.</p>
-      <input type="text" class="access-modal-input" id="accessCodeInput" placeholder="접속코드" maxlength="20"
-        autocomplete="off" onkeydown="handleKeyDown(event)" oninput="clearError()" />
-      <div class="access-modal-error" id="accessCodeError"></div>
-      <button type="button" class="access-modal-submit" onclick="submitAccessCode()">확인</button>
+  <!-- ───────── SUB-SELECT MODAL ───────── -->
+  <div class="sub-modal-overlay" id="subModal" onclick="handleSubOverlayClick(event)">
+    <div class="sub-modal" onclick="event.stopPropagation()">
+      <button type="button" class="sub-modal-close" onclick="closeSubModal()" aria-label="닫기">×</button>
+      <h3 class="sub-modal-title" id="subModalTitle">세부 과정 선택</h3>
+      <p class="sub-modal-desc">어떤 과정을 시작할까요?</p>
+      <div class="sub-options" id="subOptions"></div>
+      <button type="button" class="sub-modal-submit" id="subSubmit" onclick="submitSubChoice()" disabled>
+        시작하기 →
+      </button>
     </div>
   </div>
 
   <script>
     /* ──────────────── STEP DATA ──────────────── */
     const STEPS = {
-      step1: { label: 'Step 1', title: '마스터 이미지 만들기', url: '/lecture/step1', ready: true },
-      step2: { label: 'Step 2', title: '뮤직영상 만들기',     url: '/lecture/step2', ready: true },
-      step3: { label: 'Step 3', title: '인트로영상 만들기',   url: '/lecture/step3', ready: true },
-      step4: { label: 'Step 4', title: '광고영상 제작',       url: null,             ready: false },
-      step5: { label: 'Step 5', title: '유튜브 수익화과정',   url: null,             ready: false },
+      step1: {
+        label: 'Step 1', title: '마스터 이미지 만들기', url: '/lecture/step1', ready: true,
+      },
+      step2: {
+        label: 'Step 2', title: '영상 제작하기', ready: true,
+        items: [
+          { id: 'music', title: '뮤직 영상 만들기',   desc: '감성 뮤직 영상 스토리보드', url: '/lecture/step2' },
+          { id: 'intro', title: '인트로 영상 만들기', desc: '브랜드 인트로 영상 제작',   url: '/lecture/step3' },
+        ],
+      },
+      step4: { label: 'Step 4', title: '광고영상 제작',     url: null, ready: false },
+      step5: { label: 'Step 5', title: '유튜브 수익화과정', url: null, ready: false },
     };
 
     /* Per-step media for the panel below.
@@ -1100,33 +1299,17 @@
       ],
       step2: [
         {
-          title: '뮤직영상 미리보기',
+          title: '뮤직 영상 미리보기',
           items: [
             { type: 'video', src: 'https://www.dropbox.com/scl/fi/yuu422j08cwsdb4f9dtbn/ED334F8B-B0CF-4A63-8B30-1B298765E6AC_video.MP4?rlkey=7qjv80w77a6qnhmmx2hxzyzxn&st=5m4j3mh2&raw=1', poster: '/images/thumbs/step2-1.jpg' },
             { type: 'video', src: 'https://www.dropbox.com/scl/fi/sprxx6bx1n1fax0osnpu0/.mp4?rlkey=bzvwjmb02j0v40i7ju90y3axd&st=pz8x7xn2&raw=1', poster: '/images/thumbs/step2-2.jpg' },
           ],
         },
         {
-          title: '실습 영상',
-          items: [
-            { type: 'placeholder', label: '영상 1' },
-            { type: 'placeholder', label: '영상 2' },
-          ],
-        },
-      ],
-      step3: [
-        {
-          title: '인트로 영상',
+          title: '인트로 영상 미리보기',
           items: [
             { type: 'video', src: 'https://www.dropbox.com/scl/fi/zoxv7mrxgiykvycw98uzr/64FD93FB-9842-4116-A7CE-B6B6A26F6619_video.MP4?rlkey=4y5km1fa7slcw9vr8sdcqxsf5&st=wnlnkl49&raw=1', poster: '/images/thumbs/step3-1.jpg' },
             { type: 'video', src: 'https://www.dropbox.com/scl/fi/rgzsn6qqbz0cmwf0hhh8a/2.mp4?rlkey=cjpdtlfg0m05ta2v0hts68bov&st=n7oqdozj&raw=1', poster: '/images/thumbs/step3-2.jpg' },
-          ],
-        },
-        {
-          title: '실습 영상',
-          items: [
-            { type: 'placeholder', label: '영상 1' },
-            { type: 'placeholder', label: '영상 2' },
           ],
         },
       ],
@@ -1240,8 +1423,69 @@
 
     function startCurrentStep() {
       const data = STEPS[currentStep];
-      if (!data || !data.ready || !data.url) return;
-      navigateTop(data.url);
+      if (!data || !data.ready) return;
+      if (Array.isArray(data.items) && data.items.length > 0) {
+        openSubSelectModal(currentStep);
+        return;
+      }
+      if (data.url) navigateTop(data.url);
+    }
+
+    /* ──────────────── SUB-SELECT MODAL ──────────────── */
+    let pendingSubItem = null;
+
+    function openSubSelectModal(step) {
+      const data = STEPS[step];
+      if (!data || !data.items) return;
+      const container = document.getElementById('subOptions');
+      container.innerHTML = data.items.map(item => `
+        <button type="button" class="sub-option" data-id="${item.id}" onclick="selectSubOption('${item.id}')">
+          <div class="sub-option-body">
+            <div class="sub-option-title">${item.title}</div>
+            ${item.desc ? `<div class="sub-option-desc">${item.desc}</div>` : ''}
+          </div>
+          <div class="sub-option-check">
+            <svg viewBox="0 0 14 14" fill="none">
+              <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+        </button>
+      `).join('');
+
+      document.getElementById('subModalTitle').textContent = `${data.label} · 세부 과정 선택`;
+      pendingSubItem = null;
+      updateSubSubmitState();
+      document.getElementById('subModal').classList.add('active');
+    }
+
+    function selectSubOption(id) {
+      pendingSubItem = id;
+      document.querySelectorAll('.sub-option').forEach(b => {
+        b.classList.toggle('selected', b.dataset.id === id);
+      });
+      updateSubSubmitState();
+    }
+
+    function updateSubSubmitState() {
+      const btn = document.getElementById('subSubmit');
+      if (!btn) return;
+      btn.disabled = !pendingSubItem;
+    }
+
+    function submitSubChoice() {
+      if (!pendingSubItem) return;
+      const data = STEPS[currentStep];
+      const item = data?.items?.find(x => x.id === pendingSubItem);
+      if (item?.url) navigateTop(item.url);
+    }
+
+    function closeSubModal() {
+      document.getElementById('subModal').classList.remove('active');
+      pendingSubItem = null;
+    }
+
+    function handleSubOverlayClick(e) {
+      if (e.target.id === 'subModal') closeSubModal();
     }
 
     function scrollToVideos() {
@@ -1326,7 +1570,7 @@
     }
 
     /* ──────────────── CARROUSEL NAVIGATION ──────────────── */
-    const STEP_ORDER = ['step1', 'step2', 'step3', 'step4', 'step5'];
+    const STEP_ORDER = ['step1', 'step2', 'step4', 'step5'];
 
     function shiftStep(delta) {
       const idx = STEP_ORDER.indexOf(currentStep);

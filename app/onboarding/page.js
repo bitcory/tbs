@@ -65,7 +65,7 @@ export default async function OnboardingPage() {
             />
           </div>
 
-          <button type="submit" style={S.primaryBtn}>
+          <button type="submit" className="glass-hoverable" style={S.primaryBtn}>
             저장하고 시작하기 →
           </button>
         </form>

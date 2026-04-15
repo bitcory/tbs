@@ -40,6 +40,22 @@ body:has(.auth-scroll) {
   }
 }
 
+/* Liquid Glass button hover */
+.glass-hoverable {
+  will-change: transform;
+}
+.glass-hoverable:hover {
+  transform: translateY(-1px) scale(1.03);
+  box-shadow:
+    0 10px 18px rgba(0, 0, 0, 0.14),
+    0 0 28px rgba(0, 0, 0, 0.06),
+    inset 1.5px 1.5px 0.5px 0 rgba(255, 255, 255, 0.75),
+    inset -1px -1px 0.5px 1px rgba(255, 255, 255, 0.45) !important;
+}
+.glass-hoverable:active {
+  transform: translateY(0) scale(0.98);
+}
+
 /* Utility fade-in animation */
 @keyframes fadeIn {
   from { opacity: 0; }

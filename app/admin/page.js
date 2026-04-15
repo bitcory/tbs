@@ -34,8 +34,8 @@ export default async function AdminPage() {
 
       <div style={{ ...S.pageWrap, maxWidth: "100%", padding: "28px 16px 80px", marginTop: -48, position: "relative", color: "#0f172a" }}>
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginBottom: 16 }}>
-          <Link href="/mypage" style={S.ghostBtn}>마이페이지</Link>
-          <Link href="/" style={S.ghostBtn}>← 홈으로</Link>
+          <Link href="/mypage" className="glass-hoverable" style={S.ghostBtn}>마이페이지</Link>
+          <Link href="/" className="glass-hoverable" style={S.ghostBtn}>← 홈으로</Link>
         </div>
 
         <div style={{ ...S.card, padding: 0, overflow: "hidden" }}>

@@ -284,17 +284,43 @@ Subtitles, title, text is strictly prohibited.`;
           box-shadow: 0 18px 40px rgba(15, 23, 42, 0.1);
         }
         .tb-pill-primary {
-          background: linear-gradient(112.34deg, #68D970 -38.67%, #00996D 99.56%);
-          color: #fff;
-          box-shadow: 0 10px 24px rgba(0, 153, 109, 0.3);
+          background: rgba(255,255,255,0.4);
+          color: #00774f;
+          border: 1.5px solid rgba(0,153,109,0.35);
+          backdrop-filter: blur(18px) saturate(180%);
+          -webkit-backdrop-filter: blur(18px) saturate(180%);
+          box-shadow:
+            0 10px 24px rgba(0,153,109,0.22),
+            inset 2px 2px 1px 0 rgba(255,255,255,0.85),
+            inset -1px -1px 1px 1px rgba(255,255,255,0.5);
+          transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,2.2), box-shadow 0.3s, background 0.3s;
         }
-        .tb-pill-primary:hover { opacity: 0.94; }
+        .tb-pill-primary:hover {
+          background: rgba(255,255,255,0.55);
+          transform: translateY(-1px) scale(1.03);
+          box-shadow:
+            0 16px 32px rgba(0,153,109,0.3),
+            inset 2px 2px 1px 0 rgba(255,255,255,0.95),
+            inset -1px -1px 1px 1px rgba(255,255,255,0.6);
+        }
+        .tb-pill-primary:active { transform: translateY(0) scale(0.98); }
         .tb-pill-ghost {
-          background: #fff;
+          background: rgba(255,255,255,0.55);
           color: #334155;
-          border: 1px solid #e2e8f0;
+          border: 1px solid rgba(255,255,255,0.7);
+          backdrop-filter: blur(14px) saturate(140%);
+          -webkit-backdrop-filter: blur(14px) saturate(140%);
+          box-shadow:
+            0 6px 16px rgba(15,23,42,0.08),
+            inset 1.5px 1.5px 0.5px 0 rgba(255,255,255,0.85),
+            inset -1px -1px 0.5px 1px rgba(255,255,255,0.45);
+          transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,2.2), box-shadow 0.3s, background 0.3s;
         }
-        .tb-pill-ghost:hover { background: #f1f5f9; }
+        .tb-pill-ghost:hover {
+          background: rgba(255,255,255,0.75);
+          transform: translateY(-1px) scale(1.03);
+        }
+        .tb-pill-ghost:active { transform: translateY(0) scale(0.98); }
       `}</style>
 
       {/* Hero */}

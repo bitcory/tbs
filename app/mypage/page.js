@@ -40,9 +40,9 @@ export default async function MyPage() {
 
       <div style={{ ...S.pageWrap, marginTop: -48, position: "relative" }}>
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginBottom: 16 }}>
-          <Link href="/" style={S.ghostBtn}>← 홈으로</Link>
+          <Link href="/" className="glass-hoverable" style={S.ghostBtn}>← 홈으로</Link>
           {isAdmin && (
-            <Link href="/admin" style={S.primaryPill}>관리자 페이지</Link>
+            <Link href="/admin" className="glass-hoverable" style={S.primaryPill}>관리자 페이지</Link>
           )}
           <form
             action={async () => {
@@ -50,7 +50,7 @@ export default async function MyPage() {
               await signOut({ redirectTo: "/login" });
             }}
           >
-            <button style={S.ghostBtn}>로그아웃</button>
+            <button className="glass-hoverable" style={S.ghostBtn}>로그아웃</button>
           </form>
         </div>
 

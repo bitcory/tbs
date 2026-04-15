@@ -37,7 +37,7 @@ export default function ProfileEditor({ initialNickname, initialEmail, updatePro
         {!editing && (
           <button
             type="button"
-            onClick={() => setEditing(true)}
+            onClick={() => setEditing(true)} className="glass-hoverable"
             style={{ ...S.ghostBtn, padding: "8px 14px" }}
           >
             수정
@@ -74,7 +74,7 @@ export default function ProfileEditor({ initialNickname, initialEmail, updatePro
         <div style={{ display: "flex", gap: 10 }}>
           <button
             type="submit"
-            disabled={pending}
+            disabled={pending} className="glass-hoverable"
             style={{ ...S.primaryBtn, width: "auto", padding: "12px 24px", opacity: pending ? 0.6 : 1 }}
           >
             {pending ? "저장 중..." : "저장"}
@@ -82,7 +82,7 @@ export default function ProfileEditor({ initialNickname, initialEmail, updatePro
           <button
             type="button"
             onClick={onCancel}
-            disabled={pending}
+            disabled={pending} className="glass-hoverable"
             style={{ ...S.ghostBtn, padding: "12px 20px" }}
           >
             취소
