@@ -811,9 +811,9 @@
     .sub-option {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       width: 100%;
-      padding: 16px 18px;
+      padding: 12px 14px;
       border-radius: 16px;
       border: 2px solid #e2e8f0;
       background: #fff;
@@ -821,6 +821,22 @@
       text-align: left;
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 2.2), border-color 0.25s, box-shadow 0.25s, background 0.25s;
       font-family: inherit;
+    }
+
+    .sub-option-thumb {
+      flex-shrink: 0;
+      width: 80px;
+      height: 80px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+    }
+    .sub-option-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
     .sub-option:hover {
@@ -1250,11 +1266,8 @@
     <div class="sub-modal" onclick="event.stopPropagation()">
       <button type="button" class="sub-modal-close" onclick="closeSubModal()" aria-label="닫기">×</button>
       <h3 class="sub-modal-title" id="subModalTitle">세부 과정 선택</h3>
-      <p class="sub-modal-desc">어떤 과정을 시작할까요?</p>
+      <p class="sub-modal-desc">시작할 과정을 선택하세요.</p>
       <div class="sub-options" id="subOptions"></div>
-      <button type="button" class="sub-modal-submit" id="subSubmit" onclick="submitSubChoice()" disabled>
-        시작하기 →
-      </button>
     </div>
   </div>
 
@@ -1267,8 +1280,8 @@
       step2: {
         label: 'Step 2', title: '영상 제작하기', ready: true,
         items: [
-          { id: 'music', title: '뮤직 영상 만들기',   desc: '감성 뮤직 영상 스토리보드', url: '/lecture/step2' },
-          { id: 'intro', title: '인트로 영상 만들기', desc: '브랜드 인트로 영상 제작',   url: '/lecture/step3' },
+          { id: 'music', title: '뮤직 영상 만들기',   desc: '감성 뮤직 영상 스토리보드', thumb: '/images/thumbs/step2-1.jpg', url: '/lecture/step2' },
+          { id: 'intro', title: '인트로 영상 만들기', desc: '브랜드 인트로 영상 제작',   thumb: '/images/thumbs/step3-1.jpg', url: '/lecture/step3' },
         ],
       },
       step4: { label: 'Step 4', title: '광고영상 제작',     url: null, ready: false },
@@ -1348,8 +1361,11 @@
     }
 
     /* ──────────────── CARD SELECTION ──────────────── */
-    function selectStep(step) {
+    const selectedItems = {}; // { step2: 'music', ... }
+
+    function selectStep(step, { userInitiated = false } = {}) {
       if (!STEPS[step]) return;
+      const prevStep = currentStep;
       currentStep = step;
 
       document.querySelectorAll('.step-card').forEach(card => {
@@ -1360,21 +1376,32 @@
       document.getElementById('videoPanelEyebrow').textContent = data.label;
       document.getElementById('videoPanelTitle').textContent = data.title;
 
+      updateCtaForStep(step);
+      renderMediaPanel(step);
+      centerCardInTrack(step);
+
+      // Auto-open sub-select modal on user-initiated click if step has items
+      if (userInitiated && data.ready && Array.isArray(data.items) && data.items.length > 0) {
+        openSubSelectModal(step);
+      }
+    }
+
+    function updateCtaForStep(step) {
+      const data = STEPS[step];
       const cta = document.getElementById('ctaPrimary');
-      if (data.ready) {
-        cta.disabled = false;
-        cta.textContent = '시작하기 →';
-      } else {
+      if (!data.ready) {
         cta.disabled = true;
         cta.textContent = '준비중';
+        return;
       }
-
-      // Render the per-step media panel below
-      renderMediaPanel(step);
-
-      // Smoothly center the selected card horizontally inside the track
-      // (without affecting the page's vertical scroll)
-      centerCardInTrack(step);
+      cta.disabled = false;
+      if (Array.isArray(data.items) && data.items.length > 0) {
+        const chosenId = selectedItems[step];
+        const chosen = data.items.find(x => x.id === chosenId);
+        cta.textContent = chosen ? `${chosen.title} 시작하기 →` : '과정 선택하기 →';
+      } else {
+        cta.textContent = '시작하기 →';
+      }
     }
 
     function renderMediaPanel(step) {
@@ -1425,21 +1452,29 @@
       const data = STEPS[currentStep];
       if (!data || !data.ready) return;
       if (Array.isArray(data.items) && data.items.length > 0) {
-        openSubSelectModal(currentStep);
+        const chosenId = selectedItems[currentStep];
+        const chosen = data.items.find(x => x.id === chosenId);
+        if (chosen?.url) {
+          navigateTop(chosen.url);
+        } else {
+          openSubSelectModal(currentStep);
+        }
         return;
       }
       if (data.url) navigateTop(data.url);
     }
 
     /* ──────────────── SUB-SELECT MODAL ──────────────── */
-    let pendingSubItem = null;
-
     function openSubSelectModal(step) {
       const data = STEPS[step];
       if (!data || !data.items) return;
+      const currentId = selectedItems[step];
       const container = document.getElementById('subOptions');
       container.innerHTML = data.items.map(item => `
-        <button type="button" class="sub-option" data-id="${item.id}" onclick="selectSubOption('${item.id}')">
+        <button type="button" class="sub-option${currentId === item.id ? ' selected' : ''}" data-id="${item.id}" onclick="selectSubOption('${item.id}')">
+          <div class="sub-option-thumb">
+            ${item.thumb ? `<img src="${item.thumb}" alt="${item.title}" />` : ''}
+          </div>
           <div class="sub-option-body">
             <div class="sub-option-title">${item.title}</div>
             ${item.desc ? `<div class="sub-option-desc">${item.desc}</div>` : ''}
@@ -1453,35 +1488,21 @@
       `).join('');
 
       document.getElementById('subModalTitle').textContent = `${data.label} · 세부 과정 선택`;
-      pendingSubItem = null;
-      updateSubSubmitState();
       document.getElementById('subModal').classList.add('active');
     }
 
     function selectSubOption(id) {
-      pendingSubItem = id;
+      selectedItems[currentStep] = id;
       document.querySelectorAll('.sub-option').forEach(b => {
         b.classList.toggle('selected', b.dataset.id === id);
       });
-      updateSubSubmitState();
-    }
-
-    function updateSubSubmitState() {
-      const btn = document.getElementById('subSubmit');
-      if (!btn) return;
-      btn.disabled = !pendingSubItem;
-    }
-
-    function submitSubChoice() {
-      if (!pendingSubItem) return;
-      const data = STEPS[currentStep];
-      const item = data?.items?.find(x => x.id === pendingSubItem);
-      if (item?.url) navigateTop(item.url);
+      updateCtaForStep(currentStep);
+      // Auto-close shortly after selection for visual feedback
+      setTimeout(closeSubModal, 220);
     }
 
     function closeSubModal() {
       document.getElementById('subModal').classList.remove('active');
-      pendingSubItem = null;
     }
 
     function handleSubOverlayClick(e) {
@@ -1596,7 +1617,7 @@
             e.stopPropagation();
             return;
           }
-          selectStep(card.dataset.step);
+          selectStep(card.dataset.step, { userInitiated: true });
         });
       });
       selectStep('step1');
