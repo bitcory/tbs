@@ -46,8 +46,8 @@ export default function Page() {
         {
           heading: '📁 핵심 파일 저장 경로',
           body: [
-            'Mac: /Users/[사용자이름]/Movies/CapCut/User Data/Projects/com.lveditor.draft/[프로젝트 생성 날짜 폴더]/Resources/combination',
-            'Windows: c:/toolb > appdata > CapCut > User Data > Projects > com.lveditor.draft > [폴더명]',
+            <span key="mac"><strong style={{ color: '#DC2626' }}>Mac:</strong>{' '}<code style={{ color: '#DC2626', background: '#FEF2F2', padding: '2px 6px', borderRadius: 4, fontSize: 13 }}>/Users/toolb/Movies/CapCut/User Data/Projects/com.lveditor.draft/Resources/combination</code></span>,
+            <span key="win"><strong style={{ color: '#2563EB' }}>Windows:</strong>{' '}<code style={{ color: '#2563EB', background: '#EFF6FF', padding: '2px 6px', borderRadius: 4, fontSize: 13 }}>c:/toolb &gt; appdata &gt; CapCut &gt; User Data &gt; Projects &gt; com.lveditor.draft &gt; [폴더명]</code></span>,
             '💡 팁: 파일 탐색기에서 "수정한 날짜"로 정렬하면 방금 작업한 폴더를 쉽게 찾을 수 있습니다.',
             'combination 폴더 안의 파일이 바로 PRO 유료 기능이 적용된 영상 클립 원본입니다.',
           ],
