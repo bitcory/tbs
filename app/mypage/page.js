@@ -76,6 +76,33 @@ export default async function MyPage() {
           </div>
         </div>
 
+        <div style={{ ...S.card, marginBottom: 18 }}>
+          <div style={S.sectionTitle}>유용한 유틸 다운로드</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10 }}>
+            {[
+              { label: "Snipaste 캡쳐", url: "https://www.snipaste.com/" },
+              { label: "Everything 검색", url: "https://www.voidtools.com/ko-kr/" },
+              { label: "무료 캡컷", url: "https://aitoolb.com/61" },
+            ].map((u) => (
+              <a
+                key={u.url}
+                href={u.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="glass-hoverable"
+                style={{
+                  ...S.primaryPill,
+                  textAlign: "center",
+                  textDecoration: "none",
+                  padding: "12px 16px",
+                }}
+              >
+                {u.label}
+              </a>
+            ))}
+          </div>
+        </div>
+
         <ProfileEditor
           initialNickname={me.nickname}
           initialEmail={me.email}
