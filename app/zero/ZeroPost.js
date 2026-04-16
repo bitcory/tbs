@@ -8,6 +8,7 @@ export default function ZeroPost({
   readingTime,
   thumbClass,
   thumbLabel,
+  thumbImage,
   sections = [],
   sourceUrl,
   sourceLabel,
@@ -33,9 +34,15 @@ export default function ZeroPost({
           )}
         </header>
 
-        <div style={{ ...styles.thumb, ...(thumbClass === 'gradient-gmail' ? styles.thumbGmail : styles.thumbCapcut) }}>
-          {thumbLabel}
-        </div>
+        {thumbImage ? (
+          <div style={styles.thumbImgWrap}>
+            <img src={thumbImage} alt={title} style={styles.thumbImg} />
+          </div>
+        ) : (
+          <div style={{ ...styles.thumb, ...(thumbClass === 'gradient-gmail' ? styles.thumbGmail : styles.thumbCapcut) }}>
+            {thumbLabel}
+          </div>
+        )}
 
         <div style={styles.body}>
           {sections.map((s, i) => (
@@ -44,6 +51,13 @@ export default function ZeroPost({
               {s.body.map((p, j) => (
                 <p key={j} style={styles.p}>{p}</p>
               ))}
+              {s.images && s.images.length > 0 && (
+                <div style={styles.imageGroup}>
+                  {s.images.map((img, k) => (
+                    <img key={k} src={img.src} alt={img.alt || ''} style={styles.sectionImage} loading="lazy" />
+                  ))}
+                </div>
+              )}
               {s.links && s.links.length > 0 && (
                 <div style={styles.linkBox}>
                   {s.links.map((l, k) => (
@@ -156,6 +170,29 @@ const styles = {
   },
   thumbGmail: { background: 'linear-gradient(135deg, #EA4335, #FBBC05)' },
   thumbCapcut: { background: 'linear-gradient(135deg, #0f172a, #00B380)' },
+  thumbImgWrap: {
+    width: '100%',
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginBottom: 40,
+    boxShadow: '0 18px 40px rgba(15, 23, 42, 0.14)',
+  },
+  thumbImg: {
+    width: '100%',
+    display: 'block',
+  },
+  imageGroup: {
+    marginTop: 16,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 12,
+  },
+  sectionImage: {
+    width: '100%',
+    borderRadius: 12,
+    boxShadow: '0 4px 16px rgba(15, 23, 42, 0.1)',
+    display: 'block',
+  },
   body: {},
   section: { marginBottom: 36 },
   h2: {
