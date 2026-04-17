@@ -4,7 +4,9 @@ import { auth, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import * as S from "@/lib/uiStyles";
 import ProfileEditor from "./ProfileEditor";
-import { updateProfile } from "./actions";
+import MaterialRequestButton from "./MaterialRequestButton";
+import { updateProfile, requestMaterials } from "./actions";
+import { hasStepMaterials } from "@/lib/stepMaterials";
 
 const ROLE_LABEL = {
   USER: "일반 회원",
@@ -61,16 +63,38 @@ export default async function MyPage() {
             <span style={{ color: "#64748b", fontSize: 13 }}>가입일 {new Date(me.createdAt).toLocaleDateString("ko-KR")}</span>
           </div>
 
-          <div style={{ fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 8 }}>
-            단계 접근권한
+          <div style={{ fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 10 }}>
+            단계 접근권한 & 강의자료
           </div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {[1, 2, 3].map((n) => {
               const ok = me.stepAccess.includes(n) || me.role !== "USER";
+              const ready = hasStepMaterials(n);
               return (
-                <span key={n} style={S.badge(ok ? S.badgeGreen : S.badgeGray)}>
-                  Step {n} {ok ? "✓ 허용" : "✕ 차단"}
-                </span>
+                <div
+                  key={n}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    padding: "12px 14px",
+                    background: "#f8fafc",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: 14,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <span style={S.badge(ok ? S.badgeGreen : S.badgeGray)}>
+                    Step {n} {ok ? "✓ 허용" : "✕ 차단"}
+                  </span>
+                  <MaterialRequestButton
+                    step={n}
+                    hasAccess={ok}
+                    ready={ready}
+                    requestMaterials={requestMaterials}
+                  />
+                </div>
               );
             })}
           </div>
