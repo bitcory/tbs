@@ -299,6 +299,7 @@ export default function Step2Page() {
 
   const scenesByAct = ACTS.map(act => (storyboard?.scenes || []).filter(s => s.act === act));
   const allImagePrompts = storyboard ? buildGridText(storyboard.scenes.map(s => s.prompts.image.prompt)) : '';
+  const allImagePromptsGrok = storyboard ? storyboard.scenes.map(s => s.prompts.image.prompt).join('\n\n') : '';
   const allVideoPrompts = storyboard ? storyboard.scenes.map(s => s.prompts.video.prompt).join('\n\n') : '';
 
   return (
@@ -607,6 +608,13 @@ export default function Step2Page() {
                   >
                     <ImageIcon className="w-3.5 h-3.5" />
                     이미지 전체
+                  </button>
+                  <button
+                    onClick={() => copyText(allImagePromptsGrok)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0f172a] hover:opacity-90 text-white text-sm font-bold transition"
+                  >
+                    <ImageIcon className="w-3.5 h-3.5" />
+                    GROK 복사
                   </button>
                   <button
                     onClick={() => copyText(allVideoPrompts)}
