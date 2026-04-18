@@ -371,7 +371,7 @@ export default function FrameExtractor({ accentColor = '#f59e0b' }) {
             <button
               onClick={captureCurrentFrame}
               disabled={isExtracting || videoDuration <= 0}
-              className="flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white transition-colors disabled:opacity-30"
+              className="flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white transition-colors disabled:opacity-30 tb-press"
             >
               <ImageIcon className="w-3.5 h-3.5" />
               현재 프레임
@@ -379,14 +379,14 @@ export default function FrameExtractor({ accentColor = '#f59e0b' }) {
             <button
               onClick={captureEndFrame}
               disabled={isExtracting || videoDuration <= 0}
-              className="flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-xs font-bold bg-red-600 hover:bg-red-500 text-white transition-colors disabled:opacity-30"
+              className="flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-xs font-bold bg-red-600 hover:bg-red-500 text-white transition-colors disabled:opacity-30 tb-press"
             >
               <Film className="w-3.5 h-3.5" />
               엔드프레임
             </button>
             <button
               onClick={resetAll}
-              className="flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-xs font-bold bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300 transition-colors"
+              className="flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-xs font-bold bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300 transition-colors tb-press-soft"
             >
               <RefreshCw className="w-3.5 h-3.5" />
             </button>
@@ -427,7 +427,7 @@ export default function FrameExtractor({ accentColor = '#f59e0b' }) {
                 </div>
                 <button
                   onClick={() => { setExtractedFrames([]); setExtractionProgress(0); setSelectedFrameIds(new Set()); }}
-                  className="text-xs font-medium flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300"
+                  className="text-xs font-medium flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300 tb-press-soft"
                 >
                   <RefreshCw className="w-3 h-3" />
                   초기화
@@ -448,12 +448,12 @@ export default function FrameExtractor({ accentColor = '#f59e0b' }) {
                   전체 선택
                 </button>
                 {selectedFrameIds.size > 0 ? (
-                  <button onClick={downloadSelectedFrames} className="text-xs font-medium flex items-center gap-1.5 px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white">
+                  <button onClick={downloadSelectedFrames} className="text-xs font-medium flex items-center gap-1.5 px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white tb-press">
                     <Download className="w-3 h-3" />
                     선택 다운로드 ({selectedFrameIds.size})
                   </button>
                 ) : (
-                  <button onClick={downloadAllFrames} className="text-xs font-medium flex items-center gap-1.5 px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white">
+                  <button onClick={downloadAllFrames} className="text-xs font-medium flex items-center gap-1.5 px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white tb-press">
                     <Download className="w-3 h-3" />
                     전체 다운로드
                   </button>
@@ -484,14 +484,14 @@ export default function FrameExtractor({ accentColor = '#f59e0b' }) {
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
                           <button
                             onClick={(e) => { e.stopPropagation(); setPreviewFrame(frame); }}
-                            className="p-1.5 rounded-lg bg-amber-500 text-zinc-900 hover:bg-amber-400"
+                            className="p-1.5 rounded-lg bg-amber-500 text-zinc-900 hover:bg-amber-400 tb-press"
                             title="미리보기"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={(e) => { e.stopPropagation(); downloadFrame(frame); }}
-                            className="p-1.5 rounded-lg bg-blue-500 text-white hover:bg-blue-400"
+                            className="p-1.5 rounded-lg bg-blue-500 text-white hover:bg-blue-400 tb-press"
                             title="다운로드"
                           >
                             <Download className="w-3.5 h-3.5" />
@@ -519,11 +519,11 @@ export default function FrameExtractor({ accentColor = '#f59e0b' }) {
                       <span className="text-xs font-mono text-zinc-500">{formatTimePrecise(previewFrame.timestamp)}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <button onClick={() => downloadFrame(previewFrame)} className="px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white">
+                      <button onClick={() => downloadFrame(previewFrame)} className="px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white tb-press">
                         <Download className="w-3.5 h-3.5" />
                         다운로드
                       </button>
-                      <button onClick={() => setPreviewFrame(null)} className="p-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400">
+                      <button onClick={() => setPreviewFrame(null)} className="p-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 tb-press-soft">
                         <X className="w-4 h-4" />
                       </button>
                     </div>

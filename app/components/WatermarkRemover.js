@@ -457,15 +457,15 @@ function WmMaskPainter({ imageUrl, width, height, onMaskReady, processing }) {
           <span className="text-[10px] text-zinc-500 w-6 text-right tabular-nums font-bold">{brushSize}</span>
         </div>
         <div className="flex items-center gap-0.5">
-          <button onClick={undo} disabled={!canUndo || processing} className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300 disabled:opacity-30" title="실행 취소"><Undo2 className="w-3.5 h-3.5" /></button>
-          <button onClick={redo} disabled={!canRedo || processing} className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300 disabled:opacity-30" title="다시 실행"><Redo2 className="w-3.5 h-3.5" /></button>
+          <button onClick={undo} disabled={!canUndo || processing} className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300 disabled:opacity-30 tb-press-soft" title="실행 취소"><Undo2 className="w-3.5 h-3.5" /></button>
+          <button onClick={redo} disabled={!canRedo || processing} className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300 disabled:opacity-30 tb-press-soft" title="다시 실행"><Redo2 className="w-3.5 h-3.5" /></button>
         </div>
         <div className="flex items-center gap-0.5">
-          <button onClick={() => zoomTo(zoom / 1.3)} disabled={zoom <= WM_MIN_ZOOM || processing} className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300 disabled:opacity-30" title="축소"><ZoomOut className="w-3.5 h-3.5" /></button>
-          <button onClick={() => zoomTo(1)} disabled={zoom === 1 || processing} className="px-1.5 py-1 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300 disabled:opacity-30 text-[10px] tabular-nums min-w-[2.5rem] text-center font-bold" title="초기화">{Math.round(zoom * 100)}%</button>
-          <button onClick={() => zoomTo(zoom * 1.3)} disabled={zoom >= WM_MAX_ZOOM || processing} className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300 disabled:opacity-30" title="확대"><ZoomIn className="w-3.5 h-3.5" /></button>
+          <button onClick={() => zoomTo(zoom / 1.3)} disabled={zoom <= WM_MIN_ZOOM || processing} className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300 disabled:opacity-30 tb-press-soft" title="축소"><ZoomOut className="w-3.5 h-3.5" /></button>
+          <button onClick={() => zoomTo(1)} disabled={zoom === 1 || processing} className="px-1.5 py-1 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300 disabled:opacity-30 tb-press-soft text-[10px] tabular-nums min-w-[2.5rem] text-center font-bold" title="초기화">{Math.round(zoom * 100)}%</button>
+          <button onClick={() => zoomTo(zoom * 1.3)} disabled={zoom >= WM_MAX_ZOOM || processing} className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300 disabled:opacity-30 tb-press-soft" title="확대"><ZoomIn className="w-3.5 h-3.5" /></button>
         </div>
-        <button onClick={handleComplete} disabled={processing} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-violet-600 hover:bg-violet-500 text-white disabled:opacity-50">
+        <button onClick={handleComplete} disabled={processing} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-violet-600 hover:bg-violet-500 text-white disabled:opacity-50 tb-press">
           {processing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
           {processing ? '처리중...' : '적용'}
         </button>
@@ -660,12 +660,12 @@ export default function WatermarkRemover({ accentColor = '#8b5cf6' }) {
                 <option value="png">PNG</option>
                 <option value="webp">WebP</option>
               </select>
-              <button onClick={handleDownload} className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white">
+              <button onClick={handleDownload} className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white tb-press">
                 <Download className="w-3 h-3" />
               </button>
             </div>
           )}
-          <button onClick={resetAll} className="px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300">
+          <button onClick={resetAll} className="px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300 tb-press-soft">
             <RefreshCw className="w-3 h-3" />
           </button>
         </div>
@@ -689,7 +689,7 @@ export default function WatermarkRemover({ accentColor = '#8b5cf6' }) {
             <Droplets className="w-4 h-4" style={{ color: accentColor }} />
             <h3 className="text-sm font-black text-zinc-100 uppercase flex-1">결과 비교</h3>
             <span className="text-[10px] font-bold whitespace-nowrap px-1.5 py-0.5 rounded bg-violet-500/20 border border-violet-500/30 text-violet-300">{imageWidth}x{imageHeight}</span>
-            <button onClick={resetAll} className="px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300">
+            <button onClick={resetAll} className="px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300 tb-press-soft">
               <RefreshCw className="w-3 h-3" />
             </button>
           </div>
@@ -719,7 +719,7 @@ export default function WatermarkRemover({ accentColor = '#8b5cf6' }) {
       </div>
 
       <div className="w-full md:w-64 shrink-0 flex flex-col gap-3">
-        <button onClick={goBackToMasking} className="flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold w-full bg-violet-600 hover:bg-violet-500 text-white">
+        <button onClick={goBackToMasking} className="flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold w-full bg-violet-600 hover:bg-violet-500 text-white tb-press">
           <Droplets className="w-4 h-4" />
           다시 마스크
         </button>
@@ -733,12 +733,12 @@ export default function WatermarkRemover({ accentColor = '#8b5cf6' }) {
               <button key={f} onClick={() => setDownloadFormat(f)} className={`flex-1 text-xs py-2 font-bold uppercase transition-colors ${downloadFormat === f ? 'bg-blue-600 text-white' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}`}>{f}</button>
             ))}
           </div>
-          <button onClick={handleDownload} className="flex-1 w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white">
+          <button onClick={handleDownload} className="flex-1 w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white tb-press">
             <Download className="w-4 h-4" />
             다운로드
           </button>
         </div>
-        <button onClick={resetAll} className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold w-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300">
+        <button onClick={resetAll} className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold w-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-zinc-300 tb-press-soft">
           <ImageIcon className="w-4 h-4" />
           새 이미지
         </button>

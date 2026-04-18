@@ -53,7 +53,12 @@ body:has(.auth-scroll) {
     inset -1px -1px 0.5px 1px rgba(255, 255, 255, 0.45) !important;
 }
 .glass-hoverable:active {
-  transform: translateY(0) scale(0.98);
+  transform: translateY(1px) scale(0.94) !important;
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.18),
+    inset 2px 2px 3px 0 rgba(0, 0, 0, 0.15),
+    inset -1px -1px 1px 1px rgba(255, 255, 255, 0.25) !important;
+  transition: transform 0.08s ease-out, box-shadow 0.08s ease-out !important;
 }
 
 /* Utility fade-in animation */
@@ -63,4 +68,38 @@ body:has(.auth-scroll) {
 }
 .animate-fadeIn {
   animation: fadeIn 0.25s ease-out;
+}
+
+/* ─── Global button press feedback ─────────────────────────
+   Apply `tb-press` to solid/colored buttons, and `tb-press-soft`
+   to white/pale/tab buttons. Provides hover lift + active press-in.
+*/
+.tb-press {
+  transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 2), box-shadow 0.25s, background 0.25s, opacity 0.2s;
+  transform-origin: center;
+  will-change: transform;
+}
+.tb-press:hover {
+  transform: translateY(-1.5px) scale(1.035);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.18);
+}
+.tb-press:active {
+  transform: translateY(1px) scale(0.93);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12), inset 0 2px 4px rgba(0, 0, 0, 0.18);
+  transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
+  opacity: 0.92;
+}
+
+.tb-press-soft {
+  transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 2), box-shadow 0.25s, background 0.2s;
+  transform-origin: center;
+  will-change: transform;
+}
+.tb-press-soft:hover {
+  transform: translateY(-1px) scale(1.03);
+}
+.tb-press-soft:active {
+  transform: translateY(0.5px) scale(0.94);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.12);
+  transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
 }

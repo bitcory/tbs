@@ -75,6 +75,35 @@ Vercel이 자동 배포함.
 - Step 3: `0411`
 - Step 4, 5: 준비중 (비활성)
 
+## Button Interaction Convention (필수)
+
+모든 버튼은 hover lift + active press-in 피드백이 있어야 한다. 전역 유틸리티
+`.tb-press`(강조/컬러 버튼용), `.tb-press-soft`(흰·옅은 배경·탭 등 서브 버튼용) 를
+`app/globals.css`에서 제공하며, 새로 만드는 페이지/컴포넌트는 아래 규칙을 따른다.
+
+**적용 규칙:**
+- 컬러 배경 버튼 (`bg-blue-600`, `bg-[#E60023]`, `hover:opacity-90` 계열, 포인트 CTA) → `tb-press`
+- 흰/옅은 배경, 탭, 복사, 닫기 아이콘 버튼 → `tb-press-soft`
+- 이미 `tb-pill-primary` / `tb-pill-ghost` (글라스 버튼 styled-jsx) 를 쓰는 버튼은
+  재적용 불필요. 새 페이지에서 글라스 버튼을 만들 땐 step1~3 page.js 의 pill
+  정의(눌림 시 `translateY(1px) scale(0.94)` + inset shadow)를 그대로 복사해 사용.
+- `transition` Tailwind 클래스는 `tb-press`/`tb-press-soft` 가 이미 전환을 포함하므로
+  같이 붙이지 않아도 된다.
+
+**새 버튼 예시:**
+```jsx
+<button className="px-3 py-1.5 rounded-full bg-blue-600 text-white font-bold tb-press">
+  실행
+</button>
+<button className="px-3 py-1.5 rounded-full bg-white border border-[#e2e8f0] text-[#334155] tb-press-soft">
+  취소
+</button>
+```
+
+`main.html` 등 iframe 내부(globals.css 미적용) 에서는 `:hover` 에 lift, `:active` 에
+`translateY(1px) scale(0.94)` + `inset 0 2px 4px rgba(0,0,0,0.12)` 정도의 눌림
+shadow를 직접 CSS 로 넣는다.
+
 ## Key Files
 - `/public/toolblab/main.html` — 메인 랜딩 (히어로 + 카드 캐러셀 + 미디어 패널)
 - `/app/page.js` — iframe 래퍼

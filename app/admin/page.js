@@ -85,6 +85,7 @@ export default async function AdminPage() {
                                 }}
                               >
                                 <button
+                                  className="tb-press-soft"
                                   style={{
                                     ...S.badge(hasAccess ? S.badgeGreen : S.badgeGray),
                                     border: "none",

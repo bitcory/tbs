@@ -401,7 +401,12 @@
     }
 
     .cta-primary:active:not(:disabled) {
-      transform: translateY(0) scale(0.98);
+      transform: translateY(1px) scale(0.94);
+      box-shadow:
+        0 4px 10px rgba(0, 153, 109, 0.2),
+        inset 2px 2px 2px 0 rgba(0, 0, 0, 0.08),
+        inset -1px -1px 1px 1px rgba(255, 255, 255, 0.3);
+      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
     }
 
     .cta-primary:disabled {
@@ -909,6 +914,14 @@
       transform: translateY(-1px) scale(1.02);
       background: rgba(255, 255, 255, 0.55);
     }
+    .sub-modal-submit:not(:disabled):active {
+      transform: translateY(1px) scale(0.94);
+      box-shadow:
+        0 4px 10px rgba(0, 153, 109, 0.18),
+        inset 2px 2px 2px 0 rgba(0, 0, 0, 0.08),
+        inset -1px -1px 1px 1px rgba(255, 255, 255, 0.3);
+      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
+    }
     .sub-modal-submit:disabled {
       opacity: 0.45;
       cursor: not-allowed;
@@ -963,7 +976,9 @@
     }
 
     .class-tab:active:not(.active) {
-      transform: translateY(0) scale(0.98);
+      transform: translateY(1px) scale(0.94);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.12);
+      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
     }
 
     .class-tab.active {
@@ -1029,6 +1044,11 @@
       transform: translateY(-4px);
       border-color: #00B380;
       box-shadow: 0 20px 40px rgba(0, 153, 109, 0.18);
+    }
+    .zero-card:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 4px 12px rgba(0, 153, 109, 0.14), inset 0 2px 6px rgba(0, 0, 0, 0.06);
+      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
     }
 
     .zero-card-thumb {
