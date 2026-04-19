@@ -48,6 +48,7 @@ export default async function AdminPage() {
                   <th style={th}>권한</th>
                   <th style={th}>Step 1</th>
                   <th style={th}>Step 2</th>
+                  <th style={th}>Step 2-1</th>
                   <th style={th}>Step 3</th>
                   <th style={th}>가입일</th>
                 </tr>
@@ -73,7 +74,7 @@ export default async function AdminPage() {
                           <span style={S.badge(ROLE_BADGE[u.role])}>{ROLE_LABEL[u.role]}</span>
                         )}
                       </td>
-                      {[1, 2, 3].map((step) => {
+                      {[1, 2, 21, 3].map((step) => {
                         const hasAccess = u.role !== "USER" || u.stepAccess.includes(step);
                         return (
                           <td key={step} style={td}>

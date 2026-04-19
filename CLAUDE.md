@@ -69,11 +69,43 @@ Vercel이 자동 배포함.
 | Step 4 | - | placeholder | - |
 | Step 5 | 1 | video (single) | `thumbs/step5-1.jpg` |
 
-## Access Codes
-- Step 1: 없음 (바로 이동)
-- Step 2: `0410`
-- Step 3: `0411`
-- Step 4, 5: 준비중 (비활성)
+## Step Routes & Access
+
+모든 강의 페이지는 **로그인 + 관리자(STAFF/SUPER_ADMIN) 권한 토글** 방식으로 접근 제어한다.
+접근 코드(access code) 방식은 더 이상 사용하지 않는다.
+
+| 단계 | 라우트 | `stepAccess` 값 | 설명 |
+|------|--------|----------------|------|
+| Step 1 | `/lecture/step1` | `1` | 마스터 이미지 만들기 |
+| Step 2 | `/lecture/step2` | `2` | 뮤직 영상 만들기 |
+| Step 2-1 | `/lecture/step2-1` | `21` | 인트로 영상 만들기 (Step 2 하위) |
+| Step 3 | `/lecture/step3` | `3` | 스토리 영상 만들기 (기/승/전/결) |
+| Step 4, 5 | — | — | 준비중 (비활성) |
+
+### 접근 제어 규칙 (새 페이지에도 동일 적용)
+
+1. 각 강의 라우트 폴더에 `layout.js` 를 만들고 `requireStepAccess(<값>)` 호출.
+   ```js
+   // app/lecture/stepN/layout.js
+   import { requireStepAccess } from "@/lib/access";
+   export default async function StepNLayout({ children }) {
+     await requireStepAccess(N);       // 예: 1, 2, 21, 3
+     return children;
+   }
+   ```
+2. `stepAccess` 는 `prisma/schema.prisma` 의 `Int[]` 이다.
+   메인 단계는 한자리 정수 (1, 2, 3, 4, 5), **하위 단계는 두 자리로 인코딩**한다
+   (예: Step 2-1 → `21`, Step 3-2 → `32`). 새 서브스텝을 만들 때 같은 규칙을 따른다.
+3. `app/admin/page.js` 의 테이블 컬럼과 `[1, 2, 21, 3].map(...)` 배열에
+   해당 `stepAccess` 값을 추가해 슈퍼관리자/운영진이 개별 토글할 수 있게 한다.
+   (`STAFF` / `SUPER_ADMIN` 은 `requireStepAccess` 에서 자동 통과.)
+4. 권한 없는 사용자는 `/no-access?step=<값>` 으로 리디렉션된다.
+
+### 새 페이지 체크리스트
+- [ ] `app/lecture/<route>/layout.js` 에 `requireStepAccess(N)` 추가
+- [ ] `app/admin/page.js` 의 테이블 헤더/토글 루프에 값 추가
+- [ ] `public/toolblab/main.html` 의 `STEPS` 객체에 카드 등록 (URL + ready 플래그)
+- [ ] 이 CLAUDE.md 의 Step Routes 표에 한 줄 추가
 
 ## Button Interaction Convention (필수)
 
@@ -108,6 +140,7 @@ shadow를 직접 CSS 로 넣는다.
 - `/public/toolblab/main.html` — 메인 랜딩 (히어로 + 카드 캐러셀 + 미디어 패널)
 - `/app/page.js` — iframe 래퍼
 - `/app/layout.js` — 메타태그, 파비콘, OG 설정
-- `/app/lecture/step{1,2,3}/page.js` — 각 강의 페이지
+- `/app/lecture/step{1,2,2-1,3}/page.js` — 각 강의 페이지
+- `/app/admin/page.js` — 회원 권한/단계 접근 토글 관리
 - `/public/images/thumbs/` — 영상 썸네일
 - `/public/images/step1/` — Step 1 참고 이미지
