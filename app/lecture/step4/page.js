@@ -22,10 +22,10 @@ const ACT_COLORS = [
 ];
 
 const ACT_MAP = {
-  'hook': 'Hook', '후킹': 'Hook', 'opening': 'Hook',
-  'build': 'Build', '전개': 'Build', 'development': 'Build', 'problem': 'Build',
-  'climax': 'Climax', '절정': 'Climax', 'solution': 'Climax',
-  'cta': 'CTA', 'call_to_action': 'CTA', 'ending': 'CTA', '마무리': 'CTA',
+  'hook': 'Hook', '후킹': 'Hook', 'opening': 'Hook', '기': 'Hook', 'ki': 'Hook', 'introduction': 'Hook', 'intro': 'Hook',
+  'build': 'Build', '전개': 'Build', 'development': 'Build', 'problem': 'Build', '승': 'Build', 'seung': 'Build', 'rising_action': 'Build',
+  'climax': 'Climax', '절정': 'Climax', 'solution': 'Climax', '전': 'Climax', 'jeon': 'Climax', 'turn': 'Climax',
+  'cta': 'CTA', 'call_to_action': 'CTA', 'ending': 'CTA', '마무리': 'CTA', '결': 'CTA', 'gyeol': 'CTA', 'conclusion': 'CTA', 'resolution': 'CTA', 'falling_action': 'CTA',
 };
 
 const normalizeAct = (v) => {
