@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 import { toggleStepAccess } from "./actions";
 import RoleSelect from "./RoleSelect";
+import DeleteUserButton from "./DeleteUserButton";
 import * as S from "@/lib/uiStyles";
 
 const ROLE_LABEL = { USER: "일반", STAFF: "운영진", SUPER_ADMIN: "슈퍼" };
@@ -52,6 +53,7 @@ export default async function AdminPage() {
                   <th style={th}>Step 3</th>
                   <th style={th}>Step 4</th>
                   <th style={th}>가입일</th>
+                  {isSuper && <th style={th}>관리</th>}
                 </tr>
               </thead>
               <tbody>
@@ -114,6 +116,16 @@ export default async function AdminPage() {
                       <td style={{ ...td, color: "#94a3b8", fontSize: 12 }}>
                         {new Date(u.createdAt).toLocaleDateString("ko-KR")}
                       </td>
+                      {isSuper && (
+                        <td style={td}>
+                          {!isSelf && (
+                            <DeleteUserButton
+                              userId={u.id}
+                              label={u.nickname ?? u.email ?? u.id}
+                            />
+                          )}
+                        </td>
+                      )}
                     </tr>
                   );
                 })}

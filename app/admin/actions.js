@@ -15,6 +15,14 @@ export async function setRole(userId, role) {
   revalidatePath("/admin");
 }
 
+export async function deleteUser(userId) {
+  const me = await requireSuperAdmin();
+  if (userId === me.id) return;
+
+  await prisma.user.delete({ where: { id: userId } });
+  revalidatePath("/admin");
+}
+
 export async function toggleStepAccess(userId, step, enabled) {
   await requireAdmin();
   const user = await prisma.user.findUnique({ where: { id: userId } });
