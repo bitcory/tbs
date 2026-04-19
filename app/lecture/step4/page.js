@@ -10,27 +10,27 @@ import dynamic from 'next/dynamic';
 const FrameExtractor = dynamic(() => import('@/app/components/FrameExtractor'), { ssr: false });
 const WatermarkRemover = dynamic(() => import('@/app/components/WatermarkRemover'), { ssr: false });
 
-const CACHE_KEY = 'toolb_step3_story';
+const CACHE_KEY = 'toolb_step4_ad';
 
-const ACTS = ['기', '승', '전', '결'];
+const ACTS = ['Hook', 'Build', 'Climax', 'CTA'];
 
 const ACT_COLORS = [
-  { dot: '#22c55e', label: '기' },
-  { dot: '#3b82f6', label: '승' },
-  { dot: '#f59e0b', label: '전' },
-  { dot: '#a855f7', label: '결' },
+  { dot: '#ef4444', label: 'Hook' },
+  { dot: '#f59e0b', label: 'Build' },
+  { dot: '#8b5cf6', label: 'Climax' },
+  { dot: '#10b981', label: 'CTA' },
 ];
 
 const ACT_MAP = {
-  '기': '기', 'introduction': '기', 'intro': '기', 'ki': '기',
-  '승': '승', 'rising_action': '승', 'development': '승', 'seung': '승',
-  '전': '전', 'climax': '전', 'turn': '전', 'jeon': '전',
-  '결': '결', 'conclusion': '결', 'resolution': '결', 'falling_action': '결', 'gyeol': '결',
+  'hook': 'Hook', '후킹': 'Hook', 'opening': 'Hook',
+  'build': 'Build', '전개': 'Build', 'development': 'Build', 'problem': 'Build',
+  'climax': 'Climax', '절정': 'Climax', 'solution': 'Climax',
+  'cta': 'CTA', 'call_to_action': 'CTA', 'ending': 'CTA', '마무리': 'CTA',
 };
 
 const normalizeAct = (v) => {
   const key = String(v || '').toLowerCase();
-  return ACT_MAP[key] || ACT_MAP[v] || '기';
+  return ACT_MAP[key] || ACT_MAP[v] || 'Hook';
 };
 
 function parseStoryboard(raw) {
@@ -78,7 +78,7 @@ function parseStoryboard(raw) {
 
   return {
     id: json.id || `SB-${Date.now()}`,
-    title: json.title || '스토리 영상',
+    title: json.title || '광고영상',
     created_at: json.created_at,
     version: json.version,
     meta: {
@@ -92,7 +92,7 @@ function parseStoryboard(raw) {
   };
 }
 
-export default function Step3Page() {
+export default function Step4Page() {
   const [storyboard, setStoryboard] = useState(null);
   const [activeAct, setActiveAct] = useState(0);
   const [uploadOpen, setUploadOpen] = useState(false);
@@ -187,7 +187,7 @@ export default function Step3Page() {
       setActiveAct(0);
       setUploadOpen(false);
       setJsonInput('');
-      showToast('스토리 영상 로드 완료!');
+      showToast('광고영상 로드 완료!');
     } catch (e) {
       setUploadError(e.message || 'JSON 파싱 오류가 발생했습니다.');
     }
@@ -340,8 +340,8 @@ export default function Step3Page() {
       {/* Hero */}
       <section className="tb-hero">
         <div className="tb-hero-glow" />
-        <span className="tb-hero-eyebrow">TB STUDY · STEP 3</span>
-        <h1 className="tb-hero-title">스토리 영상 만들기</h1>
+        <span className="tb-hero-eyebrow">TB STUDY · STEP 4</span>
+        <h1 className="tb-hero-title">광고영상 만들기</h1>
       </section>
 
       {/* Glass bar */}
@@ -368,7 +368,7 @@ export default function Step3Page() {
           <div className="p-4 border-b border-[#e2e8f0]">
             <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#64748b]">
               <Clapperboard className="w-3.5 h-3.5" />
-              스토리 영상 정보
+              광고영상 정보
             </div>
             {storyboard ? (
               <div className="space-y-1.5">
@@ -439,7 +439,7 @@ export default function Step3Page() {
               className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full tb-pill-primary text-sm font-bold transition"
             >
               <ExternalLink className="w-3.5 h-3.5" />
-              3단계 젬 가이드 열기
+              4단계 젬 가이드 열기
             </a>
             <a
               href="https://kr.pinterest.com/"
@@ -513,9 +513,9 @@ export default function Step3Page() {
               <div className="w-20 h-20 mb-5 rounded-full flex items-center justify-center bg-[#ecfdf5] border border-[#e2e8f0]">
                 <Clapperboard className="w-10 h-10 text-[#00996D]" />
               </div>
-              <h3 className="text-lg font-bold text-[#0f172a] mb-2">스토리보드가 없습니다</h3>
+              <h3 className="text-lg font-bold text-[#0f172a] mb-2">광고 스토리보드가 없습니다</h3>
               <p className="text-sm text-[#64748b] mb-5 leading-relaxed">
-                JSON을 업로드하여 기/승/전/결<br />
+                JSON을 업로드하여 Hook / Build / Climax / CTA<br />
                 장면과 프롬프트를 확인하세요.
               </p>
               <button
@@ -523,7 +523,7 @@ export default function Step3Page() {
                 className="flex items-center gap-1.5 px-4 py-2 rounded-full tb-pill-primary text-sm font-bold transition"
               >
                 <Upload className="w-3.5 h-3.5" />
-                스토리보드 JSON 업로드
+                광고 스토리보드 JSON 업로드
               </button>
             </div>
           ) : (
@@ -817,8 +817,8 @@ export default function Step3Page() {
             </div>
             <div className="flex-1 overflow-y-auto p-5 space-y-3 min-h-0">
               <p className="text-sm text-[#64748b] leading-relaxed">
-                스토리보드 JSON을 붙여넣으세요. <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">scenes</code> 배열이 필요하며, 각 씬은
-                <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">act</code>(기/승/전/결),
+                광고 스토리보드 JSON을 붙여넣으세요. <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">scenes</code> 배열이 필요하며, 각 씬은
+                <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">act</code>(Hook/Build/Climax/CTA),
                 <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">prompts.image</code>,
                 <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">prompts.video</code>,
                 <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">dialogue</code> 필드를 가질 수 있습니다.
@@ -827,7 +827,7 @@ export default function Step3Page() {
                 value={jsonInput}
                 onChange={(e) => setJsonInput(e.target.value)}
                 className="w-full h-[260px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
-                placeholder='{"title": "...", "meta": {...}, "scenes": [{"id":"s01","act":"기",...,"dialogue":"..."}]}'
+                placeholder='{"title": "...", "meta": {...}, "scenes": [{"id":"s01","act":"Hook",...,"dialogue":"..."}]}'
               />
               {uploadError && (
                 <div className="text-sm text-[#b91c1c] bg-[#fee2e2] border border-[#fca5a5] rounded-xl px-3 py-2 font-semibold">

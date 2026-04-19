@@ -80,7 +80,8 @@ Vercel이 자동 배포함.
 | Step 2 | `/lecture/step2` | `2` | 뮤직 영상 만들기 |
 | Step 2-1 | `/lecture/step2-1` | `21` | 인트로 영상 만들기 (Step 2 하위) |
 | Step 3 | `/lecture/step3` | `3` | 스토리 영상 만들기 (기/승/전/결) |
-| Step 4, 5 | — | — | 준비중 (비활성) |
+| Step 4 | `/lecture/step4` | `4` | 광고영상 만들기 (Hook/Build/Climax/CTA) |
+| Step 5 | — | — | 준비중 (비활성) |
 
 ### 접근 제어 규칙 (새 페이지에도 동일 적용)
 
@@ -140,7 +141,7 @@ shadow를 직접 CSS 로 넣는다.
 - `/public/toolblab/main.html` — 메인 랜딩 (히어로 + 카드 캐러셀 + 미디어 패널)
 - `/app/page.js` — iframe 래퍼
 - `/app/layout.js` — 메타태그, 파비콘, OG 설정
-- `/app/lecture/step{1,2,2-1,3}/page.js` — 각 강의 페이지
+- `/app/lecture/step{1,2,2-1,3,4}/page.js` — 각 강의 페이지
 - `/app/admin/page.js` — 회원 권한/단계 접근 토글 관리
 - `/public/images/thumbs/` — 영상 썸네일
 - `/public/images/step1/` — Step 1 참고 이미지
