@@ -553,7 +553,7 @@ export default function Step2_1Page() {
               href="https://suno.com/"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#0f172a] hover:opacity-90 text-white text-sm font-bold tb-press"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#f97316] hover:opacity-90 text-white text-sm font-bold tb-press"
             >
               <ExternalLink className="w-3.5 h-3.5" />
               SUNO 바로가기

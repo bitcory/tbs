@@ -5,12 +5,14 @@ import Link from 'next/link';
 import {
   ArrowLeft, Upload, Copy, ExternalLink, Gem, X,
   Clapperboard, Image as ImageIcon, Film, MessageSquare, Music, Scissors, Droplets, Wrench, Trash2,
+  User,
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 const FrameExtractor = dynamic(() => import('@/app/components/FrameExtractor'), { ssr: false });
 const WatermarkRemover = dynamic(() => import('@/app/components/WatermarkRemover'), { ssr: false });
 
-const CACHE_KEY = 'toolb_step4_ad';
+const CACHE_KEY = 'toolb_step4_ad_v3';
+const CHAR_CACHE_KEY = 'toolb_step4_character';
 
 const ACTS = ['Hook', 'Build', 'Climax', 'CTA'];
 
@@ -21,10 +23,16 @@ const ACT_COLORS = [
   { dot: '#10b981', label: 'CTA' },
 ];
 
+const NARRATIVE_ROLES = [
+  'Hook', 'Setup', 'Problem', 'Escalation', 'Turn', 'Decision',
+  'Action', 'Obstacle', 'Reveal', 'Experience', 'Peak', 'CTA',
+];
+
 const ACT_MAP = {
-  'hook': 'Hook', '후킹': 'Hook', 'opening': 'Hook', '기': 'Hook', 'ki': 'Hook', 'introduction': 'Hook', 'intro': 'Hook',
-  'build': 'Build', '전개': 'Build', 'development': 'Build', 'problem': 'Build', '승': 'Build', 'seung': 'Build', 'rising_action': 'Build',
-  'climax': 'Climax', '절정': 'Climax', 'solution': 'Climax', '전': 'Climax', 'jeon': 'Climax', 'turn': 'Climax',
+  'hook': 'Hook', 'setup': 'Hook', '후킹': 'Hook', 'opening': 'Hook', '기': 'Hook', 'ki': 'Hook', 'introduction': 'Hook', 'intro': 'Hook',
+  'problem': 'Build', 'escalation': 'Build', 'build': 'Build', '전개': 'Build', 'development': 'Build', '승': 'Build', 'seung': 'Build', 'rising_action': 'Build',
+  'turn': 'Climax', 'decision': 'Climax', 'action': 'Climax', 'obstacle': 'Climax', 'reveal': 'Climax', 'experience': 'Climax', 'peak': 'Climax',
+  'climax': 'Climax', '절정': 'Climax', 'solution': 'Climax', '전': 'Climax', 'jeon': 'Climax',
   'cta': 'CTA', 'call_to_action': 'CTA', 'ending': 'CTA', '마무리': 'CTA', '결': 'CTA', 'gyeol': 'CTA', 'conclusion': 'CTA', 'resolution': 'CTA', 'falling_action': 'CTA',
 };
 
@@ -33,7 +41,288 @@ const normalizeAct = (v) => {
   return ACT_MAP[key] || ACT_MAP[v] || 'Hook';
 };
 
-function parseStoryboard(raw) {
+const defaultRoleForScene = (num, total = 12) => {
+  if (total === 12) return NARRATIVE_ROLES[(num - 1) % 12];
+  if (num === 1) return 'Hook';
+  if (num === total) return 'CTA';
+  const mid = total / 2;
+  if (num <= mid) return 'Setup';
+  return 'Action';
+};
+
+function cleanJson(raw) {
+  const cleaned = raw.trim()
+    .replace(/^```(?:json|JSON)?\s*\n?/gm, '')
+    .replace(/\n?```\s*$/gm, '')
+    .trim();
+  if (!cleaned) throw new Error('JSON 내용을 입력해주세요.');
+  try {
+    return JSON.parse(cleaned);
+  } catch (e) {
+    throw new Error(`JSON 파싱 오류: ${e.message}`);
+  }
+}
+
+function parseSceneNumber(sceneId, fallback) {
+  if (typeof sceneId === 'number') return sceneId;
+  if (typeof sceneId === 'string') {
+    const m = sceneId.match(/\d+/);
+    if (m) return parseInt(m[0], 10);
+  }
+  return fallback;
+}
+
+function buildImagePromptText(scene) {
+  const ip = scene.image_prompt || {};
+  const bg = scene.background || {};
+  const cam = scene.camera || {};
+  const parts = [];
+
+  if (ip.subject) {
+    parts.push(ip.subject);
+  } else if (scene.description) {
+    parts.push(scene.description);
+  }
+
+  if (ip.description) parts.push(ip.description);
+
+  if (ip.character_in_scene) {
+    const c = ip.character_in_scene;
+    const charParts = [
+      c.description,
+      c.action && `action: ${c.action}`,
+      c.expression && `expression: ${c.expression}`,
+      c.position && `position: ${c.position}`,
+      c.facing && `facing: ${c.facing}`,
+    ].filter(Boolean);
+    if (charParts.length > 0) parts.push(`Character: ${charParts.join(', ')}`);
+  } else if (scene.character_action) {
+    parts.push(`Character action: ${scene.character_action}`);
+  }
+
+  if (ip.scene_composition) parts.push(`Composition: ${ip.scene_composition}`);
+
+  const bgParts = [
+    bg.location,
+    bg.description_ko,
+    bg.color_grading && `color: ${bg.color_grading}`,
+    bg.lighting && `lighting: ${bg.lighting}`,
+    bg.mood && `mood: ${bg.mood}`,
+  ].filter(Boolean);
+  if (bgParts.length > 0) parts.push(`Background: ${bgParts.join(', ')}`);
+
+  const camParts = [cam.shot_type, cam.angle, cam.lens].filter(Boolean);
+  if (camParts.length > 0) parts.push(`Camera: ${camParts.join(', ')}`);
+
+  if (ip.text_overlay?.enabled) {
+    const t = ip.text_overlay;
+    parts.push(`Text overlay: "${t.text || ''}" (${t.language || 'ko'}, ${t.position || 'lower third'})`);
+  }
+
+  if (ip.quality) parts.push(`Quality: ${ip.quality}`);
+  if (ip.aspect_ratio) parts.push(`Aspect: ${ip.aspect_ratio}`);
+
+  if (scene.visual_rules) parts.push(`Visual rules: ${scene.visual_rules}`);
+
+  if (ip.negative) parts.push(`Negative: ${ip.negative}`);
+
+  return parts.join('\n');
+}
+
+function buildVideoPromptText(videoScene) {
+  const vp = videoScene.video_prompt || videoScene;
+  const parts = [];
+
+  if (vp.frame_strategy) {
+    const fs = vp.frame_strategy;
+    parts.push(`Frame strategy: ${fs.type || ''}${fs.note ? ` — ${fs.note}` : ''}`);
+  }
+  if (vp.starting_image) parts.push(`Starting image: ${vp.starting_image}`);
+  if (vp.ending_image) parts.push(`Ending image: ${vp.ending_image}`);
+
+  if (vp.camera_motion) {
+    const cm = vp.camera_motion;
+    const cmParts = [cm.type, cm.speed && `speed: ${cm.speed}`, cm.direction && `direction: ${cm.direction}`].filter(Boolean);
+    if (cmParts.length > 0) parts.push(`Camera motion: ${cmParts.join(', ')}`);
+  }
+
+  if (vp.character_motion) {
+    const m = vp.character_motion;
+    const mParts = [
+      m.action,
+      m.pace && `pace: ${m.pace}`,
+      m.expression_change && `expression: ${m.expression_change}`,
+      m.facing_change && `facing: ${m.facing_change}`,
+    ].filter(Boolean);
+    if (mParts.length > 0) parts.push(`Character motion: ${mParts.join(', ')}`);
+  }
+
+  if (vp.scene_mood) parts.push(`Mood: ${vp.scene_mood}`);
+  if (vp.environment_motion) parts.push(`Environment: ${vp.environment_motion}`);
+
+  if (vp.sound_design) {
+    const sd = vp.sound_design;
+    const sfxArr = Array.isArray(sd.sfx) ? sd.sfx : (sd.sfx ? [sd.sfx] : []);
+    const sdParts = [sd.bgm && `BGM: ${sd.bgm}`, sfxArr.length > 0 && `SFX: ${sfxArr.join(', ')}`].filter(Boolean);
+    if (sdParts.length > 0) parts.push(`Sound: ${sdParts.join(' / ')}`);
+  }
+
+  if (vp.end_frame_description) parts.push(`End frame: ${vp.end_frame_description}`);
+
+  if (vp.duration_sec) parts.push(`Duration: ${vp.duration_sec}s`);
+  if (vp.aspect_ratio) parts.push(`Aspect: ${vp.aspect_ratio}`);
+
+  return parts.join('\n');
+}
+
+function extractDialogue(videoScene) {
+  const d = videoScene?.video_prompt?.dialogue || videoScene?.dialogue;
+  if (!d) return '';
+  if (typeof d === 'string') return d;
+  if (d.enabled === false) return '';
+  if (d.versions && typeof d.versions === 'object') {
+    return Object.entries(d.versions)
+      .filter(([, v]) => v?.text)
+      .map(([lang, v]) => `[${lang}] ${v.text}${v.delivery ? ` (${v.delivery})` : ''}`)
+      .join('\n');
+  }
+  const parts = [];
+  if (d.text) parts.push(d.text);
+  if (d.delivery) parts.push(`(${d.delivery})`);
+  if (d.timing) parts.push(`@ ${d.timing}`);
+  return parts.join(' ');
+}
+
+function parseImagePrompts(raw) {
+  const json = cleanJson(raw);
+
+  const sceneArr = Array.isArray(json.scenes) ? json.scenes
+    : Array.isArray(json.image_prompts) ? json.image_prompts
+    : Array.isArray(json.storyboard?.scenes) ? json.storyboard.scenes
+    : null;
+
+  if (!sceneArr || sceneArr.length === 0) {
+    throw new Error('"scenes" 또는 "image_prompts" 배열이 필요합니다.');
+  }
+
+  const project = json.project || {};
+  const total = sceneArr.length;
+
+  const scenes = sceneArr.map((s, i) => {
+    const sceneNumber = parseSceneNumber(s.scene_id ?? s.id, i + 1);
+    const narrative = s.narrative_role || defaultRoleForScene(sceneNumber, total);
+    const act = normalizeAct(narrative);
+
+    const description = (s.background && s.background.description_ko)
+      || s.character_action
+      || s.description
+      || '';
+    const emotion = (s.background && s.background.mood) || s.emotion || '';
+
+    return {
+      id: String(s.scene_id ?? s.id ?? `scene_${sceneNumber}`),
+      scene_number: sceneNumber,
+      act,
+      narrative_role: narrative,
+      time_range: s.time_range || '',
+      background_group: s.background_group || '',
+      title: narrative || s.title || `Scene ${sceneNumber}`,
+      description,
+      emotion,
+      imageUpload: '',
+      prompts: {
+        image: {
+          id: `img_${String(sceneNumber).padStart(2, '0')}`,
+          tool: 'image_gen',
+          prompt: buildImagePromptText(s),
+        },
+        video: {
+          id: `vid_${String(sceneNumber).padStart(2, '0')}`,
+          tool: 'video_gen',
+          duration: 6,
+          prompt: '',
+        },
+      },
+      dialogue: '',
+    };
+  });
+
+  scenes.sort((a, b) => a.scene_number - b.scene_number);
+
+  const title = project.brand || json.project_title || json.title || '광고영상';
+  const aspect = project.aspect_ratio || '9:16';
+  const renderingStyle = project.rendering_style || json.style || '';
+
+  return {
+    id: project.character_ref || json.id || `SB-${Date.now()}`,
+    title,
+    meta: {
+      aspect_ratio: aspect,
+      total_scenes: scenes.length,
+      brand: project.brand || '',
+      rendering_style: renderingStyle,
+      narrative_arc: project.narrative_arc || '',
+      total_duration_sec: project.total_duration_sec || 0,
+      character_ref: project.character_ref || json.character || '',
+    },
+    scenes,
+  };
+}
+
+function parseVideoPrompts(raw) {
+  const json = cleanJson(raw);
+
+  const sceneArr = Array.isArray(json.scenes) ? json.scenes
+    : Array.isArray(json.video_prompts) ? json.video_prompts
+    : null;
+
+  if (!sceneArr || sceneArr.length === 0) {
+    throw new Error('"scenes" 또는 "video_prompts" 배열이 필요합니다.');
+  }
+
+  return sceneArr.map((s, i) => {
+    const sceneNumber = parseSceneNumber(s.scene_id ?? s.id, i + 1);
+    return {
+      scene_id: String(s.scene_id ?? s.id ?? `scene_${sceneNumber}`),
+      scene_number: sceneNumber,
+      prompt_text: buildVideoPromptText(s),
+      dialogue: extractDialogue(s),
+    };
+  });
+}
+
+function mergeVideoPromptsIntoStoryboard(storyboard, videoScenes) {
+  if (!storyboard || !Array.isArray(storyboard.scenes)) return storyboard;
+
+  const byNumber = new Map();
+  const byId = new Map();
+  videoScenes.forEach((v) => {
+    byNumber.set(v.scene_number, v);
+    byId.set(v.scene_id, v);
+  });
+
+  let matched = 0;
+  const updated = storyboard.scenes.map((s) => {
+    const v = byId.get(s.id) || byNumber.get(s.scene_number);
+    if (!v) return s;
+    matched += 1;
+    return {
+      ...s,
+      prompts: {
+        ...s.prompts,
+        video: {
+          ...s.prompts.video,
+          prompt: v.prompt_text,
+        },
+      },
+      dialogue: v.dialogue || s.dialogue,
+    };
+  });
+
+  return { storyboard: { ...storyboard, scenes: updated }, matched, total: videoScenes.length };
+}
+
+function parseCharacter(raw) {
   let cleaned = raw.trim()
     .replace(/^```(?:json|JSON)?\s*\n?/gm, '')
     .replace(/\n?```\s*$/gm, '')
@@ -44,58 +333,213 @@ function parseStoryboard(raw) {
   try { json = JSON.parse(cleaned); }
   catch (e) { throw new Error(`JSON 파싱 오류: ${e.message}`); }
 
-  if (json.storyboard && typeof json.storyboard === 'object') json = json.storyboard;
-  if (!Array.isArray(json.scenes)) throw new Error('"scenes" 배열이 필요합니다.');
+  if (json.character && typeof json.character === 'object') json = json.character;
 
   const meta = json.meta || {};
+  const ip = json.image_prompt || {};
+  const visual = json.visual_identity || {};
+  const appearance = json.appearance || {};
+  const outfit = appearance.outfit || {};
+  const facial = appearance.facial_features || {};
+  const rules = json.consistency_rules || {};
+  const styleObj = (json.style && typeof json.style === 'object') ? json.style : {};
+  const styleStr = typeof json.style === 'string' ? json.style : '';
 
-  const scenes = json.scenes.map((s, i) => {
-    if (!s.id) throw new Error(`씬 ${i + 1}: "id" 필드가 누락되었습니다.`);
-    return {
-      id: s.id,
-      scene_number: s.scene_number || (i + 1),
-      act: normalizeAct(s.act),
-      title: s.title || '',
-      description: s.description || '',
-      emotion: s.emotion || '',
-      imageUpload: s.imageUpload || '',
-      prompts: {
-        image: {
-          id: s.prompts?.image?.id || `img_${String(i + 1).padStart(2, '0')}`,
-          tool: s.prompts?.image?.tool || 'image_gen',
-          prompt: s.prompts?.image?.prompt || '',
-        },
-        video: {
-          id: s.prompts?.video?.id || `vid_${String(i + 1).padStart(2, '0')}`,
-          tool: s.prompts?.video?.tool || 'video_gen',
-          duration: s.prompts?.video?.duration || 6,
-          prompt: s.prompts?.video?.prompt || '',
-        },
-      },
-      dialogue: s.dialogue || '',
-    };
-  });
+  const name = json.name || meta.name || '';
+  const role = json.role || meta.role || json.archetype || '';
+
+  const promptParts = [];
+
+  const corePositive = [ip.subject, ip.description, ip.composition, ip.quality]
+    .filter(Boolean).join('. ');
+  if (corePositive) {
+    promptParts.push(corePositive);
+  } else {
+    const header = [
+      name && `Character: ${name}`,
+      role && `(${role})`,
+      styleStr && `Style: ${styleStr}`,
+    ].filter(Boolean).join(' ');
+    if (header) promptParts.push(header);
+  }
+
+  const visualLines = [
+    visual.age && `- Age: ${visual.age}`,
+    visual.physique && `- Physique: ${visual.physique}`,
+    visual.face && `- Face: ${visual.face}`,
+    visual.outfit && `- Outfit: ${visual.outfit}`,
+    visual.key_item && `- Key item: ${visual.key_item}`,
+  ].filter(Boolean);
+  if (visualLines.length > 0) promptParts.push(`Visual identity:\n${visualLines.join('\n')}`);
+
+  const appearanceLines = [
+    appearance.body_type && `- Body: ${appearance.body_type}`,
+    outfit.top && `- Top: ${outfit.top}`,
+    outfit.bottom && `- Bottom: ${outfit.bottom}`,
+    outfit.accessory && `- Accessory: ${outfit.accessory}`,
+    outfit.tool && `- Tool: ${outfit.tool}`,
+    facial.hair && `- Hair: ${facial.hair}`,
+    facial.eyes && `- Eyes: ${facial.eyes}`,
+    facial.default_expression && `- Default expression: ${facial.default_expression}`,
+  ].filter(Boolean);
+  if (appearanceLines.length > 0) promptParts.push(`Appearance:\n${appearanceLines.join('\n')}`);
+
+  if (json.personality) promptParts.push(`Personality: ${json.personality}`);
+
+  const styleLines = [
+    styleObj.rendering && `- Rendering: ${styleObj.rendering}`,
+    styleObj.mood && `- Mood: ${styleObj.mood}`,
+    styleObj.lighting_theme && `- Lighting: ${styleObj.lighting_theme}`,
+  ].filter(Boolean);
+  if (styleLines.length > 0) promptParts.push(`Style:\n${styleLines.join('\n')}`);
+
+  const rulesLines = [
+    rules.color_palette && `- Color palette: ${rules.color_palette}`,
+    rules.lighting && `- Lighting: ${rules.lighting}`,
+    rules.camera_angle && `- Camera angle: ${rules.camera_angle}`,
+  ].filter(Boolean);
+  if (rulesLines.length > 0) promptParts.push(`Consistency rules:\n${rulesLines.join('\n')}`);
+
+  const expressions = Array.isArray(json.expressions)
+    ? json.expressions
+        .map((e) => {
+          const id = e?.id || '';
+          const desc = e?.description || '';
+          if (!id && !desc) return '';
+          return id ? `- ${id}: ${desc}` : `- ${desc}`;
+        })
+        .filter(Boolean)
+    : [];
+  if (expressions.length > 0) promptParts.push(`Expressions:\n${expressions.join('\n')}`);
+
+  if (ip.negative) promptParts.push(`Negative: ${ip.negative}`);
+
+  const prompt = promptParts.join('\n');
+
+  if (!prompt && !name) {
+    throw new Error('캐릭터 정보를 찾을 수 없습니다. name/visual_identity/image_prompt 중 하나 이상이 필요합니다.');
+  }
 
   return {
-    id: json.id || `SB-${Date.now()}`,
-    title: json.title || '광고영상',
-    created_at: json.created_at,
-    version: json.version,
-    meta: {
-      aspect_ratio: meta.aspect_ratio || '16:9',
-      total_scenes: scenes.length,
-      genre: meta.genre || '',
-      subject_type: meta.subject_type || '',
-      mood: meta.mood || '',
-    },
-    scenes,
+    character_id: json.character_id || `char_${Date.now()}`,
+    name,
+    role,
+    aspect_ratio: ip.aspect_ratio || '',
+    prompt,
+    imageUpload: '',
   };
+}
+
+function UploadSlot({ image, onFile }) {
+  const fileRef = useRef(null);
+  const slotRef = useRef(null);
+
+  const openPicker = () => fileRef.current?.click();
+
+  const handlePaste = (e) => {
+    const items = e.clipboardData?.items || [];
+    for (const item of items) {
+      if (item.type && item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+        if (file) {
+          e.preventDefault();
+          onFile(file);
+          break;
+        }
+      }
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.currentTarget.classList.remove('dragover');
+    const file = e.dataTransfer.files?.[0];
+    if (file) onFile(file);
+  };
+
+  if (image) {
+    return (
+      <>
+        <div
+          className="relative w-full rounded-xl overflow-hidden border border-[#e2e8f0] cursor-pointer group bg-[#0f172a] flex items-center justify-center"
+          onClick={openPicker}
+          onDragOver={(e) => { e.preventDefault(); }}
+          onDrop={handleDrop}
+          style={{ maxHeight: '70vh' }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={image}
+            alt="uploaded"
+            className="w-full h-auto max-h-[70vh] object-contain block"
+          />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center pointer-events-none">
+            <span className="text-white text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+              교체
+            </span>
+          </div>
+        </div>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) onFile(file);
+            e.target.value = '';
+          }}
+        />
+      </>
+    );
+  }
+
+  return (
+    <div
+      ref={slotRef}
+      tabIndex={0}
+      onClick={() => slotRef.current?.focus()}
+      onPaste={handlePaste}
+      onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add('dragover'); }}
+      onDragLeave={(e) => e.currentTarget.classList.remove('dragover')}
+      onDrop={handleDrop}
+      className="tb-upload-slot aspect-video rounded-xl flex flex-col items-center justify-center gap-2.5 p-6 cursor-pointer text-[#64748b] outline-none focus:ring-[3px] focus:ring-[#00B380]/40 focus:border-[#00B380] focus:bg-[#ecfdf5]"
+    >
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); openPicker(); }}
+        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+        onDrop={(e) => { e.stopPropagation(); handleDrop(e); }}
+        className="flex items-center gap-2 px-6 py-3 rounded-full bg-[#00996D] hover:bg-[#00774f] text-white text-sm font-bold tb-press shadow-[0_6px_16px_rgba(0,153,109,0.3)]"
+      >
+        <Upload className="w-4 h-4" />
+        이미지 선택
+      </button>
+      <div className="text-center text-[11px] leading-relaxed mt-1">
+        <div className="font-bold text-[#475569]">클릭 · 드래그&amp;드롭 · Ctrl+V 붙여넣기</div>
+        <div className="text-[10px] mt-0.5 text-[#94a3b8]">PNG · JPG · WEBP (≤5MB)</div>
+      </div>
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) onFile(file);
+          e.target.value = '';
+        }}
+      />
+    </div>
+  );
 }
 
 export default function Step4Page() {
   const [storyboard, setStoryboard] = useState(null);
+  const [character, setCharacter] = useState(null);
   const [activeAct, setActiveAct] = useState(0);
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [uploadType, setUploadType] = useState('image_prompts');
   const [jsonInput, setJsonInput] = useState('');
   const [uploadError, setUploadError] = useState('');
   const [toast, setToast] = useState('');
@@ -103,7 +547,6 @@ export default function Step4Page() {
   const [toolView, setToolView] = useState(null);
   const [pendingScrollId, setPendingScrollId] = useState(null);
   const sceneRefs = useRef({});
-  const fileInputRefs = useRef({});
 
   useEffect(() => {
     try {
@@ -111,6 +554,11 @@ export default function Step4Page() {
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed?.scenes)) setStoryboard(parsed);
+      }
+      const charRaw = localStorage.getItem(CHAR_CACHE_KEY);
+      if (charRaw) {
+        const parsedChar = JSON.parse(charRaw);
+        if (parsedChar && typeof parsedChar.prompt === 'string') setCharacter(parsedChar);
       }
     } catch (e) { }
     setHydrated(true);
@@ -123,6 +571,14 @@ export default function Step4Page() {
       else localStorage.removeItem(CACHE_KEY);
     } catch (e) { }
   }, [storyboard, hydrated]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      if (character) localStorage.setItem(CHAR_CACHE_KEY, JSON.stringify(character));
+      else localStorage.removeItem(CHAR_CACHE_KEY);
+    } catch (e) { }
+  }, [character, hydrated]);
 
   const showToast = (msg) => {
     setToast(msg);
@@ -161,6 +617,25 @@ export default function Step4Page() {
 
   const updateDialogue = (sceneId, v) => updateScene(sceneId, { dialogue: v });
 
+  const updateCharacter = (patch) => setCharacter((prev) => prev && { ...prev, ...patch });
+  const updateCharacterPrompt = (v) => updateCharacter({ prompt: v });
+
+  const handleCharacterImageFile = (file) => {
+    if (!file || !file.type.startsWith('image/')) {
+      showToast('이미지 파일만 업로드 가능합니다.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('5MB 이하의 이미지만 업로드 가능합니다.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => updateCharacter({ imageUpload: String(e.target.result) });
+    reader.readAsDataURL(file);
+  };
+
+  const clearCharacterImage = () => updateCharacter({ imageUpload: '' });
+
   const handleImageFile = (sceneId, file) => {
     if (!file || !file.type.startsWith('image/')) {
       showToast('이미지 파일만 업로드 가능합니다.');
@@ -182,15 +657,41 @@ export default function Step4Page() {
   const loadJson = () => {
     setUploadError('');
     try {
-      const parsed = parseStoryboard(jsonInput);
-      setStoryboard(parsed);
-      setActiveAct(0);
-      setUploadOpen(false);
-      setJsonInput('');
-      showToast('광고영상 로드 완료!');
+      if (uploadType === 'character') {
+        const parsed = parseCharacter(jsonInput);
+        setCharacter(parsed);
+        setActiveAct('character');
+        setUploadOpen(false);
+        setJsonInput('');
+        showToast('캐릭터 로드 완료!');
+      } else if (uploadType === 'video_prompts') {
+        if (!storyboard) {
+          throw new Error('이미지 프롬프트를 먼저 업로드하세요.');
+        }
+        const videoScenes = parseVideoPrompts(jsonInput);
+        const result = mergeVideoPromptsIntoStoryboard(storyboard, videoScenes);
+        setStoryboard(result.storyboard);
+        setUploadOpen(false);
+        setJsonInput('');
+        showToast(`영상 프롬프트 병합 완료! (${result.matched}/${result.total})`);
+      } else {
+        const parsed = parseImagePrompts(jsonInput);
+        setStoryboard(parsed);
+        setActiveAct(0);
+        setUploadOpen(false);
+        setJsonInput('');
+        showToast('이미지 프롬프트 로드 완료!');
+      }
     } catch (e) {
       setUploadError(e.message || 'JSON 파싱 오류가 발생했습니다.');
     }
+  };
+
+  const openUpload = (type) => {
+    setUploadType(type);
+    setUploadOpen(true);
+    setUploadError('');
+    setJsonInput('');
   };
 
   useEffect(() => {
@@ -353,11 +854,29 @@ export default function Step4Page() {
         <span className="text-[11px] font-bold tracking-[0.18em] text-[#00996D] uppercase hidden sm:inline">TOOLB LAB</span>
         <div className="ml-auto flex items-center gap-2">
           <button
-            onClick={() => { setUploadOpen(true); setUploadError(''); setJsonInput(''); }}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full tb-pill-primary text-xs sm:text-sm font-bold transition"
+            onClick={() => openUpload('character')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full tb-pill-ghost text-xs sm:text-sm font-bold transition"
           >
-            <Upload className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">JSON </span>업로드
+            <User className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">캐릭터</span>
+          </button>
+          <button
+            onClick={() => openUpload('image_prompts')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full tb-pill-primary text-xs sm:text-sm font-bold transition"
+          >
+            <ImageIcon className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">이미지 </span>프롬프트
+          </button>
+          <button
+            onClick={() => openUpload('video_prompts')}
+            disabled={!storyboard}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-bold transition ${
+              storyboard ? 'tb-pill-ghost' : 'opacity-40 cursor-not-allowed bg-white/40 border border-white/70 text-[#64748b]'
+            }`}
+            title={!storyboard ? '이미지 프롬프트를 먼저 업로드하세요' : ''}
+          >
+            <Film className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">영상 </span>프롬프트
           </button>
         </div>
       </div>
@@ -384,10 +903,21 @@ export default function Step4Page() {
                   <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">비율</span>
                   <span className="text-sm text-[#0f172a] font-bold flex-1">{storyboard.meta.aspect_ratio}</span>
                 </div>
-                {storyboard.meta.genre && (
+                {storyboard.meta.rendering_style && (
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">장르</span>
-                    <span className="text-sm text-[#0f172a] font-bold flex-1">{storyboard.meta.genre}</span>
+                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">스타일</span>
+                    <span className="text-sm text-[#0f172a] font-bold flex-1">{storyboard.meta.rendering_style}</span>
+                  </div>
+                )}
+                {storyboard.meta.total_duration_sec > 0 && (
+                  <div className="flex items-start gap-2">
+                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">러닝타임</span>
+                    <span className="text-sm text-[#0f172a] font-bold flex-1">{storyboard.meta.total_duration_sec}초</span>
+                  </div>
+                )}
+                {storyboard.meta.narrative_arc && (
+                  <div className="flex items-start gap-2 pt-1">
+                    <span className="text-xs text-[#64748b] font-medium italic leading-relaxed">“{storyboard.meta.narrative_arc}”</span>
                   </div>
                 )}
               </div>
@@ -494,7 +1024,7 @@ export default function Step4Page() {
               href="https://suno.com/"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#0f172a] hover:opacity-90 text-white text-sm font-bold tb-press"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#f97316] hover:opacity-90 text-white text-sm font-bold tb-press"
             >
               <ExternalLink className="w-3.5 h-3.5" />
               SUNO 바로가기
@@ -513,18 +1043,24 @@ export default function Step4Page() {
               <div className="w-20 h-20 mb-5 rounded-full flex items-center justify-center bg-[#ecfdf5] border border-[#e2e8f0]">
                 <Clapperboard className="w-10 h-10 text-[#00996D]" />
               </div>
-              <h3 className="text-lg font-bold text-[#0f172a] mb-2">광고 스토리보드가 없습니다</h3>
+              <h3 className="text-lg font-bold text-[#0f172a] mb-2">이미지 프롬프트가 없습니다</h3>
               <p className="text-sm text-[#64748b] mb-5 leading-relaxed">
-                JSON을 업로드하여 Hook / Build / Climax / CTA<br />
-                장면과 프롬프트를 확인하세요.
+                <b>image_prompts.json</b> 을 먼저 업로드하여 씬과 프롬프트를 확인하세요.<br />
+                이후 이미지 생성 → <b>video_prompts.json</b> 업로드로 영상 프롬프트를 병합합니다.
               </p>
               <button
-                onClick={() => { setUploadOpen(true); setUploadError(''); }}
+                onClick={() => openUpload('image_prompts')}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-full tb-pill-primary text-sm font-bold transition"
               >
-                <Upload className="w-3.5 h-3.5" />
-                광고 스토리보드 JSON 업로드
+                <ImageIcon className="w-3.5 h-3.5" />
+                이미지 프롬프트 JSON 업로드
               </button>
+              {character && (
+                <div className="mt-5 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#ecfdf5] border border-[#a7f3d0] text-[#00774f] text-xs font-bold">
+                  <User className="w-3.5 h-3.5" />
+                  캐릭터 "{character.name || character.character_id}" 로드됨 — 이미지 프롬프트 업로드 후 표시됩니다
+                </div>
+              )}
             </div>
           ) : (
             <>
@@ -567,6 +1103,18 @@ export default function Step4Page() {
 
               {/* Act tab bar */}
               <div className="flex-shrink-0 flex gap-1.5 p-3 border-b border-[#e2e8f0] bg-white overflow-x-auto">
+                {character && (
+                  <button
+                    onClick={() => setActiveAct('character')}
+                    className={`flex items-center gap-2 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${activeAct === 'character'
+                      ? 'tb-pill-primary'
+                      : 'text-[#64748b] bg-[#f1f5f9] hover:bg-[#e2e8f0] tb-press-soft'
+                      }`}
+                  >
+                    <User className="w-3.5 h-3.5" style={{ opacity: activeAct === 'character' ? 1 : 0.7 }} />
+                    캐릭터
+                  </button>
+                )}
                 {ACTS.map((act, i) => {
                   const tc = ACT_COLORS[i];
                   const count = scenesByAct[i].length;
@@ -600,7 +1148,93 @@ export default function Step4Page() {
 
               {/* Scene cards */}
               <div className="flex-1 overflow-y-auto p-5 space-y-5">
-                {scenesByAct[activeAct].length === 0 ? (
+                {activeAct === 'character' ? (
+                  character ? (
+                    <div className="rounded-2xl overflow-hidden border border-[#e2e8f0] bg-white shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
+                      <div className="px-4 py-3 border-b border-[#e2e8f0] flex items-center justify-between gap-3 bg-[#ecfdf5]/60">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <span className="text-[12px] font-black px-2 py-0.5 rounded-full bg-[#00996D]/15 text-[#00996D] flex items-center gap-1">
+                            <User className="w-3 h-3" />
+                            CHAR
+                          </span>
+                          <span className="text-base font-bold text-[#0f172a] truncate">
+                            {character.name || '(이름 없음)'}
+                          </span>
+                          {character.role && (
+                            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#334155] flex-shrink-0">
+                              {character.role}
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => { setCharacter(null); setActiveAct(0); }}
+                          className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#fee2e2] border border-[#e2e8f0] text-[11px] font-bold text-[#b91c1c] tb-press-soft flex-shrink-0"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          제거
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-[minmax(400px,520px)_minmax(0,1fr)]">
+                        {/* LEFT: image upload */}
+                        <div className="p-4 border-b md:border-b-0 md:border-r border-[#e2e8f0]">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-1.5">
+                              <ImageIcon className="w-3.5 h-3.5 text-[#00996D]" />
+                              <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">이미지</span>
+                            </div>
+                            {character.imageUpload && (
+                              <button
+                                onClick={clearCharacterImage}
+                                className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-white hover:bg-[#fee2e2] border border-[#e2e8f0] text-[11px] font-bold text-[#b91c1c] tb-press-soft"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                                제거
+                              </button>
+                            )}
+                          </div>
+                          <UploadSlot
+                            image={character.imageUpload}
+                            onFile={handleCharacterImageFile}
+                          />
+                        </div>
+
+                        {/* RIGHT: prompt textarea */}
+                        <div className="p-4 min-w-0">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <ImageIcon className="w-3.5 h-3.5 text-[#00996D] flex-shrink-0" />
+                              <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">캐릭터 프롬프트</span>
+                              {character.aspect_ratio && (
+                                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#ecfdf5] text-[#00996D] font-bold">
+                                  {character.aspect_ratio}
+                                </span>
+                              )}
+                            </div>
+                            <button
+                              onClick={() => copyText(character.prompt)}
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] tb-press-soft flex-shrink-0"
+                            >
+                              <Copy className="w-3 h-3" />
+                              복사
+                            </button>
+                          </div>
+                          <textarea
+                            value={character.prompt}
+                            onChange={(e) => updateCharacterPrompt(e.target.value)}
+                            rows={12}
+                            placeholder="캐릭터 프롬프트... (네거티브 포함)"
+                            className="w-full min-h-[300px] resize-y bg-white border border-[#e2e8f0] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-10 text-[#64748b] text-sm">
+                      캐릭터 JSON이 없습니다.
+                    </div>
+                  )
+                ) : scenesByAct[activeAct].length === 0 ? (
                   <div className="text-center py-10 text-[#64748b] text-sm">
                     이 구간에 해당하는 씬이 없습니다.
                   </div>
@@ -659,52 +1293,9 @@ export default function Step4Page() {
                                 </button>
                               )}
                             </div>
-                            {scene.imageUpload ? (
-                              <div
-                                className="relative w-full rounded-xl overflow-hidden border border-[#e2e8f0] cursor-pointer group bg-[#0f172a] flex items-center justify-center"
-                                onClick={() => fileInputRefs.current[scene.id]?.click()}
-                                style={{ maxHeight: '70vh' }}
-                              >
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                  src={scene.imageUpload}
-                                  alt={`scene ${scene.scene_number}`}
-                                  className="w-full h-auto max-h-[70vh] object-contain block"
-                                />
-                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center pointer-events-none">
-                                  <span className="text-white text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                                    교체
-                                  </span>
-                                </div>
-                              </div>
-                            ) : (
-                              <div
-                                className="tb-upload-slot aspect-video rounded-xl flex flex-col items-center justify-center cursor-pointer text-[#64748b]"
-                                onClick={() => fileInputRefs.current[scene.id]?.click()}
-                                onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add('dragover'); }}
-                                onDragLeave={(e) => e.currentTarget.classList.remove('dragover')}
-                                onDrop={(e) => {
-                                  e.preventDefault();
-                                  e.currentTarget.classList.remove('dragover');
-                                  const file = e.dataTransfer.files?.[0];
-                                  if (file) handleImageFile(scene.id, file);
-                                }}
-                              >
-                                <Upload className="w-6 h-6 mb-1.5" />
-                                <span className="text-xs font-bold">드래그/클릭 업로드</span>
-                                <span className="text-[10px] mt-0.5">PNG · JPG · WEBP (≤5MB)</span>
-                              </div>
-                            )}
-                            <input
-                              ref={(el) => { fileInputRefs.current[scene.id] = el; }}
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (file) handleImageFile(scene.id, file);
-                                e.target.value = '';
-                              }}
+                            <UploadSlot
+                              image={scene.imageUpload}
+                              onFile={(file) => handleImageFile(scene.id, file)}
                             />
                           </div>
 
@@ -807,7 +1398,11 @@ export default function Step4Page() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#e2e8f0]">
-              <span className="text-base font-bold text-[#0f172a] uppercase tracking-wider">스토리보드 JSON 업로드</span>
+              <span className="text-base font-bold text-[#0f172a] uppercase tracking-wider">
+                {uploadType === 'character' ? '캐릭터 JSON 업로드'
+                  : uploadType === 'video_prompts' ? '영상 프롬프트 JSON 업로드'
+                  : '이미지 프롬프트 JSON 업로드'}
+              </span>
               <button
                 onClick={() => setUploadOpen(false)}
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#475569] tb-press-soft"
@@ -816,18 +1411,42 @@ export default function Step4Page() {
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-5 space-y-3 min-h-0">
-              <p className="text-sm text-[#64748b] leading-relaxed">
-                광고 스토리보드 JSON을 붙여넣으세요. <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">scenes</code> 배열이 필요하며, 각 씬은
-                <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">act</code>(Hook/Build/Climax/CTA),
-                <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">prompts.image</code>,
-                <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">prompts.video</code>,
-                <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">dialogue</code> 필드를 가질 수 있습니다.
-              </p>
+              {uploadType === 'character' ? (
+                <p className="text-sm text-[#64748b] leading-relaxed">
+                  <b>character.json</b> 을 붙여넣으세요.
+                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">meta</code>,
+                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">appearance</code>,
+                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">image_prompt</code>,
+                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">expressions</code>
+                  또는 <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">visual_identity</code>,
+                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">consistency_rules</code> 필드 지원.
+                </p>
+              ) : uploadType === 'video_prompts' ? (
+                <p className="text-sm text-[#64748b] leading-relaxed">
+                  <b>video_prompts.json</b> 을 붙여넣으세요. 각 씬의
+                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">scene_id</code>로 기존 씬에 병합되며,
+                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">video_prompt</code>(camera_motion, character_motion, sound_design 등)와
+                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">dialogue</code>가 반영됩니다.
+                </p>
+              ) : (
+                <p className="text-sm text-[#64748b] leading-relaxed">
+                  <b>image_prompts.json</b> 을 붙여넣으세요. <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">scenes</code> (또는 <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">image_prompts</code>) 배열이 필요하며, 각 씬은
+                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">scene_id</code>,
+                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">narrative_role</code>(Hook/Setup/Problem/Escalation/Turn/Decision/Action/Obstacle/Reveal/Experience/Peak/CTA),
+                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">background</code>,
+                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">image_prompt</code> 필드를 가질 수 있습니다.
+                </p>
+              )}
               <textarea
                 value={jsonInput}
                 onChange={(e) => setJsonInput(e.target.value)}
                 className="w-full h-[260px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
-                placeholder='{"title": "...", "meta": {...}, "scenes": [{"id":"s01","act":"Hook",...,"dialogue":"..."}]}'
+                placeholder={uploadType === 'character'
+                  ? '{"character":{"character_id":"...","meta":{"name":"..."},"appearance":{...},"image_prompt":{...},"expressions":[...]}}'
+                  : uploadType === 'video_prompts'
+                  ? '{"project":{...},"scenes":[{"scene_id":1,"video_prompt":{"camera_motion":{...},"dialogue":{...}}}]}'
+                  : '{"project":{"brand":"..."},"scenes":[{"scene_id":1,"narrative_role":"Hook","image_prompt":{...}}]}'
+                }
               />
               {uploadError && (
                 <div className="text-sm text-[#b91c1c] bg-[#fee2e2] border border-[#fca5a5] rounded-xl px-3 py-2 font-semibold">
