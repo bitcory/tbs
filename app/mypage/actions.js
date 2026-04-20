@@ -12,10 +12,12 @@ export async function updateProfile(formData) {
   if (!s?.user) redirect("/login");
   const nickname = String(formData.get("nickname") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const phoneRaw = String(formData.get("phone") ?? "").trim();
+  const phone = phoneRaw.replace(/[^\d+\-]/g, "");
   if (!nickname || !email) return;
   await prisma.user.update({
     where: { id: s.user.id },
-    data: { nickname, email },
+    data: { nickname, email, phone: phone || null },
   });
   revalidatePath("/mypage");
 }

@@ -40,7 +40,7 @@ export default async function MyPage() {
         </div>
       </section>
 
-      <div style={{ ...S.pageWrap, marginTop: -48, position: "relative" }}>
+      <div style={{ ...S.pageWrap, maxWidth: "100%", padding: "28px 20px 80px", marginTop: -48, position: "relative" }}>
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginBottom: 16 }}>
           <Link href="/" className="glass-hoverable" style={S.ghostBtn}>← 홈으로</Link>
           {isAdmin && (
@@ -56,7 +56,8 @@ export default async function MyPage() {
           </form>
         </div>
 
-        <div style={{ ...S.card, marginBottom: 18 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr))", gap: 18, marginBottom: 18 }}>
+          <div style={S.card}>
           <div style={S.sectionTitle}>내 권한</div>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
             <span style={S.badge(ROLE_BADGE[me.role])}>{ROLE_LABEL[me.role]}</span>
@@ -100,36 +101,38 @@ export default async function MyPage() {
           </div>
         </div>
 
-        <div style={{ ...S.card, marginBottom: 18 }}>
-          <div style={S.sectionTitle}>유용한 유틸 다운로드</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10 }}>
-            {[
-              { label: "Snipaste 캡쳐", url: "https://www.snipaste.com/" },
-              { label: "Everything 검색", url: "https://www.voidtools.com/ko-kr/" },
-              { label: "무료 캡컷", url: "https://aitoolb.com/61" },
-            ].map((u) => (
-              <a
-                key={u.url}
-                href={u.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="glass-hoverable"
-                style={{
-                  ...S.primaryPill,
-                  textAlign: "center",
-                  textDecoration: "none",
-                  padding: "12px 16px",
-                }}
-              >
-                {u.label}
-              </a>
-            ))}
+          <div style={S.card}>
+            <div style={S.sectionTitle}>유용한 유틸 다운로드</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10 }}>
+              {[
+                { label: "Snipaste 캡쳐", url: "https://www.snipaste.com/" },
+                { label: "Everything 검색", url: "https://www.voidtools.com/ko-kr/" },
+                { label: "무료 캡컷", url: "https://aitoolb.com/61" },
+              ].map((u) => (
+                <a
+                  key={u.url}
+                  href={u.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="glass-hoverable"
+                  style={{
+                    ...S.primaryPill,
+                    textAlign: "center",
+                    textDecoration: "none",
+                    padding: "12px 16px",
+                  }}
+                >
+                  {u.label}
+                </a>
+              ))}
+            </div>
           </div>
         </div>
 
         <ProfileEditor
           initialNickname={me.nickname}
           initialEmail={me.email}
+          initialPhone={me.phone}
           updateProfile={updateProfile}
         />
       </div>

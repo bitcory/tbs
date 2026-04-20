@@ -319,6 +319,22 @@
       background: linear-gradient(135deg, #00B380, #68E571);
     }
 
+    /* ZERO card visuals — clean opaque background, no noise overlay,
+       so transparent PNG logos render crisply. */
+    .visual-zero {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+    }
+
+    .visual-zero::before {
+      display: none;
+    }
+
+    .visual-zero img {
+      object-fit: contain;
+      padding: 14px;
+    }
+
     .step-card-label {
       font-size: 11px;
       font-weight: 800;
@@ -994,140 +1010,9 @@
     .class-view { display: none; }
     .class-view.active { display: block; }
 
-    /* ZERO CLASS — blog list */
-    .zero-wrap {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 36px 24px 80px;
-    }
-
-    .zero-header {
-      text-align: center;
-      margin-bottom: 28px;
-    }
-
-    .zero-header h2 {
-      font-size: clamp(22px, 2.8vw, 30px);
-      font-weight: 800;
-      color: #0f172a;
-      margin-bottom: 8px;
-    }
-
-    .zero-header p {
-      font-size: 14px;
-      color: #64748b;
-      line-height: 1.6;
-    }
-
-    .zero-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 18px;
-    }
-
-    .zero-card {
-      background: #fff;
-      border-radius: 18px;
-      overflow: hidden;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
-      cursor: pointer;
-      text-align: left;
-      font-family: inherit;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
-      padding: 0;
-    }
-
-    .zero-card:hover {
-      transform: translateY(-4px);
-      border-color: #00B380;
-      box-shadow: 0 20px 40px rgba(0, 153, 109, 0.18);
-    }
-    .zero-card:active {
-      transform: translateY(1px) scale(0.98);
-      box-shadow: 0 4px 12px rgba(0, 153, 109, 0.14), inset 0 2px 6px rgba(0, 0, 0, 0.06);
-      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
-    }
-
-    .zero-card-thumb {
-      aspect-ratio: 16/9;
-      overflow: hidden;
-    }
-
-    .zero-card-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .zero-card-body {
-      padding: 18px 20px 22px;
-    }
-
-    .zero-card-cat {
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #00996D;
-      margin-bottom: 8px;
-    }
-
-    .zero-card-title {
-      font-size: 17px;
-      font-weight: 800;
-      color: #0f172a;
-      margin-bottom: 6px;
-      line-height: 1.4;
-    }
-
-    .zero-card-desc {
-      font-size: 13px;
-      color: #64748b;
-      line-height: 1.5;
-    }
-
-    /* PRO CLASS — coming soon */
-    .pro-wrap {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 80px 24px 120px;
-      text-align: center;
-    }
-
-    .pro-badge {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      padding: 8px 16px;
-      background: linear-gradient(112.34deg, #68D970 -38.67%, #00996D 99.56%);
-      color: #fff;
-      border-radius: 100px;
-      margin-bottom: 20px;
-    }
-
-    .pro-wrap h2 {
-      font-size: clamp(26px, 3.4vw, 36px);
-      font-weight: 800;
-      color: #0f172a;
-      margin-bottom: 14px;
-    }
-
-    .pro-wrap p {
-      font-size: 15px;
-      color: #64748b;
-      line-height: 1.7;
-    }
-
     @media (max-width: 640px) {
       .class-tabs { gap: 6px; padding: 0 14px; }
       .class-tab { font-size: 11px; padding: 12px 6px; }
-      .zero-list { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -1154,39 +1039,73 @@
 
     <!-- ───────── ZERO CLASS VIEW ───────── -->
     <div class="class-view" id="view-zero">
-      <div class="zero-wrap">
-        <div class="zero-header">
-          <h2>시작 전 준비 과정</h2>
-          <p>영상 제작에 앞서 꼭 필요한 기본 세팅을 하나씩 따라해보세요.</p>
-        </div>
-        <div class="zero-list">
-          <button type="button" class="zero-card" onclick="openZeroPost('gmail')">
-            <div class="zero-card-thumb"><img src="/images/classimg/zero_01.png" alt="구글 메일 만들기"></div>
-            <div class="zero-card-body">
-              <p class="zero-card-cat">STEP 01 · 계정</p>
-              <h3 class="zero-card-title">구글계정 가입하기</h3>
-              <p class="zero-card-desc">AI 툴 가입·유튜브 운영에 필수인 구글 계정을 만드는 방법.</p>
+
+      <section class="cards-section">
+        <div class="cards-track" id="cardsTrackZero">
+
+          <button type="button" class="step-card" data-zero="gmail" onclick="openZeroPost('gmail')">
+            <div class="step-card-visual visual-zero">
+              <img src="/images/classimg/zero_01.png" alt="구글 메일 만들기" />
             </div>
+            <p class="step-card-label">Step 01 · 계정</p>
+            <p class="step-card-title">구글계정 가입하기</p>
           </button>
-          <button type="button" class="zero-card" onclick="openZeroPost('capcut')">
-            <div class="zero-card-thumb"><img src="/images/classimg/zero_02.png" alt="캡컷 설치하기"></div>
-            <div class="zero-card-body">
-              <p class="zero-card-cat">STEP 02 · 툴 설치</p>
-              <h3 class="zero-card-title">무료 캡컷 다운로드</h3>
-              <p class="zero-card-desc">무료 영상 편집 툴 캡컷을 PC/모바일에 설치하는 방법.</p>
+
+          <button type="button" class="step-card" data-zero="capcut" onclick="openZeroPost('capcut')">
+            <div class="step-card-visual visual-zero">
+              <img src="/images/classimg/zero_02.png" alt="캡컷 설치하기" />
             </div>
+            <p class="step-card-label">Step 02 · 툴 설치</p>
+            <p class="step-card-title">무료 캡컷 다운로드</p>
           </button>
+
         </div>
-      </div>
+      </section>
+
     </div>
 
     <!-- ───────── PRO CLASS VIEW ───────── -->
     <div class="class-view" id="view-pro">
-      <div class="pro-wrap">
-        <span class="pro-badge">Coming Soon</span>
-        <h2>PRO CLASS</h2>
-        <p>전문가를 위한 심화 과정을 준비 중입니다.<br />곧 만나보실 수 있습니다.</p>
+
+      <section class="cards-section">
+        <div class="cards-track" id="cardsTrackPro">
+
+          <button type="button" class="step-card" data-step="step4">
+            <div class="step-card-check">
+              <svg viewBox="0 0 14 14" fill="none">
+                <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <div class="step-card-visual visual-step4">
+              <img src="/images/4class.png" alt="Step 4 광고영상 제작" />
+            </div>
+            <p class="step-card-label">Step 4</p>
+            <p class="step-card-title">광고영상 제작</p>
+          </button>
+
+          <button type="button" class="step-card" data-step="step5">
+            <div class="step-card-check">
+              <svg viewBox="0 0 14 14" fill="none">
+                <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <div class="step-card-visual visual-step5">
+              <img src="/images/5class.png" alt="Step 5 유튜브 수익화" />
+            </div>
+            <p class="step-card-label">Step 5</p>
+            <p class="step-card-title">유튜브 수익화과정</p>
+            <span class="step-card-status">준비중</span>
+          </button>
+
+        </div>
+      </section>
+
+      <div class="cta-row">
+        <button type="button" class="cta-primary" id="ctaPrimaryPro" onclick="startCurrentStep()">
+          시작하기 →
+        </button>
       </div>
+
     </div>
 
     <!-- ───────── UP CLASS VIEW ───────── -->
@@ -1220,34 +1139,6 @@
           </div>
           <p class="step-card-label">Step 2</p>
           <p class="step-card-title">영상 제작하기</p>
-        </button>
-
-        <button type="button" class="step-card" data-step="step4">
-          <div class="step-card-check">
-            <svg viewBox="0 0 14 14" fill="none">
-              <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </div>
-          <div class="step-card-visual visual-step4">
-            <img src="/images/4class.png" alt="Step 4 광고영상 제작" />
-          </div>
-          <p class="step-card-label">Step 4</p>
-          <p class="step-card-title">광고영상 제작</p>
-          <span class="step-card-status">준비중</span>
-        </button>
-
-        <button type="button" class="step-card" data-step="step5">
-          <div class="step-card-check">
-            <svg viewBox="0 0 14 14" fill="none">
-              <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </div>
-          <div class="step-card-visual visual-step5">
-            <img src="/images/5class.png" alt="Step 5 유튜브 수익화" />
-          </div>
-          <p class="step-card-label">Step 5</p>
-          <p class="step-card-title">유튜브 수익화과정</p>
-          <span class="step-card-status">준비중</span>
         </button>
 
       </div>
@@ -1363,6 +1254,8 @@
     let currentStep = 'step1';
 
     /* ──────────────── CLASS TABS ──────────────── */
+    const CLASS_DEFAULT_STEP = { up: 'step1', pro: 'step4' };
+
     function selectClass(cls) {
       document.querySelectorAll('.class-tab').forEach(t => {
         t.classList.toggle('active', t.dataset.class === cls);
@@ -1370,6 +1263,8 @@
       document.querySelectorAll('.class-view').forEach(v => {
         v.classList.toggle('active', v.id === `view-${cls}`);
       });
+      const defaultStep = CLASS_DEFAULT_STEP[cls];
+      if (defaultStep && STEPS[defaultStep]) selectStep(defaultStep);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -1405,20 +1300,22 @@
 
     function updateCtaForStep(step) {
       const data = STEPS[step];
-      const cta = document.getElementById('ctaPrimary');
-      if (!data.ready) {
-        cta.disabled = true;
-        cta.textContent = '준비중';
-        return;
-      }
-      cta.disabled = false;
-      if (Array.isArray(data.items) && data.items.length > 0) {
-        const chosenId = selectedItems[step];
-        const chosen = data.items.find(x => x.id === chosenId);
-        cta.textContent = chosen ? `${chosen.title} 시작하기 →` : '과정 선택하기 →';
-      } else {
-        cta.textContent = '시작하기 →';
-      }
+      const ctas = document.querySelectorAll('.cta-primary');
+      ctas.forEach(cta => {
+        if (!data.ready) {
+          cta.disabled = true;
+          cta.textContent = '준비중';
+          return;
+        }
+        cta.disabled = false;
+        if (Array.isArray(data.items) && data.items.length > 0) {
+          const chosenId = selectedItems[step];
+          const chosen = data.items.find(x => x.id === chosenId);
+          cta.textContent = chosen ? `${chosen.title} 시작하기 →` : '과정 선택하기 →';
+        } else {
+          cta.textContent = '시작하기 →';
+        }
+      });
     }
 
     function renderMediaPanel(step) {
@@ -1455,10 +1352,10 @@
     }
 
     function centerCardInTrack(step) {
-      const track = document.getElementById('cardsTrack');
-      if (!track) return;
-      const card = track.querySelector(`.step-card[data-step="${step}"]`);
+      const card = document.querySelector(`.cards-track .step-card[data-step="${step}"]`);
       if (!card) return;
+      const track = card.closest('.cards-track');
+      if (!track) return;
       const trackRect = track.getBoundingClientRect();
       const cardRect = card.getBoundingClientRect();
       const delta = (cardRect.left + cardRect.width / 2) - (trackRect.left + trackRect.width / 2);
@@ -1608,103 +1505,100 @@
     }
 
     /* ──────────────── CARROUSEL NAVIGATION ──────────────── */
-    const STEP_ORDER = ['step1', 'step2', 'step4', 'step5'];
-
     function shiftStep(delta) {
-      const idx = STEP_ORDER.indexOf(currentStep);
-      const next = STEP_ORDER[Math.max(0, Math.min(STEP_ORDER.length - 1, idx + delta))];
+      const activeView = document.querySelector('.class-view.active');
+      if (!activeView) return;
+      const stepsInView = Array.from(activeView.querySelectorAll('.step-card[data-step]'))
+        .map(c => c.dataset.step);
+      const idx = stepsInView.indexOf(currentStep);
+      if (idx < 0) return;
+      const next = stepsInView[Math.max(0, Math.min(stepsInView.length - 1, idx + delta))];
       if (next && next !== currentStep) selectStep(next);
     }
 
     /* ──────────────── INIT ──────────────── */
-    document.addEventListener('DOMContentLoaded', () => {
-      const track = document.getElementById('cardsTrack');
+    function setupCardsTrack(track) {
+      if (!track) return;
 
-      // Drag-to-scroll state (shared with click handler to suppress click after drag)
       let isDragging = false;
       let dragMoved = 0;
       let dragStartX = 0;
       let dragStartScrollLeft = 0;
+      let dragCaptured = false;
+      const DRAG_THRESHOLD = 6;
 
-      document.querySelectorAll('.step-card').forEach(card => {
+      // Click handlers scoped to this track (so dragMoved state is per-track)
+      track.querySelectorAll('.step-card').forEach(card => {
         card.addEventListener('click', (e) => {
-          // Suppress click if this was the end of a drag
-          if (dragMoved > 6) {
+          if (dragMoved > DRAG_THRESHOLD) {
             e.preventDefault();
             e.stopPropagation();
             return;
           }
-          selectStep(card.dataset.step, { userInitiated: true });
+          if (card.dataset.step) {
+            selectStep(card.dataset.step, { userInitiated: true });
+          }
+          // ZERO cards (data-zero) rely on inline onclick to navigate.
         });
       });
+
+      const onPointerDown = (e) => {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        isDragging = true;
+        dragCaptured = false;
+        dragMoved = 0;
+        dragStartX = e.clientX;
+        dragStartScrollLeft = track.scrollLeft;
+      };
+
+      const onPointerMove = (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - dragStartX;
+        dragMoved = Math.max(dragMoved, Math.abs(dx));
+        if (!dragCaptured && dragMoved > DRAG_THRESHOLD) {
+          dragCaptured = true;
+          track.style.cursor = 'grabbing';
+          track.style.scrollSnapType = 'none';
+          track.style.scrollBehavior = 'auto';
+          try { track.setPointerCapture(e.pointerId); } catch (_) {}
+        }
+        if (dragCaptured) {
+          track.scrollLeft = dragStartScrollLeft - dx;
+        }
+      };
+
+      const onPointerUp = (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        if (dragCaptured) {
+          track.style.cursor = '';
+          track.style.scrollBehavior = '';
+          track.style.scrollSnapType = 'x mandatory';
+          try { track.releasePointerCapture(e.pointerId); } catch (_) {}
+        } else {
+          const el = document.elementFromPoint(e.clientX, e.clientY);
+          const card = el && el.closest && el.closest('.step-card');
+          if (card && card.dataset.step) selectStep(card.dataset.step);
+        }
+        dragCaptured = false;
+      };
+
+      track.addEventListener('pointerdown', onPointerDown);
+      track.addEventListener('pointermove', onPointerMove);
+      track.addEventListener('pointerup', onPointerUp);
+      track.addEventListener('pointercancel', onPointerUp);
+      track.addEventListener('pointerleave', onPointerUp);
+
+      track.querySelectorAll('img').forEach(img => {
+        img.setAttribute('draggable', 'false');
+      });
+      track.style.cursor = 'grab';
+      track.style.userSelect = 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.cards-track').forEach(setupCardsTrack);
       selectStep('step1');
-
-      if (track) {
-
-        // Drag-to-scroll (mouse / pen / touch via Pointer Events)
-        let dragCaptured = false;
-        const DRAG_THRESHOLD = 6;
-
-        const onPointerDown = (e) => {
-          // Only primary button for mouse
-          if (e.pointerType === 'mouse' && e.button !== 0) return;
-          isDragging = true;
-          dragCaptured = false;
-          dragMoved = 0;
-          dragStartX = e.clientX;
-          dragStartScrollLeft = track.scrollLeft;
-          // Don't capture pointer yet — only after threshold is exceeded.
-          // This way pure clicks still bubble normally to the card click handler.
-        };
-
-        const onPointerMove = (e) => {
-          if (!isDragging) return;
-          const dx = e.clientX - dragStartX;
-          dragMoved = Math.max(dragMoved, Math.abs(dx));
-          if (!dragCaptured && dragMoved > DRAG_THRESHOLD) {
-            // Threshold passed — start the actual drag
-            dragCaptured = true;
-            track.style.cursor = 'grabbing';
-            track.style.scrollSnapType = 'none';
-            track.style.scrollBehavior = 'auto';
-            try { track.setPointerCapture(e.pointerId); } catch (_) {}
-          }
-          if (dragCaptured) {
-            track.scrollLeft = dragStartScrollLeft - dx;
-          }
-        };
-
-        const onPointerUp = (e) => {
-          if (!isDragging) return;
-          isDragging = false;
-          if (dragCaptured) {
-            track.style.cursor = '';
-            track.style.scrollBehavior = '';
-            track.style.scrollSnapType = 'x mandatory';
-            try { track.releasePointerCapture(e.pointerId); } catch (_) {}
-          } else {
-            // Pure click — fallback selection in case the native click event
-            // doesn't reach the card (e.g., pointer-capture edge cases)
-            const el = document.elementFromPoint(e.clientX, e.clientY);
-            const card = el && el.closest && el.closest('.step-card');
-            if (card && card.dataset.step) selectStep(card.dataset.step);
-          }
-          dragCaptured = false;
-        };
-
-        track.addEventListener('pointerdown', onPointerDown);
-        track.addEventListener('pointermove', onPointerMove);
-        track.addEventListener('pointerup', onPointerUp);
-        track.addEventListener('pointercancel', onPointerUp);
-        track.addEventListener('pointerleave', onPointerUp);
-
-        // Disable native image dragging inside cards
-        track.querySelectorAll('img').forEach(img => {
-          img.setAttribute('draggable', 'false');
-        });
-        track.style.cursor = 'grab';
-        track.style.userSelect = 'none';
-      }
 
       // Keyboard arrows → navigate cards
       document.addEventListener('keydown', (e) => {
