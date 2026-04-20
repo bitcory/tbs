@@ -86,65 +86,101 @@ function parseSceneNumber(sceneId, fallback) {
 }
 
 function buildImagePromptText(scene) {
-  const ip = scene.image_prompt || {};
-  const bg = scene.background || {};
-  const cam = scene.camera || {};
   const parts = [];
 
-  if (ip.subject) {
-    parts.push(ip.subject);
-  } else if (scene.description) {
-    parts.push(scene.description);
-  }
+  // v3.8: image_prompt is a single string
+  if (typeof scene.image_prompt === 'string' && scene.image_prompt.trim()) {
+    parts.push(scene.image_prompt.trim());
+  } else {
+    // v3.0 legacy: image_prompt is an object
+    const ip = scene.image_prompt || {};
+    const bg = scene.background || {};
+    const cam = scene.camera || {};
 
-  if (ip.description) parts.push(ip.description);
+    if (ip.subject) {
+      parts.push(ip.subject);
+    } else if (scene.description) {
+      parts.push(scene.description);
+    }
+    if (ip.description) parts.push(ip.description);
 
-  if (ip.character_in_scene) {
-    const c = ip.character_in_scene;
-    const charParts = [
-      c.description,
-      c.action && `action: ${c.action}`,
-      c.expression && `expression: ${c.expression}`,
-      c.position && `position: ${c.position}`,
-      c.facing && `facing: ${c.facing}`,
+    if (ip.character_in_scene) {
+      const c = ip.character_in_scene;
+      const charParts = [
+        c.description,
+        c.action && `action: ${c.action}`,
+        c.expression && `expression: ${c.expression}`,
+        c.position && `position: ${c.position}`,
+        c.facing && `facing: ${c.facing}`,
+      ].filter(Boolean);
+      if (charParts.length > 0) parts.push(`Character: ${charParts.join(', ')}`);
+    } else if (scene.character_action) {
+      parts.push(`Character action: ${scene.character_action}`);
+    }
+
+    if (ip.scene_composition) parts.push(`Composition: ${ip.scene_composition}`);
+
+    const bgParts = [
+      bg.location,
+      bg.description_ko,
+      bg.color_grading && `color: ${bg.color_grading}`,
+      bg.lighting && `lighting: ${bg.lighting}`,
+      bg.mood && `mood: ${bg.mood}`,
     ].filter(Boolean);
-    if (charParts.length > 0) parts.push(`Character: ${charParts.join(', ')}`);
-  } else if (scene.character_action) {
-    parts.push(`Character action: ${scene.character_action}`);
+    if (bgParts.length > 0) parts.push(`Background: ${bgParts.join(', ')}`);
+
+    const camParts = [cam.shot_type, cam.angle, cam.lens].filter(Boolean);
+    if (camParts.length > 0) parts.push(`Camera: ${camParts.join(', ')}`);
+
+    if (ip.text_overlay?.enabled) {
+      const t = ip.text_overlay;
+      parts.push(`Text overlay: "${t.text || ''}" (${t.language || 'ko'}, ${t.position || 'lower third'})`);
+    }
+
+    if (ip.quality) parts.push(`Quality: ${ip.quality}`);
+    if (ip.aspect_ratio) parts.push(`Aspect: ${ip.aspect_ratio}`);
+
+    if (scene.visual_rules) parts.push(`Visual rules: ${scene.visual_rules}`);
+
+    if (ip.negative) parts.push(`Negative: ${ip.negative}`);
   }
 
-  if (ip.scene_composition) parts.push(`Composition: ${ip.scene_composition}`);
-
-  const bgParts = [
-    bg.location,
-    bg.description_ko,
-    bg.color_grading && `color: ${bg.color_grading}`,
-    bg.lighting && `lighting: ${bg.lighting}`,
-    bg.mood && `mood: ${bg.mood}`,
-  ].filter(Boolean);
-  if (bgParts.length > 0) parts.push(`Background: ${bgParts.join(', ')}`);
-
-  const camParts = [cam.shot_type, cam.angle, cam.lens].filter(Boolean);
-  if (camParts.length > 0) parts.push(`Camera: ${camParts.join(', ')}`);
-
-  if (ip.text_overlay?.enabled) {
-    const t = ip.text_overlay;
-    parts.push(`Text overlay: "${t.text || ''}" (${t.language || 'ko'}, ${t.position || 'lower third'})`);
+  // v3.8: negative_prompt at scene level
+  if (scene.negative_prompt) {
+    parts.push(`Negative: ${scene.negative_prompt}`);
   }
 
-  if (ip.quality) parts.push(`Quality: ${ip.quality}`);
-  if (ip.aspect_ratio) parts.push(`Aspect: ${ip.aspect_ratio}`);
-
-  if (scene.visual_rules) parts.push(`Visual rules: ${scene.visual_rules}`);
-
-  if (ip.negative) parts.push(`Negative: ${ip.negative}`);
+  // NOTE: scene.subtitle is post-edit reference data (for CapCut/AE).
+  // Do NOT include in image prompt — stored on scene object for separate display.
 
   return parts.join('\n');
 }
 
-function buildVideoPromptText(videoScene) {
-  const vp = videoScene.video_prompt || videoScene;
+function buildVideoPromptBase(scene) {
   const parts = [];
+
+  // v3.8: video_prompt is a single string; motion fields are at scene level
+  if (typeof scene.video_prompt === 'string' && scene.video_prompt.trim()) {
+    parts.push(scene.video_prompt.trim());
+    if (scene.camera_motion) parts.push(`Camera motion: ${scene.camera_motion}`);
+    if (scene.character_motion) parts.push(`Character motion: ${scene.character_motion}`);
+    if (scene.environment_motion) parts.push(`Environment: ${scene.environment_motion}`);
+    if (scene.end_frame_description) parts.push(`End frame: ${scene.end_frame_description}`);
+    if (scene.scene_connection?.transition_type) {
+      parts.push(`Transition: ${scene.scene_connection.transition_type}`);
+    }
+    return parts.join('\n');
+  }
+
+  // v3.0 legacy: delegated to legacy builder below
+  return buildVideoPromptLegacy(scene);
+}
+
+function buildVideoPromptLegacy(scene) {
+  const parts = [];
+
+  // v3.0 legacy: video_prompt is an object
+  const vp = scene.video_prompt || scene;
 
   if (vp.frame_strategy) {
     const fs = vp.frame_strategy;
@@ -153,13 +189,15 @@ function buildVideoPromptText(videoScene) {
   if (vp.starting_image) parts.push(`Starting image: ${vp.starting_image}`);
   if (vp.ending_image) parts.push(`Ending image: ${vp.ending_image}`);
 
-  if (vp.camera_motion) {
+  if (vp.camera_motion && typeof vp.camera_motion === 'object') {
     const cm = vp.camera_motion;
     const cmParts = [cm.type, cm.speed && `speed: ${cm.speed}`, cm.direction && `direction: ${cm.direction}`].filter(Boolean);
     if (cmParts.length > 0) parts.push(`Camera motion: ${cmParts.join(', ')}`);
+  } else if (typeof vp.camera_motion === 'string') {
+    parts.push(`Camera motion: ${vp.camera_motion}`);
   }
 
-  if (vp.character_motion) {
+  if (vp.character_motion && typeof vp.character_motion === 'object') {
     const m = vp.character_motion;
     const mParts = [
       m.action,
@@ -168,6 +206,8 @@ function buildVideoPromptText(videoScene) {
       m.facing_change && `facing: ${m.facing_change}`,
     ].filter(Boolean);
     if (mParts.length > 0) parts.push(`Character motion: ${mParts.join(', ')}`);
+  } else if (typeof vp.character_motion === 'string') {
+    parts.push(`Character motion: ${vp.character_motion}`);
   }
 
   if (vp.scene_mood) parts.push(`Mood: ${vp.scene_mood}`);
@@ -188,8 +228,8 @@ function buildVideoPromptText(videoScene) {
   return parts.join('\n');
 }
 
-function extractDialogue(videoScene) {
-  const d = videoScene?.video_prompt?.dialogue || videoScene?.dialogue;
+function extractDialogueText(d) {
+  // Only text + delivery (for dialogue textarea). Timing/SFX live in meta.
   if (!d) return '';
   if (typeof d === 'string') return d;
   if (d.enabled === false) return '';
@@ -202,8 +242,36 @@ function extractDialogue(videoScene) {
   const parts = [];
   if (d.text) parts.push(d.text);
   if (d.delivery) parts.push(`(${d.delivery})`);
-  if (d.timing) parts.push(`@ ${d.timing}`);
   return parts.join(' ');
+}
+
+function extractDialogueMeta(d) {
+  if (!d || typeof d !== 'object') return { timing: '', sfx: '' };
+  return {
+    timing: d.timing || '',
+    sfx: d.sfx || '',
+  };
+}
+
+function composeDialogueLine(dialogueText, meta) {
+  const hasDialogue = dialogueText && dialogueText.trim();
+  const hasTiming = meta?.timing;
+  const hasSfx = meta?.sfx;
+  if (!hasDialogue && !hasTiming && !hasSfx) return '';
+
+  const pieces = [];
+  if (hasDialogue) pieces.push(dialogueText.trim());
+  if (hasTiming) pieces.push(`@ ${meta.timing}`);
+  if (hasSfx) {
+    pieces.push((hasDialogue || hasTiming) ? `/ SFX: ${meta.sfx}` : `SFX: ${meta.sfx}`);
+  }
+  return pieces.join(' ');
+}
+
+// Back-compat wrapper — callers of extractDialogue get full text including meta.
+function extractDialogue(videoScene) {
+  const d = videoScene?.dialogue || videoScene?.video_prompt?.dialogue;
+  return extractDialogueText(d);
 }
 
 function parseImagePrompts(raw) {
@@ -220,17 +288,26 @@ function parseImagePrompts(raw) {
 
   const project = json.project || {};
   const total = sceneArr.length;
+  const sharedNegative = project.shared_negative || '';
 
   const scenes = sceneArr.map((s, i) => {
     const sceneNumber = parseSceneNumber(s.scene_id ?? s.id, i + 1);
     const narrative = s.narrative_role || defaultRoleForScene(sceneNumber, total);
     const act = normalizeAct(narrative);
 
-    const description = (s.background && s.background.description_ko)
+    // v3.8: background_description_ko (flat string) / v3.0: background.description_ko (object)
+    const description = s.background_description_ko
+      || (typeof s.background === 'object' && s.background?.description_ko)
       || s.character_action
       || s.description
       || '';
-    const emotion = (s.background && s.background.mood) || s.emotion || '';
+    const emotion = (typeof s.background === 'object' && s.background?.mood) || s.emotion || '';
+
+    // Fallback negative to project.shared_negative (v3.8)
+    const sceneForPrompt = {
+      ...s,
+      negative_prompt: s.negative_prompt || sharedNegative,
+    };
 
     return {
       id: String(s.scene_id ?? s.id ?? `scene_${sceneNumber}`),
@@ -239,6 +316,9 @@ function parseImagePrompts(raw) {
       narrative_role: narrative,
       time_range: s.time_range || '',
       background_group: s.background_group || '',
+      ad_role: s.ad_role || '',
+      product_exposure: s.product_exposure || null,
+      subtitle: s.subtitle || null,
       title: narrative || s.title || `Scene ${sceneNumber}`,
       description,
       emotion,
@@ -247,7 +327,7 @@ function parseImagePrompts(raw) {
         image: {
           id: `img_${String(sceneNumber).padStart(2, '0')}`,
           tool: 'image_gen',
-          prompt: buildImagePromptText(s),
+          prompt: buildImagePromptText(sceneForPrompt),
         },
         video: {
           id: `vid_${String(sceneNumber).padStart(2, '0')}`,
@@ -277,6 +357,11 @@ function parseImagePrompts(raw) {
       narrative_arc: project.narrative_arc || '',
       total_duration_sec: project.total_duration_sec || 0,
       character_ref: project.character_ref || json.character || '',
+      genre_tone: project.genre_tone || '',
+      concept_direction: project.concept_direction || '',
+      brand_assets: project.brand_assets || null,
+      ad_balance_check: project.ad_balance_check || null,
+      shared_negative: sharedNegative,
     },
     scenes,
   };
@@ -295,11 +380,20 @@ function parseVideoPrompts(raw) {
 
   return sceneArr.map((s, i) => {
     const sceneNumber = parseSceneNumber(s.scene_id ?? s.id, i + 1);
+    const baseText = buildVideoPromptBase(s);
+    const d = s.dialogue || s.video_prompt?.dialogue;
+    const dialogueText = extractDialogueText(d);
+    const dialogueMeta = extractDialogueMeta(d);
+    const dialogueLine = composeDialogueLine(dialogueText, dialogueMeta);
+    const promptText = [baseText, dialogueLine].filter(Boolean).join('\n');
+
     return {
       scene_id: String(s.scene_id ?? s.id ?? `scene_${sceneNumber}`),
       scene_number: sceneNumber,
-      prompt_text: buildVideoPromptText(s),
-      dialogue: extractDialogue(s),
+      baseText,
+      dialogue: dialogueText,
+      dialogueMeta,
+      prompt_text: promptText,
     };
   });
 }
@@ -326,9 +420,11 @@ function mergeVideoPromptsIntoStoryboard(storyboard, videoScenes) {
         video: {
           ...s.prompts.video,
           prompt: v.prompt_text,
+          baseText: v.baseText,
         },
       },
-      dialogue: v.dialogue || s.dialogue,
+      dialogue: v.dialogue,
+      dialogueMeta: v.dialogueMeta,
     };
   });
 
@@ -349,25 +445,23 @@ function parseCharacter(raw) {
   if (json.character && typeof json.character === 'object') json = json.character;
 
   const meta = json.meta || {};
-  const ip = json.image_prompt || {};
-  const visual = json.visual_identity || {};
-  const appearance = json.appearance || {};
-  const outfit = appearance.outfit || {};
-  const facial = appearance.facial_features || {};
-  const rules = json.consistency_rules || {};
-  const styleObj = (json.style && typeof json.style === 'object') ? json.style : {};
-  const styleStr = typeof json.style === 'string' ? json.style : '';
-
   const name = json.name || meta.name || '';
-  const role = json.role || meta.role || json.archetype || '';
+  const role = meta.role || json.role || json.archetype || '';
 
   const promptParts = [];
 
-  const corePositive = [ip.subject, ip.description, ip.composition, ip.quality]
-    .filter(Boolean).join('. ');
-  if (corePositive) {
-    promptParts.push(corePositive);
+  // v3.8: image_prompt is a single string
+  if (typeof json.image_prompt === 'string' && json.image_prompt.trim()) {
+    promptParts.push(json.image_prompt.trim());
+  } else if (json.image_prompt && typeof json.image_prompt === 'object') {
+    // v3.0 legacy: image_prompt is an object
+    const ip = json.image_prompt;
+    const corePositive = [ip.subject, ip.description, ip.composition, ip.quality]
+      .filter(Boolean).join('. ');
+    if (corePositive) promptParts.push(corePositive);
   } else {
+    // fallback header
+    const styleStr = typeof json.style === 'string' ? json.style : '';
     const header = [
       name && `Character: ${name}`,
       role && `(${role})`,
@@ -376,43 +470,59 @@ function parseCharacter(raw) {
     if (header) promptParts.push(header);
   }
 
-  const visualLines = [
-    visual.age && `- Age: ${visual.age}`,
-    visual.physique && `- Physique: ${visual.physique}`,
-    visual.face && `- Face: ${visual.face}`,
-    visual.outfit && `- Outfit: ${visual.outfit}`,
-    visual.key_item && `- Key item: ${visual.key_item}`,
-  ].filter(Boolean);
-  if (visualLines.length > 0) promptParts.push(`Visual identity:\n${visualLines.join('\n')}`);
+  // Consistency identifiers (v3.8)
+  if (Array.isArray(json.consistency_identifiers) && json.consistency_identifiers.length > 0) {
+    promptParts.push(`Consistency identifiers: ${json.consistency_identifiers.join(' | ')}`);
+  }
 
-  const appearanceLines = [
-    appearance.body_type && `- Body: ${appearance.body_type}`,
-    outfit.top && `- Top: ${outfit.top}`,
-    outfit.bottom && `- Bottom: ${outfit.bottom}`,
-    outfit.accessory && `- Accessory: ${outfit.accessory}`,
-    outfit.tool && `- Tool: ${outfit.tool}`,
-    facial.hair && `- Hair: ${facial.hair}`,
-    facial.eyes && `- Eyes: ${facial.eyes}`,
-    facial.default_expression && `- Default expression: ${facial.default_expression}`,
-  ].filter(Boolean);
-  if (appearanceLines.length > 0) promptParts.push(`Appearance:\n${appearanceLines.join('\n')}`);
+  // Legacy v3.0 fallback fields — only added if v3.8 image_prompt missing
+  if (typeof json.image_prompt !== 'string') {
+    const visual = json.visual_identity || {};
+    const appearance = json.appearance || {};
+    const outfit = appearance.outfit || {};
+    const facial = appearance.facial_features || {};
+    const rules = json.consistency_rules || {};
+    const styleObj = (json.style && typeof json.style === 'object') ? json.style : {};
 
-  if (json.personality) promptParts.push(`Personality: ${json.personality}`);
+    const visualLines = [
+      visual.age && `- Age: ${visual.age}`,
+      visual.physique && `- Physique: ${visual.physique}`,
+      visual.face && `- Face: ${visual.face}`,
+      visual.outfit && `- Outfit: ${visual.outfit}`,
+      visual.key_item && `- Key item: ${visual.key_item}`,
+    ].filter(Boolean);
+    if (visualLines.length > 0) promptParts.push(`Visual identity:\n${visualLines.join('\n')}`);
 
-  const styleLines = [
-    styleObj.rendering && `- Rendering: ${styleObj.rendering}`,
-    styleObj.mood && `- Mood: ${styleObj.mood}`,
-    styleObj.lighting_theme && `- Lighting: ${styleObj.lighting_theme}`,
-  ].filter(Boolean);
-  if (styleLines.length > 0) promptParts.push(`Style:\n${styleLines.join('\n')}`);
+    const appearanceLines = [
+      appearance.body_type && `- Body: ${appearance.body_type}`,
+      outfit.top && `- Top: ${outfit.top}`,
+      outfit.bottom && `- Bottom: ${outfit.bottom}`,
+      outfit.accessory && `- Accessory: ${outfit.accessory}`,
+      outfit.tool && `- Tool: ${outfit.tool}`,
+      facial.hair && `- Hair: ${facial.hair}`,
+      facial.eyes && `- Eyes: ${facial.eyes}`,
+      facial.default_expression && `- Default expression: ${facial.default_expression}`,
+    ].filter(Boolean);
+    if (appearanceLines.length > 0) promptParts.push(`Appearance:\n${appearanceLines.join('\n')}`);
 
-  const rulesLines = [
-    rules.color_palette && `- Color palette: ${rules.color_palette}`,
-    rules.lighting && `- Lighting: ${rules.lighting}`,
-    rules.camera_angle && `- Camera angle: ${rules.camera_angle}`,
-  ].filter(Boolean);
-  if (rulesLines.length > 0) promptParts.push(`Consistency rules:\n${rulesLines.join('\n')}`);
+    if (json.personality) promptParts.push(`Personality: ${json.personality}`);
 
+    const styleLines = [
+      styleObj.rendering && `- Rendering: ${styleObj.rendering}`,
+      styleObj.mood && `- Mood: ${styleObj.mood}`,
+      styleObj.lighting_theme && `- Lighting: ${styleObj.lighting_theme}`,
+    ].filter(Boolean);
+    if (styleLines.length > 0) promptParts.push(`Style:\n${styleLines.join('\n')}`);
+
+    const rulesLines = [
+      rules.color_palette && `- Color palette: ${rules.color_palette}`,
+      rules.lighting && `- Lighting: ${rules.lighting}`,
+      rules.camera_angle && `- Camera angle: ${rules.camera_angle}`,
+    ].filter(Boolean);
+    if (rulesLines.length > 0) promptParts.push(`Consistency rules:\n${rulesLines.join('\n')}`);
+  }
+
+  // Expressions
   const expressions = Array.isArray(json.expressions)
     ? json.expressions
         .map((e) => {
@@ -425,19 +535,23 @@ function parseCharacter(raw) {
     : [];
   if (expressions.length > 0) promptParts.push(`Expressions:\n${expressions.join('\n')}`);
 
-  if (ip.negative) promptParts.push(`Negative: ${ip.negative}`);
+  // Negative prompt — v3.8 top-level, or v3.0 nested
+  const negative = json.negative_prompt
+    || (json.image_prompt && typeof json.image_prompt === 'object' && json.image_prompt.negative)
+    || '';
+  if (negative) promptParts.push(`Negative: ${negative}`);
 
   const prompt = promptParts.join('\n');
 
   if (!prompt && !name) {
-    throw new Error('캐릭터 정보를 찾을 수 없습니다. name/visual_identity/image_prompt 중 하나 이상이 필요합니다.');
+    throw new Error('캐릭터 정보를 찾을 수 없습니다. name/image_prompt 중 하나 이상이 필요합니다.');
   }
 
   return {
     character_id: json.character_id || `char_${Date.now()}`,
     name,
     role,
-    aspect_ratio: ip.aspect_ratio || '',
+    aspect_ratio: '',
     prompt,
     imageUpload: '',
   };
@@ -628,7 +742,44 @@ export default function Step4Page() {
     });
   };
 
-  const updateDialogue = (sceneId, v) => updateScene(sceneId, { dialogue: v });
+  const updateDialogue = (sceneId, v) => {
+    setStoryboard((prev) => prev && {
+      ...prev,
+      scenes: prev.scenes.map((s) => {
+        if (s.id !== sceneId) return s;
+        const meta = s.dialogueMeta || {};
+        const oldLine = composeDialogueLine(s.dialogue, meta);
+        const newLine = composeDialogueLine(v, meta);
+
+        let newVideoPrompt = s.prompts?.video?.prompt || '';
+        if (oldLine && newVideoPrompt.includes(oldLine)) {
+          if (newLine) {
+            newVideoPrompt = newVideoPrompt.replace(oldLine, newLine);
+          } else {
+            newVideoPrompt = newVideoPrompt
+              .replace('\n' + oldLine, '')
+              .replace(oldLine, '');
+          }
+        } else if (newLine) {
+          newVideoPrompt = newVideoPrompt
+            ? `${newVideoPrompt}\n${newLine}`
+            : newLine;
+        }
+
+        return {
+          ...s,
+          dialogue: v,
+          prompts: {
+            ...s.prompts,
+            video: {
+              ...s.prompts.video,
+              prompt: newVideoPrompt,
+            },
+          },
+        };
+      }),
+    });
+  };
 
   const updateCharacter = (patch) => setCharacter((prev) => prev && { ...prev, ...patch });
   const updateCharacterPrompt = (v) => updateCharacter({ prompt: v });
