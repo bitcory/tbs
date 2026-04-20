@@ -8,7 +8,7 @@ export const metadata = {
 export default function Page() {
   return (
     <ZeroPost
-      category="STEP 02 · 툴 설치"
+      category="STEP 04 · 툴 설치"
       title="캡컷(CapCut) PRO 구버전 무료사용 꿀팁"
       subtitle="유료 PRO 기능을 체험하고 학습하기 위한 캡컷 구버전 설치 방법을 안내합니다."
       readingTime="약 6분"

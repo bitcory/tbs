@@ -335,6 +335,17 @@
       padding: 14px;
     }
 
+    /* Photo variant — full-bleed portrait thumbnails (no logo padding) */
+    .visual-zero.visual-zero--photo {
+      background: #0f172a;
+      border: none;
+    }
+
+    .visual-zero.visual-zero--photo img {
+      object-fit: cover;
+      padding: 0;
+    }
+
     .step-card-label {
       font-size: 11px;
       font-weight: 800;
@@ -1043,7 +1054,12 @@
       <section class="cards-section">
         <div class="cards-track" id="cardsTrackZero">
 
-          <button type="button" class="step-card" data-zero="gmail" onclick="openZeroPost('gmail')">
+          <button type="button" class="step-card" data-step="zero-gmail">
+            <div class="step-card-check">
+              <svg viewBox="0 0 14 14" fill="none">
+                <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
             <div class="step-card-visual visual-zero">
               <img src="/images/classimg/zero_01.png" alt="구글 메일 만들기" />
             </div>
@@ -1051,16 +1067,53 @@
             <p class="step-card-title">구글계정 가입하기</p>
           </button>
 
-          <button type="button" class="step-card" data-zero="capcut" onclick="openZeroPost('capcut')">
+          <button type="button" class="step-card" data-step="zero-flow">
+            <div class="step-card-check">
+              <svg viewBox="0 0 14 14" fill="none">
+                <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <div class="step-card-visual visual-zero visual-zero--photo">
+              <img src="/images/zero/flow/thumb.png" alt="FLOW 가입하기" />
+            </div>
+            <p class="step-card-label">Step 02 · 계정</p>
+            <p class="step-card-title">FLOW 가입하기</p>
+          </button>
+
+          <button type="button" class="step-card" data-step="zero-ai-photo">
+            <div class="step-card-check">
+              <svg viewBox="0 0 14 14" fill="none">
+                <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <div class="step-card-visual visual-zero visual-zero--photo">
+              <img src="/images/zero/ai-photo/thumb.png" alt="AI 사진 만들기" />
+            </div>
+            <p class="step-card-label">Step 03 · AI 사진</p>
+            <p class="step-card-title">AI 사진 만들기</p>
+          </button>
+
+          <button type="button" class="step-card" data-step="zero-capcut">
+            <div class="step-card-check">
+              <svg viewBox="0 0 14 14" fill="none">
+                <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
             <div class="step-card-visual visual-zero">
               <img src="/images/classimg/zero_02.png" alt="캡컷 설치하기" />
             </div>
-            <p class="step-card-label">Step 02 · 툴 설치</p>
+            <p class="step-card-label">Step 04 · 툴 설치</p>
             <p class="step-card-title">무료 캡컷 다운로드</p>
           </button>
 
         </div>
       </section>
+
+      <div class="cta-row">
+        <button type="button" class="cta-primary" id="ctaPrimaryZero" onclick="startCurrentStep()">
+          시작하기 →
+        </button>
+      </div>
 
     </div>
 
@@ -1194,6 +1247,11 @@
       },
       step4: { label: 'Step 4', title: '광고영상 제작',     url: '/lecture/step4', ready: true },
       step5: { label: 'Step 5', title: '유튜브 수익화과정', url: null, ready: false },
+
+      'zero-gmail':    { label: 'Step 01', title: '구글계정 가입하기',   url: '/zero/gmail',    ready: true },
+      'zero-flow':     { label: 'Step 02', title: 'FLOW 가입하기',        url: '/zero/flow',     ready: true },
+      'zero-ai-photo': { label: 'Step 03', title: 'AI 사진 만들기',      url: '/zero/ai-photo', ready: true },
+      'zero-capcut':   { label: 'Step 04', title: '무료 캡컷 다운로드',  url: '/zero/capcut',   ready: true },
     };
 
     /* Per-step media for the panel below.
@@ -1254,7 +1312,7 @@
     let currentStep = 'step1';
 
     /* ──────────────── CLASS TABS ──────────────── */
-    const CLASS_DEFAULT_STEP = { up: 'step1', pro: 'step4' };
+    const CLASS_DEFAULT_STEP = { zero: 'zero-gmail', up: 'step1', pro: 'step4' };
 
     function selectClass(cls) {
       document.querySelectorAll('.class-tab').forEach(t => {
@@ -1268,14 +1326,10 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function openZeroPost(slug) {
-      navigateTop(`/zero/${slug}`);
-    }
-
     /* ──────────────── CARD SELECTION ──────────────── */
     const selectedItems = {}; // { step2: 'music', ... }
 
-    function selectStep(step, { userInitiated = false } = {}) {
+    function selectStep(step, { userInitiated = false, skipCenter = false } = {}) {
       if (!STEPS[step]) return;
       const prevStep = currentStep;
       currentStep = step;
@@ -1290,12 +1344,31 @@
 
       updateCtaForStep(step);
       renderMediaPanel(step);
-      centerCardInTrack(step);
+      if (!skipCenter) centerCardInTrack(step);
 
       // Auto-open sub-select modal on user-initiated click if step has items
       if (userInitiated && data.ready && Array.isArray(data.items) && data.items.length > 0) {
         openSubSelectModal(step);
       }
+    }
+
+    function detectCenterCard(track) {
+      const cards = track.querySelectorAll('.step-card[data-step]');
+      if (!cards.length) return null;
+      const trackRect = track.getBoundingClientRect();
+      const trackCenter = trackRect.left + trackRect.width / 2;
+      let closest = null;
+      let minDist = Infinity;
+      cards.forEach(card => {
+        const rect = card.getBoundingClientRect();
+        const cardCenter = rect.left + rect.width / 2;
+        const dist = Math.abs(cardCenter - trackCenter);
+        if (dist < minDist) {
+          minDist = dist;
+          closest = card;
+        }
+      });
+      return closest;
     }
 
     function updateCtaForStep(step) {
@@ -1538,7 +1611,6 @@
           if (card.dataset.step) {
             selectStep(card.dataset.step, { userInitiated: true });
           }
-          // ZERO cards (data-zero) rely on inline onclick to navigate.
         });
       });
 
@@ -1588,6 +1660,20 @@
       track.addEventListener('pointerup', onPointerUp);
       track.addEventListener('pointercancel', onPointerUp);
       track.addEventListener('pointerleave', onPointerUp);
+
+      // Sync active card to center of track after drag/wheel/trackpad/touch scroll.
+      // Debounced so programmatic smooth-scroll doesn't cause loops.
+      let scrollTimer = null;
+      const syncActiveFromScroll = () => {
+        const card = detectCenterCard(track);
+        if (card && card.dataset.step && card.dataset.step !== currentStep) {
+          selectStep(card.dataset.step, { skipCenter: true });
+        }
+      };
+      track.addEventListener('scroll', () => {
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(syncActiveFromScroll, 120);
+      }, { passive: true });
 
       track.querySelectorAll('img').forEach(img => {
         img.setAttribute('draggable', 'false');
