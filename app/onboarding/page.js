@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import * as S from "@/lib/uiStyles";
+import { logConsent } from "@/lib/consent";
 
 export default async function OnboardingPage() {
   const session = await auth();
@@ -38,6 +39,13 @@ export default async function OnboardingPage() {
         marketingAgreedAt: marketingOptIn ? now : null,
       },
     });
+
+    // 동의 이력 로그 (INSERT-only, 감사 추적용)
+    await logConsent(s.user.id, "privacy", "granted", "onboarding");
+    if (marketingOptIn) {
+      await logConsent(s.user.id, "marketing", "granted", "onboarding");
+    }
+
     revalidatePath("/", "layout");
     redirect("/mypage");
   }

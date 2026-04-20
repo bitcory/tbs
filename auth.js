@@ -4,7 +4,6 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  debug: true, // TEMP: production 에러 원인 확인용. 해결 후 제거.
   trustHost: true,
   adapter: PrismaAdapter(prisma),
   providers: [

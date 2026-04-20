@@ -149,6 +149,21 @@ export default function ProfileEditor({
           </button>
         </div>
       )}
+
+      <div
+        style={{
+          marginTop: 18,
+          padding: "12px 14px",
+          background: "#ecfdf5",
+          border: "1px solid #a7f3d0",
+          borderRadius: 10,
+          fontSize: 12.5,
+          color: "#065f46",
+          lineHeight: 1.55,
+        }}
+      >
+        📧 <strong>강의자료 안내</strong> — 강의자료는 <strong>이메일 또는 전화번호가 등록된 회원</strong>에게만 발송됩니다. 정확한 수신을 위해 회원정보를 최신 상태로 유지해 주세요.
+      </div>
     </form>
   );
 }
@@ -161,6 +176,7 @@ function ConsentBlock({
   setMarketingOptIn,
   privacyAgreedAt,
 }) {
+  const hasAgreedPrivacy = !!privacyAgreedAt;
   const box = {
     marginTop: 8,
     padding: "14px 16px",
@@ -174,27 +190,62 @@ function ConsentBlock({
   const row = { display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13, lineHeight: 1.55, color: "#334155" };
   const cb = { marginTop: 3, width: 16, height: 16, accentColor: "#00996D", cursor: editing ? "pointer" : "default" };
 
+  // 이미 동의한 경우, 수정 화면에서도 "동의 완료" 로만 표시 (취소는 회원 탈퇴를 통해서만 가능)
+  const privacyAgreedDisplay = {
+    display: "flex",
+    alignItems: "flex-start",
+    gap: 10,
+    padding: "4px 0",
+  };
+  const checkBadge = {
+    marginTop: 2,
+    width: 18,
+    height: 18,
+    borderRadius: 5,
+    background: "linear-gradient(135deg, #68D970, #00996D)",
+    color: "#fff",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: 12,
+    fontWeight: 900,
+    flexShrink: 0,
+  };
+
   return (
     <div style={box}>
-      <label style={row}>
-        <input
-          type="checkbox"
-          checked={privacyAgreed}
-          onChange={(e) => setPrivacyAgreed(e.target.checked)}
-          disabled={!editing}
-          style={cb}
-        />
-        <span>
-          <strong style={{ color: "#0f172a" }}>[필수]</strong> 개인정보 수집·이용에 동의합니다.
-          <br />
-          <span style={{ color: "#64748b", fontSize: 12 }}>
-            수집 항목: 닉네임, 이메일, 핸드폰번호 · 이용 목적: 강의 제공 및 회원 관리 · 보관 기간: 회원 탈퇴 시까지
-            {privacyAgreedAt && (
-              <> · 동의일자: {new Date(privacyAgreedAt).toLocaleDateString("ko-KR")}</>
-            )}
+      {hasAgreedPrivacy ? (
+        <div style={privacyAgreedDisplay}>
+          <span style={checkBadge}>✓</span>
+          <span style={{ fontSize: 13, lineHeight: 1.55, color: "#334155" }}>
+            <strong style={{ color: "#0f172a" }}>개인정보 수집·이용 동의 완료</strong>
+            <br />
+            <span style={{ color: "#64748b", fontSize: 12 }}>
+              동의일자: {new Date(privacyAgreedAt).toLocaleDateString("ko-KR")} · 수집 항목: 닉네임, 이메일, 핸드폰번호 · 보관 기간: 회원 탈퇴 시까지
+              <br />
+              동의 철회는 회원 탈퇴를 통해서만 가능합니다.
+            </span>
           </span>
-        </span>
-      </label>
+        </div>
+      ) : (
+        <label style={row}>
+          <input
+            type="checkbox"
+            checked={privacyAgreed}
+            onChange={(e) => setPrivacyAgreed(e.target.checked)}
+            disabled={!editing}
+            style={cb}
+          />
+          <span>
+            <strong style={{ color: "#0f172a" }}>[필수]</strong> 개인정보 수집·이용에 동의합니다.
+            <br />
+            <span style={{ color: "#64748b", fontSize: 12 }}>
+              수집 항목: 닉네임, 이메일, 핸드폰번호 · 이용 목적: 강의 제공 및 회원 관리 · 보관 기간: 회원 탈퇴 시까지
+            </span>
+          </span>
+        </label>
+      )}
+
       <label style={row}>
         <input
           type="checkbox"

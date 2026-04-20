@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { sendMaterialsEmail } from "@/lib/email";
 import { hasStepMaterials } from "@/lib/stepMaterials";
+import { logConsent } from "@/lib/consent";
 
 export async function updateProfile(formData) {
   const s = await auth();
@@ -39,6 +40,21 @@ export async function updateProfile(formData) {
       marketingAgreedAt: marketingChanged ? now : undefined,
     },
   });
+
+  // 동의 이력 로그 (INSERT-only)
+  if (!me?.privacyAgreedAt) {
+    // 프로필에서 뒤늦게 처음 동의한 경우
+    await logConsent(s.user.id, "privacy", "granted", "profile_edit");
+  }
+  if (marketingChanged) {
+    await logConsent(
+      s.user.id,
+      "marketing",
+      marketingOptIn ? "granted" : "revoked",
+      "profile_edit"
+    );
+  }
+
   revalidatePath("/mypage");
   return { ok: true };
 }
