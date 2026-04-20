@@ -17,10 +17,10 @@ const CHAR_CACHE_KEY = 'toolb_step4_character';
 const ACTS = ['Hook', 'Build', 'Climax', 'CTA'];
 
 const ACT_COLORS = [
-  { dot: '#ef4444', label: 'Hook' },
-  { dot: '#f59e0b', label: 'Build' },
-  { dot: '#8b5cf6', label: 'Climax' },
-  { dot: '#10b981', label: 'CTA' },
+  { dot: '#ef4444', label: '기', english: 'Hook' },
+  { dot: '#f59e0b', label: '승', english: 'Build' },
+  { dot: '#8b5cf6', label: '전', english: 'Climax' },
+  { dot: '#10b981', label: '결', english: 'CTA' },
 ];
 
 const NARRATIVE_ROLES = [
@@ -29,11 +29,24 @@ const NARRATIVE_ROLES = [
 ];
 
 const ACT_MAP = {
-  'hook': 'Hook', 'setup': 'Hook', '후킹': 'Hook', 'opening': 'Hook', '기': 'Hook', 'ki': 'Hook', 'introduction': 'Hook', 'intro': 'Hook',
-  'problem': 'Build', 'escalation': 'Build', 'build': 'Build', '전개': 'Build', 'development': 'Build', '승': 'Build', 'seung': 'Build', 'rising_action': 'Build',
-  'turn': 'Climax', 'decision': 'Climax', 'action': 'Climax', 'obstacle': 'Climax', 'reveal': 'Climax', 'experience': 'Climax', 'peak': 'Climax',
-  'climax': 'Climax', '절정': 'Climax', 'solution': 'Climax', '전': 'Climax', 'jeon': 'Climax',
-  'cta': 'CTA', 'call_to_action': 'CTA', 'ending': 'CTA', '마무리': 'CTA', '결': 'CTA', 'gyeol': 'CTA', 'conclusion': 'CTA', 'resolution': 'CTA', 'falling_action': 'CTA',
+  // 기 (Hook)
+  'hook': 'Hook', 'setup': 'Hook', 'opening': 'Hook', 'introduction': 'Hook', 'intro': 'Hook',
+  '후킹': 'Hook', '도입': 'Hook', '기': 'Hook', 'ki': 'Hook',
+
+  // 승 (Build)
+  'problem': 'Build', 'escalation': 'Build', 'rising_action': 'Build', 'development': 'Build',
+  'build': 'Build', '전개': 'Build', '승': 'Build', 'seung': 'Build',
+
+  // 전 (Climax)
+  'turn': 'Climax', 'decision': 'Climax', 'action': 'Climax', 'obstacle': 'Climax',
+  'reveal': 'Climax', 'experience': 'Climax', 'peak': 'Climax', 'climax': 'Climax',
+  'twist': 'Climax', 'solution': 'Climax', 'confrontation': 'Climax',
+  '절정': 'Climax', '전': 'Climax', 'jeon': 'Climax',
+
+  // 결 (CTA)
+  'resolution': 'CTA', 'falling_action': 'CTA', 'cta': 'CTA', 'ending': 'CTA',
+  'conclusion': 'CTA', 'call_to_action': 'CTA', 'outro': 'CTA',
+  '마무리': 'CTA', '결말': 'CTA', '결': 'CTA', 'gyeol': 'CTA',
 };
 
 const normalizeAct = (v) => {
@@ -1132,7 +1145,10 @@ export default function Step4Page() {
                         className="w-1.5 h-1.5 rounded-full"
                         style={{ background: isActive ? '#fff' : tc.dot, opacity: isActive ? 1 : 0.6 }}
                       />
-                      {act}
+                      <span className="flex items-baseline gap-1">
+                        <span>{tc.label}</span>
+                        <span className="text-[10px] font-semibold opacity-60">{tc.english}</span>
+                      </span>
                       {count > 0 && (
                         <span
                           className="text-[11px] font-bold px-1.5 py-0.5 rounded-full"
