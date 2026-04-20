@@ -176,92 +176,151 @@ function ConsentBlock({
   setMarketingOptIn,
   privacyAgreedAt,
 }) {
+  const [open, setOpen] = useState(false);
   const hasAgreedPrivacy = !!privacyAgreedAt;
-  const box = {
+
+  const wrap = {
     marginTop: 8,
-    padding: "14px 16px",
     background: "#f8fafc",
     border: "1px solid #e2e8f0",
     borderRadius: 12,
+    overflow: "hidden",
+  };
+  const summary = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "12px 16px",
+    cursor: "pointer",
+    background: "transparent",
+    border: "none",
+    width: "100%",
+    textAlign: "left",
+    fontFamily: "inherit",
+    color: "#334155",
+  };
+  const body = {
+    padding: "0 16px 14px",
     display: "flex",
     flexDirection: "column",
     gap: 10,
+    borderTop: "1px solid #e2e8f0",
+    paddingTop: 14,
   };
   const row = { display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13, lineHeight: 1.55, color: "#334155" };
   const cb = { marginTop: 3, width: 16, height: 16, accentColor: "#00996D", cursor: editing ? "pointer" : "default" };
-
-  // 이미 동의한 경우, 수정 화면에서도 "동의 완료" 로만 표시 (취소는 회원 탈퇴를 통해서만 가능)
-  const privacyAgreedDisplay = {
-    display: "flex",
-    alignItems: "flex-start",
-    gap: 10,
-    padding: "4px 0",
-  };
-  const checkBadge = {
-    marginTop: 2,
-    width: 18,
-    height: 18,
-    borderRadius: 5,
-    background: "linear-gradient(135deg, #68D970, #00996D)",
-    color: "#fff",
+  const miniBadge = (ok) => ({
     display: "inline-flex",
     alignItems: "center",
-    justifyContent: "center",
-    fontSize: 12,
-    fontWeight: 900,
-    flexShrink: 0,
-  };
+    gap: 4,
+    padding: "3px 8px",
+    borderRadius: 100,
+    fontSize: 11,
+    fontWeight: 700,
+    background: ok ? "#dcfce7" : "#f1f5f9",
+    color: ok ? "#166534" : "#94a3b8",
+  });
 
   return (
-    <div style={box}>
-      {hasAgreedPrivacy ? (
-        <div style={privacyAgreedDisplay}>
-          <span style={checkBadge}>✓</span>
-          <span style={{ fontSize: 13, lineHeight: 1.55, color: "#334155" }}>
-            <strong style={{ color: "#0f172a" }}>개인정보 수집·이용 동의 완료</strong>
-            <br />
-            <span style={{ color: "#64748b", fontSize: 12 }}>
-              동의일자: {new Date(privacyAgreedAt).toLocaleDateString("ko-KR")} · 수집 항목: 닉네임, 이메일, 핸드폰번호 · 보관 기간: 회원 탈퇴 시까지
-              <br />
-              동의 철회는 회원 탈퇴를 통해서만 가능합니다.
-            </span>
+    <div style={wrap}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        style={summary}
+      >
+        <span style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>
+            동의 내역
           </span>
-        </div>
-      ) : (
-        <label style={row}>
-          <input
-            type="checkbox"
-            checked={privacyAgreed}
-            onChange={(e) => setPrivacyAgreed(e.target.checked)}
-            disabled={!editing}
-            style={cb}
-          />
-          <span>
-            <strong style={{ color: "#0f172a" }}>[필수]</strong> 개인정보 수집·이용에 동의합니다.
-            <br />
-            <span style={{ color: "#64748b", fontSize: 12 }}>
-              수집 항목: 닉네임, 이메일, 핸드폰번호 · 이용 목적: 강의 제공 및 회원 관리 · 보관 기간: 회원 탈퇴 시까지
-            </span>
+          <span style={miniBadge(hasAgreedPrivacy)}>
+            개인정보 {hasAgreedPrivacy ? "✓" : "미동의"}
           </span>
-        </label>
-      )}
-
-      <label style={row}>
-        <input
-          type="checkbox"
-          checked={marketingOptIn}
-          onChange={(e) => setMarketingOptIn(e.target.checked)}
-          disabled={!editing}
-          style={cb}
-        />
-        <span>
-          <strong style={{ color: "#0f172a" }}>[선택]</strong> TOOLB의 강의 일정, AI 정보 등 마케팅 정보 수신에 동의합니다.
-          <br />
-          <span style={{ color: "#64748b", fontSize: 12 }}>
-            이메일·문자로 발송되며 언제든지 수신 거부할 수 있습니다.
+          <span style={miniBadge(marketingOptIn)}>
+            마케팅 {marketingOptIn ? "ON" : "OFF"}
           </span>
         </span>
-      </label>
+        <span
+          style={{
+            fontSize: 12,
+            color: "#64748b",
+            transition: "transform 0.2s",
+            transform: open ? "rotate(180deg)" : "rotate(0deg)",
+            display: "inline-block",
+          }}
+        >
+          ▼
+        </span>
+      </button>
+
+      {open && (
+        <div style={body}>
+          {hasAgreedPrivacy ? (
+            <div style={row}>
+              <span
+                style={{
+                  marginTop: 2,
+                  width: 18,
+                  height: 18,
+                  borderRadius: 5,
+                  background: "linear-gradient(135deg, #68D970, #00996D)",
+                  color: "#fff",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 12,
+                  fontWeight: 900,
+                  flexShrink: 0,
+                }}
+              >
+                ✓
+              </span>
+              <span>
+                <strong style={{ color: "#0f172a" }}>개인정보 수집·이용 동의 완료</strong>
+                <br />
+                <span style={{ color: "#64748b", fontSize: 12 }}>
+                  동의일자: {new Date(privacyAgreedAt).toLocaleDateString("ko-KR")} · 수집 항목: 닉네임, 이메일, 핸드폰번호 · 보관 기간: 회원 탈퇴 시까지
+                  <br />
+                  동의 철회는 회원 탈퇴를 통해서만 가능합니다.
+                </span>
+              </span>
+            </div>
+          ) : (
+            <label style={row}>
+              <input
+                type="checkbox"
+                checked={privacyAgreed}
+                onChange={(e) => setPrivacyAgreed(e.target.checked)}
+                disabled={!editing}
+                style={cb}
+              />
+              <span>
+                <strong style={{ color: "#0f172a" }}>[필수]</strong> 개인정보 수집·이용에 동의합니다.
+                <br />
+                <span style={{ color: "#64748b", fontSize: 12 }}>
+                  수집 항목: 닉네임, 이메일, 핸드폰번호 · 이용 목적: 강의 제공 및 회원 관리 · 보관 기간: 회원 탈퇴 시까지
+                </span>
+              </span>
+            </label>
+          )}
+
+          <label style={row}>
+            <input
+              type="checkbox"
+              checked={marketingOptIn}
+              onChange={(e) => setMarketingOptIn(e.target.checked)}
+              disabled={!editing}
+              style={cb}
+            />
+            <span>
+              <strong style={{ color: "#0f172a" }}>[선택]</strong> TOOLB의 강의 일정, AI 정보 등 마케팅 정보 수신에 동의합니다.
+              <br />
+              <span style={{ color: "#64748b", fontSize: 12 }}>
+                이메일·문자로 발송되며 언제든지 수신 거부할 수 있습니다.
+              </span>
+            </span>
+          </label>
+        </div>
+      )}
     </div>
   );
 }
