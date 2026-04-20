@@ -26,6 +26,10 @@ model User {
   stepAccess    Int[]     @default([])
   onboarded     Boolean   @default(false)
 
+  privacyAgreedAt    DateTime?
+  marketingOptIn     Boolean   @default(false)
+  marketingAgreedAt  DateTime?
+
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

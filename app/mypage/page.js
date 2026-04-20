@@ -133,6 +133,8 @@ export default async function MyPage() {
           initialNickname={me.nickname}
           initialEmail={me.email}
           initialPhone={me.phone}
+          initialPrivacyAgreedAt={me.privacyAgreedAt}
+          initialMarketingOptIn={me.marketingOptIn}
           updateProfile={updateProfile}
         />
       </div>

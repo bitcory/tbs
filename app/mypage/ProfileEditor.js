@@ -3,34 +3,61 @@
 import { useState, useTransition } from "react";
 import * as S from "@/lib/uiStyles";
 
-export default function ProfileEditor({ initialNickname, initialEmail, initialPhone, updateProfile }) {
+export default function ProfileEditor({
+  initialNickname,
+  initialEmail,
+  initialPhone,
+  initialPrivacyAgreedAt,
+  initialMarketingOptIn,
+  updateProfile,
+}) {
+  const hadPrivacy = !!initialPrivacyAgreedAt;
   const [editing, setEditing] = useState(false);
   const [nickname, setNickname] = useState(initialNickname ?? "");
   const [email, setEmail] = useState(initialEmail ?? "");
   const [phone, setPhone] = useState(initialPhone ?? "");
+  const [privacyAgreed, setPrivacyAgreed] = useState(hadPrivacy);
+  const [marketingOptIn, setMarketingOptIn] = useState(!!initialMarketingOptIn);
   const [savedNickname, setSavedNickname] = useState(initialNickname ?? "");
   const [savedEmail, setSavedEmail] = useState(initialEmail ?? "");
   const [savedPhone, setSavedPhone] = useState(initialPhone ?? "");
+  const [savedMarketing, setSavedMarketing] = useState(!!initialMarketingOptIn);
+  const [errorMsg, setErrorMsg] = useState("");
   const [pending, startTransition] = useTransition();
 
   function onCancel() {
     setNickname(savedNickname);
     setEmail(savedEmail);
     setPhone(savedPhone);
+    setPrivacyAgreed(hadPrivacy);
+    setMarketingOptIn(savedMarketing);
+    setErrorMsg("");
     setEditing(false);
   }
 
   function onSave(e) {
     e.preventDefault();
+    setErrorMsg("");
+    if (!privacyAgreed) {
+      setErrorMsg("개인정보 수집·이용에 동의해 주세요.");
+      return;
+    }
     const fd = new FormData();
     fd.set("nickname", nickname);
     fd.set("email", email);
     fd.set("phone", phone);
+    if (privacyAgreed) fd.set("privacyAgreed", "on");
+    if (marketingOptIn) fd.set("marketingOptIn", "on");
     startTransition(async () => {
-      await updateProfile(fd);
+      const res = await updateProfile(fd);
+      if (res && res.ok === false) {
+        setErrorMsg(res.message || "저장에 실패했습니다.");
+        return;
+      }
       setSavedNickname(nickname);
       setSavedEmail(email);
       setSavedPhone(phone);
+      setSavedMarketing(marketingOptIn);
       setEditing(false);
     });
   }
@@ -75,7 +102,7 @@ export default function ProfileEditor({ initialNickname, initialEmail, initialPh
         />
       </div>
 
-      <div style={{ marginBottom: editing ? 20 : 0 }}>
+      <div style={{ marginBottom: 18 }}>
         <label style={S.label}>핸드폰 번호</label>
         <input
           type="tel"
@@ -90,8 +117,21 @@ export default function ProfileEditor({ initialNickname, initialEmail, initialPh
         />
       </div>
 
+      <ConsentBlock
+        editing={editing}
+        privacyAgreed={privacyAgreed}
+        setPrivacyAgreed={setPrivacyAgreed}
+        marketingOptIn={marketingOptIn}
+        setMarketingOptIn={setMarketingOptIn}
+        privacyAgreedAt={initialPrivacyAgreedAt}
+      />
+
+      {errorMsg && (
+        <div style={{ color: "#dc2626", fontSize: 13, marginTop: 12 }}>{errorMsg}</div>
+      )}
+
       {editing && (
-        <div style={{ display: "flex", gap: 10 }}>
+        <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
           <button
             type="submit"
             disabled={pending} className="glass-hoverable"
@@ -110,5 +150,67 @@ export default function ProfileEditor({ initialNickname, initialEmail, initialPh
         </div>
       )}
     </form>
+  );
+}
+
+function ConsentBlock({
+  editing,
+  privacyAgreed,
+  setPrivacyAgreed,
+  marketingOptIn,
+  setMarketingOptIn,
+  privacyAgreedAt,
+}) {
+  const box = {
+    marginTop: 8,
+    padding: "14px 16px",
+    background: "#f8fafc",
+    border: "1px solid #e2e8f0",
+    borderRadius: 12,
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+  };
+  const row = { display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13, lineHeight: 1.55, color: "#334155" };
+  const cb = { marginTop: 3, width: 16, height: 16, accentColor: "#00996D", cursor: editing ? "pointer" : "default" };
+
+  return (
+    <div style={box}>
+      <label style={row}>
+        <input
+          type="checkbox"
+          checked={privacyAgreed}
+          onChange={(e) => setPrivacyAgreed(e.target.checked)}
+          disabled={!editing}
+          style={cb}
+        />
+        <span>
+          <strong style={{ color: "#0f172a" }}>[필수]</strong> 개인정보 수집·이용에 동의합니다.
+          <br />
+          <span style={{ color: "#64748b", fontSize: 12 }}>
+            수집 항목: 닉네임, 이메일, 핸드폰번호 · 이용 목적: 강의 제공 및 회원 관리 · 보관 기간: 회원 탈퇴 시까지
+            {privacyAgreedAt && (
+              <> · 동의일자: {new Date(privacyAgreedAt).toLocaleDateString("ko-KR")}</>
+            )}
+          </span>
+        </span>
+      </label>
+      <label style={row}>
+        <input
+          type="checkbox"
+          checked={marketingOptIn}
+          onChange={(e) => setMarketingOptIn(e.target.checked)}
+          disabled={!editing}
+          style={cb}
+        />
+        <span>
+          <strong style={{ color: "#0f172a" }}>[선택]</strong> TOOLB의 강의 일정, AI 정보 등 마케팅 정보 수신에 동의합니다.
+          <br />
+          <span style={{ color: "#64748b", fontSize: 12 }}>
+            이메일·문자로 발송되며 언제든지 수신 거부할 수 있습니다.
+          </span>
+        </span>
+      </label>
+    </div>
   );
 }

@@ -14,12 +14,33 @@ export async function updateProfile(formData) {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const phoneRaw = String(formData.get("phone") ?? "").trim();
   const phone = phoneRaw.replace(/[^\d+\-]/g, "");
+  const privacyAgreed = formData.get("privacyAgreed") === "on";
+  const marketingOptIn = formData.get("marketingOptIn") === "on";
   if (!nickname || !email) return;
+  if (!privacyAgreed) {
+    return { ok: false, message: "개인정보 수집·이용 동의가 필요합니다." };
+  }
+
+  const me = await prisma.user.findUnique({
+    where: { id: s.user.id },
+    select: { marketingOptIn: true, privacyAgreedAt: true },
+  });
+  const now = new Date();
+  const marketingChanged = !!me && me.marketingOptIn !== marketingOptIn;
+
   await prisma.user.update({
     where: { id: s.user.id },
-    data: { nickname, email, phone: phone || null },
+    data: {
+      nickname,
+      email,
+      phone: phone || null,
+      privacyAgreedAt: me?.privacyAgreedAt ?? now,
+      marketingOptIn,
+      marketingAgreedAt: marketingChanged ? now : undefined,
+    },
   });
   revalidatePath("/mypage");
+  return { ok: true };
 }
 
 export async function requestMaterials(step) {
