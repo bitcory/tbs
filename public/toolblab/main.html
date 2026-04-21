@@ -1322,15 +1322,25 @@
     /* ──────────────── CLASS TABS ──────────────── */
     const CLASS_DEFAULT_STEP = { zero: 'zero-gmail', up: 'step1', pro: 'step4' };
 
-    function selectClass(cls) {
+    function classOfStep(step) {
+      if (!step) return null;
+      if (step.startsWith('zero-')) return 'zero';
+      if (step === 'step4' || step === 'step5') return 'pro';
+      if (step === 'step1' || step === 'step2' || step === 'step3') return 'up';
+      return null;
+    }
+
+    function selectClass(cls, stepOverride) {
       document.querySelectorAll('.class-tab').forEach(t => {
         t.classList.toggle('active', t.dataset.class === cls);
       });
       document.querySelectorAll('.class-view').forEach(v => {
         v.classList.toggle('active', v.id === `view-${cls}`);
       });
-      const defaultStep = CLASS_DEFAULT_STEP[cls];
-      if (defaultStep && STEPS[defaultStep]) selectStep(defaultStep);
+      const targetStep = stepOverride && STEPS[stepOverride]
+        ? stepOverride
+        : CLASS_DEFAULT_STEP[cls];
+      if (targetStep && STEPS[targetStep]) selectStep(targetStep);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -1700,7 +1710,21 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.cards-track').forEach(setupCardsTrack);
-      selectStep('step1');
+
+      const params = new URLSearchParams(window.location.search);
+      const cParam = params.get('c');
+      const sParam = params.get('s');
+      const validClasses = ['zero', 'up', 'pro'];
+      const targetStep = sParam && STEPS[sParam] ? sParam : null;
+      const targetClass = validClasses.includes(cParam)
+        ? cParam
+        : (targetStep ? classOfStep(targetStep) : null);
+
+      if (targetClass) {
+        selectClass(targetClass, targetStep);
+      } else {
+        selectStep('step1');
+      }
 
       // Keyboard arrows → navigate cards
       document.addEventListener('keydown', (e) => {

@@ -3,12 +3,21 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import * as S from "@/lib/uiStyles";
 
-export default async function Home() {
+export default async function Home({ searchParams }) {
   const session = await auth();
   let me = null;
   if (session?.user) {
     me = await prisma.user.findUnique({ where: { id: session.user.id } });
   }
+
+  // Pass class/step hints to the iframe so "back to home" restores the right section
+  const sp = (await searchParams) ?? {};
+  const qs = new URLSearchParams();
+  if (typeof sp.c === "string") qs.set("c", sp.c);
+  if (typeof sp.s === "string") qs.set("s", sp.s);
+  const iframeSrc = qs.toString()
+    ? `/toolblab/main.html?${qs.toString()}`
+    : "/toolblab/main.html";
 
   const avatarWrap = {
     display: "flex",
@@ -36,7 +45,7 @@ export default async function Home() {
   return (
     <main className="fixed inset-0 w-screen h-screen bg-[#050505] overflow-hidden">
       <iframe
-        src="/toolblab/main.html"
+        src={iframeSrc}
         title="TB STUDY"
         className="w-full h-full border-0 block"
       />

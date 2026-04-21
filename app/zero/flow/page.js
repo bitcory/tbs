@@ -8,6 +8,7 @@ export const metadata = {
 export default function Page() {
   return (
     <ZeroPost
+      stepId="zero-flow"
       category="STEP 02 · 계정"
       title="FLOW 가입하기"
       subtitle="AI 영상 제작 워크플로우 툴 FLOW에 가입하고 시작하는 방법을 안내합니다."

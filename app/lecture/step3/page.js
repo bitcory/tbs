@@ -346,7 +346,7 @@ export default function Step3Page() {
 
       {/* Glass bar */}
       <div className="tb-glass-bar">
-        <Link href="/" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full tb-pill-ghost text-xs sm:text-sm font-bold transition">
+        <Link href="/?c=up&s=step3" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full tb-pill-ghost text-xs sm:text-sm font-bold transition">
           <ArrowLeft className="w-3.5 h-3.5" />
           홈
         </Link>

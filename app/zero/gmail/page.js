@@ -8,6 +8,7 @@ export const metadata = {
 export default function Page() {
   return (
     <ZeroPost
+      stepId="zero-gmail"
       category="STEP 01 · 계정"
       title="구글 메일(Gmail) 만들기"
       subtitle="AI 툴 가입·유튜브 운영에 꼭 필요한 구글 계정을 만들어 봅시다."

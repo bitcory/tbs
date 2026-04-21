@@ -171,7 +171,7 @@ export default function AIPhotoPage() {
   return (
     <div style={styles.page}>
       <div style={styles.topbar}>
-        <Link href="/" className="tb-press-soft" style={styles.backBtn}>
+        <Link href="/?c=zero&s=zero-ai-photo" className="tb-press-soft" style={styles.backBtn}>
           <ArrowLeft size={15} strokeWidth={2.5} /> 메인으로
         </Link>
         <span style={styles.topCat}>ZERO CLASS</span>
@@ -247,7 +247,7 @@ export default function AIPhotoPage() {
         </div>
 
         <div style={styles.footer}>
-          <Link href="/" style={styles.footerBtn}>← 다른 과정 보기</Link>
+          <Link href="/?c=zero&s=zero-ai-photo" style={styles.footerBtn}>← 다른 과정 보기</Link>
         </div>
       </article>
 
