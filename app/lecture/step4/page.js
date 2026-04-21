@@ -879,7 +879,7 @@ export default function Step4Page() {
       <style jsx global>{`
         .tb-hero {
           position: relative;
-          padding: 28px 20px 72px;
+          padding: 22px 20px 56px;
           background: linear-gradient(135deg, #016837 0%, #00996D 45%, #00B380 100%);
           color: #fff;
           text-align: center;

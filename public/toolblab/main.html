@@ -97,7 +97,7 @@
     ════════════════════════════ */
     .hero {
       position: relative;
-      padding: 56px 24px 110px;
+      padding: 40px 24px 92px;
       background: linear-gradient(135deg, #016837 0%, #00996D 45%, #00B380 100%);
       color: #fff;
       text-align: center;
@@ -595,7 +595,7 @@
     ════════════════════════════ */
     @media (max-width: 900px) {
       .hero {
-        padding: 36px 20px 90px;
+        padding: 28px 20px 76px;
       }
 
       .step-card {
@@ -1122,12 +1122,6 @@
         </div>
       </section>
 
-      <div class="cta-row">
-        <button type="button" class="cta-primary" id="ctaPrimaryZero" onclick="startCurrentStep()">
-          시작하기 →
-        </button>
-      </div>
-
     </div>
 
     <!-- ───────── PRO CLASS VIEW ───────── -->
@@ -1622,9 +1616,17 @@
             e.stopPropagation();
             return;
           }
-          if (card.dataset.step) {
-            selectStep(card.dataset.step, { userInitiated: true });
+          const step = card.dataset.step;
+          if (!step) return;
+          // ZERO CLASS cards: navigate directly on click (no intermediate selection)
+          if (step.startsWith('zero-')) {
+            const data = STEPS[step];
+            if (data && data.ready && data.url) {
+              navigateTop(data.url);
+              return;
+            }
           }
+          selectStep(step, { userInitiated: true });
         });
       });
 

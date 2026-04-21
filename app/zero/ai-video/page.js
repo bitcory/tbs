@@ -38,8 +38,8 @@ export default function AIVideoPage() {
   return (
     <div style={styles.page}>
       <div style={styles.topbar}>
-        <Link href="/" style={styles.backBtn}>
-          <ArrowLeft size={16} /> 메인으로
+        <Link href="/" className="tb-press-soft" style={styles.backBtn}>
+          <ArrowLeft size={15} strokeWidth={2.5} /> 메인으로
         </Link>
         <span style={styles.topCat}>ZERO CLASS</span>
       </div>
@@ -151,10 +151,15 @@ const styles = {
     display: 'inline-flex',
     alignItems: 'center',
     gap: 6,
-    color: '#475569',
-    fontSize: 14,
-    fontWeight: 600,
+    padding: '8px 14px 8px 10px',
+    color: '#0f172a',
+    fontSize: 13,
+    fontWeight: 700,
     textDecoration: 'none',
+    background: '#fff',
+    border: '1px solid #cbd5e1',
+    borderRadius: 100,
+    boxShadow: '0 2px 8px rgba(15, 23, 42, 0.06)',
   },
   topCat: {
     fontSize: 11,

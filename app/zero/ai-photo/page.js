@@ -171,19 +171,15 @@ export default function AIPhotoPage() {
   return (
     <div style={styles.page}>
       <div style={styles.topbar}>
-        <Link href="/" style={styles.backBtn}>
-          <ArrowLeft size={16} /> 메인으로
+        <Link href="/" className="tb-press-soft" style={styles.backBtn}>
+          <ArrowLeft size={15} strokeWidth={2.5} /> 메인으로
         </Link>
         <span style={styles.topCat}>ZERO CLASS</span>
       </div>
 
       <article style={styles.article}>
         <header style={styles.header}>
-          <p style={styles.category}>Step 03 · AI 사진</p>
           <h1 style={styles.title}>AI 사진 만들기</h1>
-          <p style={styles.subtitle}>
-            프롬프트 한 번 복사해서 원하는 AI 툴에 붙여넣으면 바로 만들 수 있어요.
-          </p>
         </header>
 
         <div className="ai-carousel">
@@ -377,10 +373,15 @@ const styles = {
     display: 'inline-flex',
     alignItems: 'center',
     gap: 6,
-    color: '#475569',
-    fontSize: 14,
-    fontWeight: 600,
+    padding: '8px 14px 8px 10px',
+    color: '#0f172a',
+    fontSize: 13,
+    fontWeight: 700,
     textDecoration: 'none',
+    background: '#fff',
+    border: '1px solid #cbd5e1',
+    borderRadius: 100,
+    boxShadow: '0 2px 8px rgba(15, 23, 42, 0.06)',
   },
   topCat: {
     fontSize: 11,
@@ -391,26 +392,14 @@ const styles = {
   article: {
     maxWidth: 960,
     margin: '0 auto',
-    padding: '48px 24px 100px',
+    padding: '20px 24px 100px',
   },
-  header: { marginBottom: 32, textAlign: 'center' },
-  category: {
-    fontSize: 12,
-    fontWeight: 800,
-    letterSpacing: '0.14em',
-    color: '#00996D',
-    marginBottom: 12,
-  },
+  header: { marginBottom: 14, textAlign: 'center' },
   title: {
-    fontSize: 'clamp(26px, 3.4vw, 38px)',
+    fontSize: 'clamp(22px, 3.2vw, 34px)',
     fontWeight: 800,
-    lineHeight: 1.3,
-    marginBottom: 14,
-  },
-  subtitle: {
-    fontSize: 15,
-    color: '#475569',
-    lineHeight: 1.6,
+    lineHeight: 1.2,
+    margin: 0,
   },
   card: {
     background: '#fff',
