@@ -113,8 +113,13 @@ export default function Step1Page() {
   const [hydrated, setHydrated] = useState(false);
   const [toolView, setToolView] = useState(null);
   const [speakPromptOpen, setSpeakPromptOpen] = useState(false);
+  const [variant, setVariant] = useState('talking');
 
-  const SPEAK_PROMPT = `The character is a native Korean speaker.
+  const VARIANTS = {
+    talking: {
+      label: '말하는 프롬프트',
+      sub: 'Step 1-1',
+      prompt: `The character is a native Korean speaker.
 All dialogue must be spoken in Korean ONLY.
 English is strictly prohibited.
 Voice requirements:
@@ -131,8 +136,51 @@ Performance:
 - Realistic emotions
 - Not robotic
 - Not exaggerated
-Subtitles, title, text is strictly prohibited.`;
+Subtitles, title, text is strictly prohibited.`,
+    },
+    dance: {
+      label: '춤추는 영상 프롬프트',
+      sub: 'Step 1-2',
+      prompt: `The person begins with quick rhythmic footwork, alternating sharp heel and toe stomps on the floor, then sharply spins around to face away and swings their hips playfully side to side, next explosively jumps up and rotates 180 degrees mid-air, finally landing to face forward with one arm thrusting diagonally upward toward the sky and holding the victory pose. Preserve the exact appearance, clothing, and footwear from the source image. Locked frontal medium shot rises subtly with the jump, then freezes completely still on the final pose. Sharp percussive footstep sounds alternating between heel and toe, fabric swishing, a whoosh on the jump, one solid landing sound, a short crowd cheer sustaining into the freeze. No music.`,
+    },
+    fly: {
+      label: '날아가는 영상 프롬프트',
+      sub: 'Step 1-3',
+      prompt: `Ultra-realistic cinematic aerial rear follow shot using the uploaded image as exact identity reference. Camera strictly positioned behind the subject, slight rear-left tracking only. Wide-angle cinematic lens with subtle telephoto compression. Very far camera distance subject appears small in frame. Low altitude flight just above ocean surface. High-speed forward motion. Subject seen only from behind. Fully horizontal flying posture. Arms stretched outward like wings. Legs slightly bent. Clothing pushed backward from wind resistance. Environment: open ocean at sunset. Large ocean dominating frame. Infinite cinematic horizon in upper third. Smooth reflective water with extreme horizontal motion blur streaks. Subtle haze near horizon. Lighting: Low golden sunset directly in front of subject. Strong backlit rim light outlining arms and shoulders. Intense golden reflections across water surface. Sky gradient from peach and pink into deep blue ocean shadows. Hyper-realistic DSLR photography. No CGI look. Extreme 8K clarity. Mood: freedom, speed, solitude. Important: Camera must stay behind subject. No side profile. Subject far from camera. Water motion blur very strong.`,
+    },
+    interview: {
+      label: '동물 인터뷰 프롬프트',
+      sub: 'Step 1-4',
+      prompt: `An anthropomorphic animal character speaks directly to the camera in an interview style.
+Setup:
+- Medium close-up, eye-level framing
+- Soft bokeh background as if on a documentary set
+- Natural studio lighting with a gentle key light
+Voice requirements:
+- Speaks in Korean ONLY, English is strictly prohibited
+- Warm, conversational tone like a TV interview
+- Natural pauses and subtle breathing sounds
+Animal performance:
+- Mouth moves in sync with speech
+- Ears, whiskers, or fur subtly react to emotion
+- Blinks and slight head tilts for naturalness
+Dialogue (Korean only):
+"안녕하세요, 저는 오늘의 주인공이에요."
+"제가 겪은 이야기를 들려드릴게요."
+"끝까지 함께해 주세요."
+Subtitles, title, text is strictly prohibited.`,
+    },
+  };
+
+  const currentVariant = VARIANTS[variant] || VARIANTS.talking;
+  const SPEAK_PROMPT = currentVariant.prompt;
   const promptRef = useRef(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const v = params.get('v');
+    if (v && VARIANTS[v]) setVariant(v);
+  }, []);
 
   // Load cache on mount
   useEffect(() => {
@@ -340,8 +388,8 @@ Subtitles, title, text is strictly prohibited.`;
       {/* Hero */}
       <section className="tb-hero">
         <div className="tb-hero-glow" />
-        <span className="tb-hero-eyebrow">TB STUDY · STEP 1</span>
-        <h1 className="tb-hero-title">마스터 이미지 만들기</h1>
+        <span className="tb-hero-eyebrow">TB STUDY · {currentVariant.sub}</span>
+        <h1 className="tb-hero-title">영상기초다지기</h1>
       </section>
 
       {/* Glass bar (hovering over hero wave) */}
@@ -464,7 +512,7 @@ Subtitles, title, text is strictly prohibited.`;
             </a>
           </div>
 
-          {/* Speak prompt */}
+          {/* Variant prompt */}
           <div className="p-4 border-t border-[#e2e8f0]">
             <button
               onClick={() => setSpeakPromptOpen(true)}
@@ -475,7 +523,7 @@ Subtitles, title, text is strictly prohibited.`;
               }}
             >
               <Mic className="w-4 h-4" />
-              말하는 프롬프트
+              {currentVariant.label}
             </button>
           </div>
         </aside>
@@ -700,7 +748,7 @@ Subtitles, title, text is strictly prohibited.`;
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#e2e8f0]">
               <span className="text-base font-bold text-[#0f172a] uppercase tracking-wider flex items-center gap-2">
                 <Mic className="w-4 h-4 text-[#7C3AED]" />
-                말하는 프롬프트
+                {currentVariant.label}
               </span>
               <button
                 onClick={() => setSpeakPromptOpen(false)}
