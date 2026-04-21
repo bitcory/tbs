@@ -343,7 +343,12 @@ export default function AIPhotoPage() {
 
         @media (max-width: 768px) {
           .ai-grid :global(.ai-slide) {
-            padding: 4px 16px 28px;
+            padding: 4px 16px 20px;
+          }
+          .ai-grid :global(.ai-card) {
+            /* 3:4 이미지 + 본문(~200px)이 한 화면에 들어오도록 폭 제한.
+               탑바/헤더/점 등 고정 영역(~200px)을 제외한 공간에 맞춤. */
+            max-width: min(320px, calc((100dvh - 400px) * 0.75));
           }
         }
       `}</style>
