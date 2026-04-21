@@ -24,7 +24,7 @@ export default function Page() {
             { label: 'FLOW 바로가기', href: 'https://flow.google/' },
           ],
           images: [
-            { src: '/images/zero/flow/1.png', alt: 'FLOW 가입 시작 화면' },
+            { src: '/images/zero/flow/intro.png', alt: 'FLOW 가입 시작 화면' },
           ],
         },
         {
