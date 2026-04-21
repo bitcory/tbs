@@ -14,7 +14,7 @@ const GENDER_OPTIONS = [
 function buildPrompt({ gender, age, dialogue }) {
   const ageSafe = age.trim() || '30s';
   const dialogueSafe = dialogue.trim() || '...';
-  return `A hyper-realistic cinematic close-up of a ${gender} in their ${ageSafe}. The character has an intense and expressive facial look. The setting is realistic with professional cinematic lighting and high-fidelity textures. The character speaks in a professional, native Korean voice with natural intonation: "${dialogueSafe}". No subtitles, no on-screen text, no titles. 4k, cinematic film look.`;
+  return `A hyper-realistic cinematic close-up of a ${gender} in their ${ageSafe}. The character has an intense and expressive facial look. The setting is realistic with professional cinematic lighting and high-fidelity textures. The character speaks in a professional, native Korean voice with natural intonation: "${dialogueSafe}". No subtitles, no on-screen text, no titles, no bgm, no background music. 4k, cinematic film look.`;
 }
 
 export default function AIVideoPage() {
