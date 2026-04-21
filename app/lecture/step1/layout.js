@@ -1,6 +1,3 @@
-import { requireStepAccess } from "@/lib/access";
-
-export default async function Step1Layout({ children }) {
-  await requireStepAccess(1);
+export default function Step1Layout({ children }) {
   return children;
 }
