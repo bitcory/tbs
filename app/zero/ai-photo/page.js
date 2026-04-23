@@ -11,7 +11,11 @@ const ITEMS = [
     title: '증명사진 만들기',
     subtitle: '깔끔하고 단정한 느낌의 AI 증명사진.',
     image: '/images/zero/ai-photo/id-photo.png',
-    prompt: '[Image #13]',
+    prompt: `Use the attached reference image as the absolute foundation for facial identity. Maintain exact facial features, bone structure, hair texture, and likeness from the reference image only. Single subject only, single person composition.
+Background: Light neutral gray studio backdrop with a subtle gradient, smooth and seamless professional finish.
+Lighting: Soft professional studio lighting, even front-facing key light, balanced exposure with gentle fill light to remove any harsh shadows.
+Pose: Perfectly centered frontal portrait, head facing directly forward, eyes looking straight into the camera with a neutral and calm expression.
+Camera: High-resolution photography, sharp focus on facial details, 85mm lens for natural proportions. Style: Photorealistic, clean, luxury beauty studio aesthetic, ID photo precision with high-end skin texture preservation.`,
   },
   {
     id: 'profile-photo',
