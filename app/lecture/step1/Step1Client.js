@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Upload, Copy, Clipboard, ExternalLink, Gem, X, Layers, List, Info, Film, Droplets, Wrench, Mic } from 'lucide-react';
+import { ArrowLeft, Upload, Copy, Clipboard, ExternalLink, Gem, X, Layers, List, Info, Film, Droplets, Wrench, Mic, Languages } from 'lucide-react';
 import dynamic from 'next/dynamic';
 const FrameExtractor = dynamic(() => import('@/app/components/FrameExtractor'), { ssr: false });
 const WatermarkRemover = dynamic(() => import('@/app/components/WatermarkRemover'), { ssr: false });
@@ -432,6 +432,15 @@ Subtitles, title, text is strictly prohibited.`,
               도구
             </div>
             <div className="space-y-1">
+              <a
+                href="https://translate.google.co.kr/?sl=ko&tl=en&op=translate"
+                target="_blank"
+                rel="noreferrer"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#334155] bg-[#f1f5f9] hover:bg-[#e2e8f0] tb-press-soft"
+              >
+                <Languages className="w-4 h-4" />
+                구글번역기
+              </a>
               <button
                 onClick={() => setToolView(toolView === 'frame-extractor' ? null : 'frame-extractor')}
                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition ${
