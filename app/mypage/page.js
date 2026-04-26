@@ -102,12 +102,12 @@ export default async function MyPage() {
         </div>
 
           <div style={S.card}>
-            <div style={S.sectionTitle}>유용한 유틸 다운로드</div>
+            <div style={S.sectionTitle}>유용한툴</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10 }}>
               {[
-                { label: "Snipaste 캡쳐", url: "https://www.snipaste.com/" },
-                { label: "Everything 검색", url: "https://www.voidtools.com/ko-kr/" },
-                { label: "무료 캡컷", url: "https://aitoolb.com/61" },
+                { label: "Snipaste 캡쳐", url: "https://www.snipaste.com/", c: "59,130,246" },
+                { label: "Everything 검색", url: "https://www.voidtools.com/ko-kr/", c: "245,158,11" },
+                { label: "무료 캡컷", url: "https://aitoolb.com/61", c: "236,72,153" },
               ].map((u) => (
                 <a
                   key={u.url}
@@ -120,6 +120,8 @@ export default async function MyPage() {
                     textAlign: "center",
                     textDecoration: "none",
                     padding: "12px 16px",
+                    background: `linear-gradient(135deg, rgba(${u.c},0.95) 0%, rgba(${u.c},0.78) 100%)`,
+                    boxShadow: `0 6px 16px rgba(${u.c},0.32), inset 1.5px 1.5px 0.5px 0 rgba(255,255,255,0.5), inset -1px -1px 0.5px 1px rgba(255,255,255,0.2)`,
                   }}
                 >
                   {u.label}
