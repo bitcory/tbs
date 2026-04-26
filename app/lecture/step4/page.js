@@ -879,11 +879,24 @@ export default function Step4Page() {
       <style jsx global>{`
         .tb-hero {
           position: relative;
-          padding: 22px 20px 56px;
+          padding: 16px 20px 36px;
           background: linear-gradient(135deg, #016837 0%, #00996D 45%, #00B380 100%);
           color: #fff;
           text-align: center;
           overflow: hidden;
+        }
+        .tb-hero-row {
+          position: relative;
+          z-index: 2;
+          display: grid;
+          grid-template-columns: 1fr auto 1fr;
+          align-items: center;
+          gap: 12px;
+        }
+        @media (max-width: 640px) {
+          .tb-hero-row {
+            display: block;
+          }
         }
         .tb-hero::before {
           content: '';
@@ -895,7 +908,7 @@ export default function Step4Page() {
         .tb-hero::after {
           content: '';
           position: absolute; left: -10%; right: -10%; bottom: -1px;
-          height: 60px;
+          height: 24px;
           background: #f8fafc;
           border-radius: 50% 50% 0 0 / 100% 100% 0 0;
         }
@@ -907,22 +920,29 @@ export default function Step4Page() {
         }
         .tb-hero-eyebrow {
           display: inline-block;
-          font-size: 11px; font-weight: 800;
-          letter-spacing: 0.28em; text-transform: uppercase;
-          padding: 6px 14px; border-radius: 100px;
+          font-size: 10px; font-weight: 800;
+          letter-spacing: 0.26em; text-transform: uppercase;
+          padding: 4px 11px; border-radius: 100px;
           background: rgba(255,255,255,0.16);
           border: 1px solid rgba(255,255,255,0.35);
           backdrop-filter: blur(14px);
           -webkit-backdrop-filter: blur(14px);
-          margin-bottom: 14px;
+          grid-column: 1;
+          justify-self: start;
         }
         .tb-hero-title {
-          font-size: clamp(26px, 7vw, 34px);
+          font-size: clamp(20px, 4.5vw, 26px);
           font-weight: 900;
           line-height: 1.2;
           letter-spacing: -0.01em;
-          position: relative;
-          z-index: 2;
+          margin: 0;
+          grid-column: 2;
+          justify-self: center;
+        }
+        @media (max-width: 640px) {
+          .tb-hero-eyebrow {
+            margin-bottom: 8px;
+          }
         }
         .tb-glass-bar {
           position: relative; z-index: 3;
@@ -1005,8 +1025,10 @@ export default function Step4Page() {
       {/* Hero */}
       <section className="tb-hero">
         <div className="tb-hero-glow" />
-        <span className="tb-hero-eyebrow">TB STUDY · STEP 4</span>
-        <h1 className="tb-hero-title">광고영상 만들기</h1>
+        <div className="tb-hero-row">
+          <span className="tb-hero-eyebrow">TB STUDY · STEP 4</span>
+          <h1 className="tb-hero-title">광고영상 만들기</h1>
+        </div>
       </section>
 
       {/* Glass bar */}
