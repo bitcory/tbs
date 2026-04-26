@@ -210,7 +210,7 @@ export default function Step3Page() {
   const allDialogues = storyboard ? storyboard.scenes.map(s => s.dialogue).filter(Boolean).join('\n\n') : '';
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-[#0f172a]">
+    <div className="min-h-screen md:h-screen md:flex md:flex-col md:overflow-hidden bg-[#f8fafc] text-[#0f172a]">
       <style jsx global>{`
         .tb-hero {
           position: relative;
@@ -384,7 +384,7 @@ export default function Step3Page() {
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row md:h-[calc(100vh-220px)] w-full px-4 pt-6 gap-4 2xl:px-6">
+      <div className="flex flex-col md:flex-row md:flex-1 md:min-h-0 w-full px-4 pt-6 pb-4 gap-4 2xl:px-6">
         {/* Sidebar */}
         <aside className="w-full md:w-[300px] flex-shrink-0 bg-white border border-[#e2e8f0] rounded-2xl shadow-[0_8px_24px_rgba(15,23,42,0.06)] md:overflow-y-auto">
           <div className="p-4 border-b border-[#e2e8f0]">
