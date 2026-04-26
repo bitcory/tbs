@@ -108,6 +108,7 @@ export default async function MyPage() {
                 { label: "Snipaste 캡쳐", url: "https://www.snipaste.com/", c: "59,130,246" },
                 { label: "Everything 검색", url: "https://www.voidtools.com/ko-kr/", c: "245,158,11" },
                 { label: "무료 캡컷", url: "https://aitoolb.com/61", c: "236,72,153" },
+                { label: "오픈챗팅방", url: "https://open.kakao.com/o/gWR9vhXh", c: "139,92,246" },
               ].map((u) => (
                 <a
                   key={u.url}
