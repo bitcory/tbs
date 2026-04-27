@@ -1,20 +1,32 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import * as S from "@/lib/uiStyles";
 
 export default async function Home({ searchParams }) {
+  // Pass class/step hints to the iframe so "back to home" restores the right section
+  const sp = (await searchParams) ?? {};
+  const qs = new URLSearchParams();
+  if (typeof sp.c === "string") qs.set("c", sp.c);
+  if (typeof sp.s === "string") qs.set("s", sp.s);
+
+  // First-visit intro gate. Deep links (with c/s query) and explicit skip bypass.
+  const isDeepLink = qs.toString().length > 0;
+  const skipIntro = sp.skipIntro === "1";
+  if (!isDeepLink && !skipIntro) {
+    const cookieStore = await cookies();
+    const seenIntro = cookieStore.get("tbs_intro_seen")?.value === "1";
+    if (!seenIntro) redirect("/intro");
+  }
+
   const session = await auth();
   let me = null;
   if (session?.user) {
     me = await prisma.user.findUnique({ where: { id: session.user.id } });
   }
 
-  // Pass class/step hints to the iframe so "back to home" restores the right section
-  const sp = (await searchParams) ?? {};
-  const qs = new URLSearchParams();
-  if (typeof sp.c === "string") qs.set("c", sp.c);
-  if (typeof sp.s === "string") qs.set("s", sp.s);
   const iframeSrc = qs.toString()
     ? `/toolblab/main.html?${qs.toString()}`
     : "/toolblab/main.html";
