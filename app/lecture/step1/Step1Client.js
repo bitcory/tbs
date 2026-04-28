@@ -140,7 +140,39 @@ Subtitles, title, text is strictly prohibited.`,
     dance: {
       label: '춤추는 영상 프롬프트',
       sub: 'Step 1-2',
-      prompt: `The person begins with quick rhythmic footwork, alternating sharp heel and toe stomps on the floor, then sharply spins around to face away and swings their hips playfully side to side, next explosively jumps up and rotates 180 degrees mid-air, finally landing to face forward with one arm thrusting diagonally upward toward the sky and holding the victory pose. Preserve the exact appearance, clothing, and footwear from the source image. Locked frontal medium shot rises subtly with the jump, then freezes completely still on the final pose. Sharp percussive footstep sounds alternating between heel and toe, fabric swishing, a whoosh on the jump, one solid landing sound, a short crowd cheer sustaining into the freeze. No music.`,
+      prompts: [
+        {
+          title: '브레이크댄스',
+          prompt: `A 10-second video of a dancer performing breakdance.
+0-2s: The dancer starts with a confident pose, slight head nod to the beat.
+2-5s: Fast footwork and top rock moves, smooth and rhythmic.
+5-8s: Transition into power moves, including a clean windmill spin.
+8-10s: Ends with a freeze pose, holding balance with strong lighting.
+Camera: dynamic tracking shot, slight slow motion on power moves.
+Style: cinematic, high contrast, sharp details, realistic motion. no bgm`,
+        },
+        {
+          title: '탭댄스',
+          prompt: `A 10-second video of a dancer performing tap dance on a wooden stage.
+0-3s: Starts with light rhythmic tapping, feet close-up.
+3-6s: Fast synchronized footwork with clear sound emphasis.
+6-8s: Spins while maintaining tap rhythm.
+8-10s: Ends with a sharp final stomp and pose.
+Camera: low angle focusing on feet, smooth zoom out at the end.
+Style: warm lighting, stage atmosphere, realistic shadows.`,
+        },
+        {
+          title: '웨이/팝핀',
+          prompt: `A 10-second video of a dancer performing wave and popping dance.
+0-2s: Starts with subtle finger wave.
+2-5s: Full arm wave flowing into shoulders and chest.
+5-7s: Body wave moving smoothly down to legs.
+7-9s: Quick popping hits synchronized with beats.
+9-10s: Freeze with a stylish pose.
+Camera: slow motion emphasis on wave transitions.
+Style: futuristic lighting, neon highlights, smooth motion.`,
+        },
+      ],
     },
     fly: {
       label: '날아가는 영상 프롬프트',
@@ -781,12 +813,41 @@ Subtitles, title, text is strictly prohibited.`,
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-5 space-y-3 min-h-0">
-              <textarea
-                value={SPEAK_PROMPT}
-                readOnly
-                className="w-full h-[420px] resize-none font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
-              />
+            <div className="flex-1 overflow-y-auto p-5 space-y-4 min-h-0">
+              {currentVariant.prompts ? (
+                currentVariant.prompts.map((p, i) => (
+                  <div key={i} className="space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm font-bold text-[#0f172a] flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#7C3AED]" />
+                        {p.title}
+                      </span>
+                      <button
+                        onClick={() => copyText(p.prompt)}
+                        className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-bold text-white hover:opacity-90 tb-press"
+                        style={{
+                          background: 'linear-gradient(112.34deg, #A855F7 -38.67%, #6D28D9 99.56%)',
+                          boxShadow: '0 6px 14px rgba(109, 40, 217, 0.25)',
+                        }}
+                      >
+                        <Copy className="w-3 h-3" />
+                        복사하기
+                      </button>
+                    </div>
+                    <textarea
+                      value={p.prompt}
+                      readOnly
+                      className="w-full h-[180px] resize-none font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
+                    />
+                  </div>
+                ))
+              ) : (
+                <textarea
+                  value={SPEAK_PROMPT}
+                  readOnly
+                  className="w-full h-[420px] resize-none font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
+                />
+              )}
             </div>
             <div className="flex justify-end gap-2 px-5 py-3 border-t border-[#e2e8f0]">
               <button
@@ -795,17 +856,19 @@ Subtitles, title, text is strictly prohibited.`,
               >
                 닫기
               </button>
-              <button
-                onClick={() => copyText(SPEAK_PROMPT)}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-bold text-white hover:opacity-90 tb-press"
-                style={{
-                  background: 'linear-gradient(112.34deg, #A855F7 -38.67%, #6D28D9 99.56%)',
-                  boxShadow: '0 10px 24px rgba(109, 40, 217, 0.3)',
-                }}
-              >
-                <Copy className="w-3.5 h-3.5" />
-                복사하기
-              </button>
+              {!currentVariant.prompts && (
+                <button
+                  onClick={() => copyText(SPEAK_PROMPT)}
+                  className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-bold text-white hover:opacity-90 tb-press"
+                  style={{
+                    background: 'linear-gradient(112.34deg, #A855F7 -38.67%, #6D28D9 99.56%)',
+                    boxShadow: '0 10px 24px rgba(109, 40, 217, 0.3)',
+                  }}
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                  복사하기
+                </button>
+              )}
             </div>
           </div>
         </div>
