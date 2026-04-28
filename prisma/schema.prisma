@@ -13,6 +13,18 @@ enum Role {
   SUPER_ADMIN
 }
 
+enum ClassType {
+  ZERO
+  UP
+  PRO
+}
+
+enum EnrollmentStatus {
+  APPLIED
+  ATTENDED
+  CANCELLED
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -36,6 +48,10 @@ model User {
   accounts    Account[]
   sessions    Session[]
   consentLogs ConsentLog[]
+
+  mainSessions      ClassSession[] @relation("MainInstructor")
+  assistantSessions ClassSession[] @relation("AssistantInstructor")
+  enrollments       Enrollment[]
 }
 
 model ConsentLog {
@@ -87,4 +103,49 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model ClassSession {
+  id                    String    @id @default(cuid())
+  startAt               DateTime
+  classType             ClassType
+  mainInstructorId      String?
+  assistantInstructorId String?
+  note                  String?   @db.Text
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  mainInstructor      User? @relation("MainInstructor", fields: [mainInstructorId], references: [id], onDelete: SetNull)
+  assistantInstructor User? @relation("AssistantInstructor", fields: [assistantInstructorId], references: [id], onDelete: SetNull)
+  enrollments         Enrollment[]
+
+  @@index([startAt])
+  @@index([mainInstructorId])
+  @@index([assistantInstructorId])
+}
+
+model Enrollment {
+  id        String           @id @default(cuid())
+  sessionId String
+  userId    String
+  status    EnrollmentStatus @default(APPLIED)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  session ClassSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, userId])
+  @@index([userId])
+}
+
+model PricingConfig {
+  id             String    @id @default(cuid())
+  classType      ClassType @unique
+  pricePerPerson Int
+  toolbShare     Float     @default(0.50)
+  mainShare      Float     @default(0.35)
+  assistantShare Float     @default(0.15)
+  updatedAt      DateTime  @updatedAt
+  updatedById    String?
 }

@@ -52,7 +52,11 @@ export default async function AdminPage() {
       </section>
 
       <div style={{ ...S.pageWrap, maxWidth: "100%", padding: "28px 16px 80px", marginTop: -48, position: "relative", color: "#0f172a" }}>
-        <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginBottom: 16 }}>
+        <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginBottom: 16, flexWrap: "wrap" }}>
+          <Link href="/admin/schedule" className="glass-hoverable" style={S.ghostBtn}>강의 일정</Link>
+          {isSuper && (
+            <Link href="/admin/pricing" className="glass-hoverable" style={S.ghostBtn}>단가/요율</Link>
+          )}
           <Link href="/mypage" className="glass-hoverable" style={S.ghostBtn}>마이페이지</Link>
           <Link href="/" className="glass-hoverable" style={S.ghostBtn}>← 홈으로</Link>
         </div>
