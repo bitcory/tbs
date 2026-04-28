@@ -18,8 +18,8 @@ export default async function SchedulePage() {
     prisma.classSession.findMany({
       orderBy: { startAt: "asc" },
       include: {
-        mainInstructor:      { select: { id: true, name: true, nickname: true, email: true } },
-        assistantInstructor: { select: { id: true, name: true, nickname: true, email: true } },
+        mainInstructor:      { select: { id: true, name: true, nickname: true, email: true, bankName: true, bankAccount: true, accountHolder: true } },
+        assistantInstructor: { select: { id: true, name: true, nickname: true, email: true, bankName: true, bankAccount: true, accountHolder: true } },
         enrollments: {
           include: {
             user: { select: { id: true, name: true, nickname: true, email: true } },

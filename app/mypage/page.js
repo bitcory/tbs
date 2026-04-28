@@ -4,8 +4,9 @@ import { auth, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import * as S from "@/lib/uiStyles";
 import ProfileEditor from "./ProfileEditor";
+import BankInfoEditor from "./BankInfoEditor";
 import MaterialRequestButton from "./MaterialRequestButton";
-import { updateProfile, requestMaterials } from "./actions";
+import { updateProfile, updateBankInfo, requestMaterials } from "./actions";
 import { hasStepMaterials } from "@/lib/stepMaterials";
 
 const ROLE_LABEL = {
@@ -140,6 +141,15 @@ export default async function MyPage() {
           initialMarketingOptIn={me.marketingOptIn}
           updateProfile={updateProfile}
         />
+
+        {isAdmin && (
+          <BankInfoEditor
+            initialBankName={me.bankName}
+            initialBankAccount={me.bankAccount}
+            initialAccountHolder={me.accountHolder}
+            updateBankInfo={updateBankInfo}
+          />
+        )}
       </div>
     </div>
   );

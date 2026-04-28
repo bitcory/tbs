@@ -77,6 +77,10 @@ export default function ScheduleClient({ me, sessions, staffUsers, memberUsers, 
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      {me.role === "SUPER_ADMIN" && (
+        <PayoutSummary sessions={sessions} />
+      )}
+
       <CalendarHeader
         year={viewYear}
         month={viewMonth}
@@ -576,6 +580,153 @@ function EnrollPicker({ session, memberUsers, onClose, onAdd, pending }) {
         <button onClick={onClose} className="tb-press-soft" style={miniBtn}>닫기</button>
       </div>
     </ModalShell>
+  );
+}
+
+function PayoutSummary({ sessions }) {
+  const [period, setPeriod] = useState("month"); // "month" | "all"
+  const now = new Date();
+  const yyyymm = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}`;
+
+  const { totalToolb, mains, assistants, totalRevenue } = useMemo(() => {
+    const filtered = sessions.filter((s) => {
+      if (period === "all") return true;
+      const d = new Date(s.startAt);
+      return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}` === yyyymm;
+    });
+
+    let totalToolb = 0;
+    let totalRevenue = 0;
+    const mainsMap = new Map();
+    const assistsMap = new Map();
+
+    for (const s of filtered) {
+      // For super-admin, all revenue fields are populated.
+      totalToolb += s.revenue.toolb || 0;
+      totalRevenue += s.revenue.total || 0;
+
+      if (s.mainInstructor && (s.revenue.main || 0) > 0) {
+        const id = s.mainInstructor.id;
+        const cur = mainsMap.get(id) || { user: s.mainInstructor, total: 0, sessions: 0 };
+        cur.total += s.revenue.main;
+        cur.sessions += 1;
+        mainsMap.set(id, cur);
+      }
+      if (s.assistantInstructor && (s.revenue.assistant || 0) > 0) {
+        const id = s.assistantInstructor.id;
+        const cur = assistsMap.get(id) || { user: s.assistantInstructor, total: 0, sessions: 0 };
+        cur.total += s.revenue.assistant;
+        cur.sessions += 1;
+        assistsMap.set(id, cur);
+      }
+    }
+
+    const sortByTotal = (a, b) => b.total - a.total;
+    return {
+      totalToolb,
+      totalRevenue,
+      mains:      Array.from(mainsMap.values()).sort(sortByTotal),
+      assistants: Array.from(assistsMap.values()).sort(sortByTotal),
+    };
+  }, [sessions, period, yyyymm]);
+
+  return (
+    <div style={{
+      background: "#fff", borderRadius: 14, padding: 20,
+      border: "1px solid rgba(15,23,42,0.06)", boxShadow: "0 4px 14px rgba(15,23,42,0.05)",
+    }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 800 }}>💰 정산 요약</h2>
+        <div style={{ display: "flex", gap: 4, padding: 4, background: "#f1f5f9", borderRadius: 999 }}>
+          {[{ k: "month", label: "이번 달" }, { k: "all", label: "전체" }].map((opt) => (
+            <button
+              key={opt.k}
+              onClick={() => setPeriod(opt.k)}
+              className="tb-press-soft"
+              style={{
+                padding: "6px 14px", borderRadius: 999, fontSize: 12, fontWeight: 700,
+                border: "none", cursor: "pointer",
+                background: period === opt.k ? "#fff" : "transparent",
+                color:      period === opt.k ? "#016837" : "#64748b",
+                boxShadow:  period === opt.k ? "0 2px 6px rgba(0,0,0,0.06)" : "none",
+              }}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{
+        display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+        gap: 12, marginBottom: 18,
+      }}>
+        <SummaryStat label="총매출" value={totalRevenue} accent="#0f172a" />
+        <SummaryStat label="툴비 합계 (50%)" value={totalToolb} accent="#016837" highlight />
+      </div>
+
+      <PayoutGroup title="주강사별 (35%)" rows={mains}      accent="#1d4ed8" emptyMsg="해당 기간에 주강사 정산 내역이 없습니다." />
+      <PayoutGroup title="보조강사별 (15%)" rows={assistants} accent="#7e22ce" emptyMsg="해당 기간에 보조강사 정산 내역이 없습니다." />
+    </div>
+  );
+}
+
+function SummaryStat({ label, value, accent, highlight }) {
+  return (
+    <div style={{
+      background: highlight ? "#ecfdf5" : "#f8fafc",
+      borderRadius: 10, padding: 12,
+      border: highlight ? "1px solid #a7f3d0" : "1px solid #e2e8f0",
+    }}>
+      <div style={{ fontSize: 11, color: "#64748b", fontWeight: 700, marginBottom: 4 }}>{label}</div>
+      <div style={{ fontSize: 18, fontWeight: 900, color: accent }}>{formatKRW(value)}</div>
+    </div>
+  );
+}
+
+function PayoutGroup({ title, rows, accent, emptyMsg }) {
+  return (
+    <div style={{ marginTop: 14 }}>
+      <h3 style={{ fontSize: 13, fontWeight: 700, color: accent, marginBottom: 8 }}>{title}</h3>
+      {rows.length === 0 ? (
+        <div style={{ color: "#94a3b8", fontSize: 13, padding: "10px 0" }}>{emptyMsg}</div>
+      ) : (
+        <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column", gap: 6 }}>
+          {rows.map((r) => <PayoutRow key={r.user.id} row={r} accent={accent} />)}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function PayoutRow({ row, accent }) {
+  const { user, total, sessions } = row;
+  const hasBank = user.bankName || user.bankAccount;
+  return (
+    <li style={{
+      display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
+      padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 10, background: "#fafafa",
+      flexWrap: "wrap",
+    }}>
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#0f172a" }}>
+          {userLabel(user)} <span style={{ color: "#94a3b8", fontWeight: 500, fontSize: 12 }}>· {sessions}회</span>
+        </div>
+        <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
+          {hasBank ? (
+            <>
+              {user.bankName || "은행 미입력"} {user.bankAccount || "계좌 미입력"}
+              {user.accountHolder ? ` · 예금주 ${user.accountHolder}` : ""}
+            </>
+          ) : (
+            <span style={{ color: "#dc2626" }}>⚠️ 계좌정보 미등록 — 본인이 마이페이지에서 입력 필요</span>
+          )}
+        </div>
+      </div>
+      <div style={{ fontSize: 16, fontWeight: 900, color: accent, whiteSpace: "nowrap" }}>
+        {formatKRW(total)}
+      </div>
+    </li>
   );
 }
 

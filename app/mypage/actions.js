@@ -59,6 +59,36 @@ export async function updateProfile(formData) {
   return { ok: true };
 }
 
+export async function updateBankInfo(formData) {
+  const s = await auth();
+  if (!s?.user) redirect("/login");
+
+  const me = await prisma.user.findUnique({
+    where: { id: s.user.id },
+    select: { role: true },
+  });
+  if (!me || (me.role !== "STAFF" && me.role !== "SUPER_ADMIN")) {
+    return { ok: false, message: "운영진 권한이 필요합니다." };
+  }
+
+  const bankName      = String(formData.get("bankName")      ?? "").trim().slice(0, 30);
+  const bankAccount   = String(formData.get("bankAccount")   ?? "").trim().slice(0, 40);
+  const accountHolder = String(formData.get("accountHolder") ?? "").trim().slice(0, 30);
+
+  await prisma.user.update({
+    where: { id: s.user.id },
+    data: {
+      bankName:      bankName      || null,
+      bankAccount:   bankAccount   || null,
+      accountHolder: accountHolder || null,
+    },
+  });
+
+  revalidatePath("/mypage");
+  revalidatePath("/admin/schedule");
+  return { ok: true };
+}
+
 export async function requestMaterials(step) {
   const s = await auth();
   if (!s?.user) return { ok: false, message: "로그인이 필요합니다." };

@@ -283,7 +283,7 @@ export default function Step2_1Page() {
   }, [activeType, pendingScrollId]);
 
   const scenesByType = TYPES.map(t => (storyboard?.scenes || []).filter(s => s.type === t));
-  const allImagePrompts = storyboard ? buildGridText(storyboard.scenes.map(s => s.prompts.image.prompt)) : '';
+  const allImagePrompts = storyboard ? storyboard.scenes.map(s => s.prompts.image.prompt).join('\n\n') : '';
   const allVideoPrompts = storyboard ? storyboard.scenes.filter(s => s.prompts.video).map(s => s.prompts.video.prompt).join('\n\n') : '';
 
   return (
