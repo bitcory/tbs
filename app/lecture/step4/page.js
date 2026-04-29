@@ -1158,7 +1158,7 @@ export default function Step4Page() {
               젬 가이드
             </div>
             <a
-              href="#"
+              href="https://gemini.google.com/gem/1nh-RnkpG9Iwi9htGz3wQjV_777wXZXBh?usp=sharing"
               target="_blank"
               rel="noreferrer"
               className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full tb-pill-primary text-sm font-bold transition"
