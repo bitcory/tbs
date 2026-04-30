@@ -2,20 +2,20 @@ import Link from "next/link";
 import { requireSuperAdmin } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
 import * as S from "@/lib/uiStyles";
+import { PRICING_SLOTS, pricingKey, buildPricingMap } from "@/lib/pricing";
 import PricingClient from "./PricingClient";
-
-const CLASS_TYPES = ["ZERO", "UP", "PRO"];
 
 export default async function PricingPage() {
   await requireSuperAdmin();
 
   const rows = await prisma.pricingConfig.findMany();
-  const byType = Object.fromEntries(rows.map((r) => [r.classType, r]));
+  const byKey = buildPricingMap(rows);
 
-  const initial = CLASS_TYPES.map((ct) => {
-    const r = byType[ct];
+  const initial = PRICING_SLOTS.map(({ classType, stepLevel }) => {
+    const r = byKey[pricingKey(classType, stepLevel)];
     return {
-      classType: ct,
+      classType,
+      stepLevel,
       pricePerPerson: r?.pricePerPerson ?? 0,
       toolbShare:     r?.toolbShare     ?? 0.5,
       mainShare:      r?.mainShare      ?? 0.35,

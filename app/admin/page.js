@@ -25,13 +25,13 @@ const STEP1_OPTIONS = [
 
 const SINGLE_STEPS = [
   { step: 2, label: "UP 2" },
-  { step: 21, label: "UP 2-1" },
-  { step: 3, label: "UP 3" },
+  { step: 21, label: "UP 3" },
 ];
 
 const PRO_STEPS = [
   { step: 6, label: "PRO 1" },
   { step: 4, label: "PRO 2" },
+  { step: 3, label: "PRO 4" },
 ];
 
 export default async function AdminPage() {

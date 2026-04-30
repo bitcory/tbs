@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import * as S from "@/lib/uiStyles";
-import { CLASS_TYPE_LABEL, CLASS_TYPE_COLOR } from "@/lib/pricing";
+import { CLASS_TYPE_COLOR, formatClassLabel } from "@/lib/pricing";
 import { updatePricing } from "./actions";
 
 export default function PricingClient({ initial }) {
@@ -28,7 +28,7 @@ export default function PricingClient({ initial }) {
     setMsg(null);
     const bad = rows.find((r) => Math.abs(r.toolbShare + r.mainShare + r.assistantShare - 1) > 0.001);
     if (bad) {
-      setMsg({ type: "err", text: `${CLASS_TYPE_LABEL[bad.classType]} 요율 합이 100%가 아닙니다.` });
+      setMsg({ type: "err", text: `${formatClassLabel(bad.classType, bad.stepLevel)} 요율 합이 100%가 아닙니다.` });
       return;
     }
     startTransition(async () => {
@@ -49,7 +49,7 @@ export default function PricingClient({ initial }) {
           const sum = r.toolbShare + r.mainShare + r.assistantShare;
           const sumOk = Math.abs(sum - 1) < 0.001;
           return (
-            <div key={r.classType} style={{
+            <div key={`${r.classType}_${r.stepLevel}`} style={{
               border: "1px solid #e2e8f0", borderRadius: 12, padding: 16,
             }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
@@ -57,7 +57,7 @@ export default function PricingClient({ initial }) {
                   padding: "4px 10px", borderRadius: 6, fontSize: 13, fontWeight: 800,
                   background: c.bg, color: c.fg,
                 }}>
-                  {CLASS_TYPE_LABEL[r.classType]}
+                  {formatClassLabel(r.classType, r.stepLevel)}
                 </span>
                 <span style={{ fontSize: 12, fontWeight: 700, color: sumOk ? "#16a34a" : "#dc2626" }}>
                   요율 합계 {asPct(sum)}%

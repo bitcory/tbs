@@ -71,7 +71,7 @@ export const metadata = {
     description: SITE_DESCRIPTION,
     images: [
       {
-        url: '/images/og-image.png',
+        url: '/images/meta/og-image.png',
         width: 1870,
         height: 982,
         alt: 'TB STUDY - AI 영상 제작 학습실',
@@ -83,7 +83,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
-    images: ['/images/og-image.png'],
+    images: ['/images/meta/og-image.png'],
   },
   robots: {
     index: true,

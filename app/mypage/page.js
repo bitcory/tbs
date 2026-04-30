@@ -8,6 +8,7 @@ import BankInfoEditor from "./BankInfoEditor";
 import MaterialRequestButton from "./MaterialRequestButton";
 import { updateProfile, updateBankInfo, requestMaterials } from "./actions";
 import { hasStepMaterials } from "@/lib/stepMaterials";
+import { stepLabel } from "@/lib/stepLabel";
 
 const ROLE_LABEL = {
   USER: "일반 회원",
@@ -91,7 +92,7 @@ export default async function MyPage() {
                   }}
                 >
                   <span style={S.badge(ok ? S.badgeGreen : S.badgeGray)}>
-                    UP {n} {ok ? "✓ 허용" : "✕ 차단"}
+                    {stepLabel(n)} {ok ? "✓ 허용" : "✕ 차단"}
                   </span>
                   <MaterialRequestButton
                     step={n}

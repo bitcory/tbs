@@ -11,7 +11,7 @@ import dynamic from 'next/dynamic';
 const FrameExtractor = dynamic(() => import('@/app/components/FrameExtractor'), { ssr: false });
 const WatermarkRemover = dynamic(() => import('@/app/components/WatermarkRemover'), { ssr: false });
 
-const CACHE_KEY = 'toolb_step6_cinematic_v1';
+const CACHE_KEY = 'toolb_step6_cinematic_v2';
 
 const SHOT_FALLBACK_LABEL = {
   S01: 'Two Shot · Master',
@@ -42,6 +42,19 @@ function cleanJson(raw) {
   }
 }
 
+function flattenDialogue(d, characters) {
+  if (!d) return '';
+  if (typeof d === 'string') return d;
+  if (typeof d !== 'object') return '';
+  // v2 object form: { speaker, ko, en, delivery, subtitle }
+  if (d.subtitle && typeof d.subtitle === 'string') return d.subtitle;
+  const name = d.speaker && characters?.[d.speaker]?.name
+    ? characters[d.speaker].name
+    : (d.speaker || '');
+  const line = d.ko || d.en || '';
+  return name ? `${name}: ${line}` : line;
+}
+
 function parseProject(raw) {
   const json = cleanJson(raw);
   if (!json.characters?.A || !json.characters?.B) {
@@ -50,61 +63,34 @@ function parseProject(raw) {
   if (!Array.isArray(json.shots) || json.shots.length === 0) {
     throw new Error('shots 배열이 필요합니다.');
   }
+  const characters = json.characters;
   const shots = json.shots.map((s, i) => ({
     shot_id: s.shot_id || `S${String(i + 1).padStart(2, '0')}`,
     shot_type: s.shot_type || '',
     shot_label: s.shot_label || '',
+    duration_sec: typeof s.duration_sec === 'number' ? s.duration_sec : null,
     purpose: s.purpose || '',
     characters_in_frame: Array.isArray(s.characters_in_frame) ? s.characters_in_frame : ['A', 'B'],
     camera: s.camera || {},
     blocking: s.blocking || {},
     emotion: s.emotion || {},
-    i2i_prompt: s.i2i_prompt || '',
+    audio: s.audio || null,
+    dialogue_meta: (s.dialogue && typeof s.dialogue === 'object') ? s.dialogue : null,
+    // Accept both new (image_prompt) and legacy (i2i_prompt) field names.
+    image_prompt: s.image_prompt || s.i2i_prompt || '',
     video_prompt: typeof s.video_prompt === 'string' ? s.video_prompt : '',
-    dialogue: typeof s.dialogue === 'string' ? s.dialogue : '',
+    dialogue: flattenDialogue(s.dialogue, characters),
     imageUpload: '',
   }));
   return {
     project: json.project || {},
     scene_context: json.scene_context || {},
     characters: {
-      A: { ...json.characters.A, imageUpload: '' },
-      B: { ...json.characters.B, imageUpload: '' },
+      A: { ...characters.A, imageUpload: '' },
+      B: { ...characters.B, imageUpload: '' },
     },
     shots,
   };
-}
-
-function buildCharacterInfoText(char) {
-  if (!char) return '';
-  const parts = [];
-  if (char.name) parts.push(`# ${char.name}`);
-  if (char.role) parts.push(char.role);
-  if (char.vibe) parts.push(`바이브: ${char.vibe}`);
-  if (char.physical) {
-    const p = char.physical;
-    const phys = [
-      p.height_build && `체격: ${p.height_build}`,
-      p.face_shape && `얼굴형: ${p.face_shape}`,
-      p.skin && `피부: ${p.skin}`,
-      p.eyes && `눈: ${p.eyes}`,
-      p.hair && `머리: ${p.hair}`,
-      p.distinguishing && `특징: ${p.distinguishing}`,
-    ].filter(Boolean);
-    if (phys.length) parts.push('[신체]\n' + phys.join('\n'));
-  }
-  if (char.wardrobe) {
-    const w = char.wardrobe;
-    const wear = [
-      w.outerwear && w.outerwear !== '없음' && `아우터: ${w.outerwear}`,
-      w.top && `상의: ${w.top}`,
-      w.bottom && `하의: ${w.bottom}`,
-      w.shoes && `신발: ${w.shoes}`,
-      w.accessories && `액세서리: ${w.accessories}`,
-    ].filter(Boolean);
-    if (wear.length) parts.push('[의상]\n' + wear.join('\n'));
-  }
-  return parts.join('\n\n');
 }
 
 function UploadSlot({ image, onFile }) {
@@ -311,12 +297,9 @@ export default function Step6Page() {
     reader.readAsDataURL(file);
   };
 
-  const allI2iPrompts = data ? data.shots.map((s) => s.i2i_prompt).filter(Boolean).join('\n\n') : '';
+  const allImagePrompts = data ? data.shots.map((s) => s.image_prompt).filter(Boolean).join('\n\n') : '';
   const allVideoPrompts = data ? data.shots.map((s) => s.video_prompt).filter(Boolean).join('\n\n') : '';
-  const allDialogues = data ? data.shots.map((s) => {
-    if (!s.dialogue) return '';
-    return `# ${s.shot_id}\n${s.dialogue}`;
-  }).filter(Boolean).join('\n\n') : '';
+  const allDialogues = data ? data.shots.map((s) => s.dialogue).filter(Boolean).join('\n\n') : '';
 
   const sc = data?.scene_context || {};
 
@@ -521,6 +504,27 @@ export default function Step6Page() {
                     <span className="text-sm text-[#0f172a] font-bold flex-1">{sc.time_of_day}</span>
                   </div>
                 )}
+                {data.project?.total_duration_sec > 0 && (
+                  <div className="flex items-start gap-2">
+                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">러닝</span>
+                    <span className="text-sm text-[#0f172a] font-bold flex-1">
+                      {data.project.total_duration_sec}초
+                      {data.project?.clip_duration_sec ? ` (컷당 ${data.project.clip_duration_sec}초)` : ''}
+                    </span>
+                  </div>
+                )}
+                {data.project?.video_model && (
+                  <div className="flex items-start gap-2">
+                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">영상</span>
+                    <span className="text-sm text-[#0f172a] font-bold flex-1">{data.project.video_model}</span>
+                  </div>
+                )}
+                {data.project?.image_model && (
+                  <div className="flex items-start gap-2">
+                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">이미지</span>
+                    <span className="text-sm text-[#0f172a] font-bold flex-1">{data.project.image_model}</span>
+                  </div>
+                )}
                 {sc.mood && (
                   <div className="flex items-start gap-2 pt-1">
                     <span className="text-xs text-[#64748b] font-medium italic leading-relaxed">"{sc.mood}"</span>
@@ -687,7 +691,7 @@ export default function Step6Page() {
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
                   <button
-                    onClick={() => copyText(allI2iPrompts)}
+                    onClick={() => copyText(allImagePrompts)}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full tb-pill-primary text-sm font-bold transition"
                   >
                     <ImageIcon className="w-3.5 h-3.5" />
@@ -854,7 +858,6 @@ export default function Step6Page() {
 function CharacterCard({ who, character, onCopy, onUpdatePrompt, onImageFile, onClearImage }) {
   const c = character;
   if (!c) return null;
-  const infoText = buildCharacterInfoText(c);
 
   return (
     <div className="rounded-2xl overflow-hidden border border-[#e2e8f0] bg-white shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
@@ -912,6 +915,14 @@ function CharacterCard({ who, character, onCopy, onUpdatePrompt, onImageFile, on
               {c.vibe}
             </p>
           )}
+          {c.voice_profile && (
+            <div className="flex flex-wrap gap-x-3 gap-y-1 px-3 py-2 rounded-xl bg-[#fefce8] border border-[#fde68a] text-[12px]">
+              <span className="text-[10px] font-black text-[#a16207] uppercase tracking-wider self-center">VOICE</span>
+              {c.voice_profile.tone && <Stat k="톤" v={c.voice_profile.tone} />}
+              {c.voice_profile.pace && <Stat k="페이스" v={c.voice_profile.pace} />}
+              {c.voice_profile.emotion_baseline && <Stat k="기본감정" v={c.voice_profile.emotion_baseline} />}
+            </div>
+          )}
           <CharSpecGrid character={c} />
           <div>
             <div className="flex items-center justify-between mb-2">
@@ -919,23 +930,13 @@ function CharacterCard({ who, character, onCopy, onUpdatePrompt, onImageFile, on
                 <ImageIcon className="w-3.5 h-3.5 text-[#00996D] flex-shrink-0" />
                 <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">캐릭터 시트 프롬프트</span>
               </div>
-              <div className="flex gap-1.5">
-                <button
-                  onClick={() => onCopy(infoText)}
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] tb-press-soft"
-                  title="신체·의상 정보 한국어로 복사"
-                >
-                  <Copy className="w-3 h-3" />
-                  정보
-                </button>
-                <button
-                  onClick={() => onCopy(c.sheet_prompt || '')}
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] tb-press-soft"
-                >
-                  <Copy className="w-3 h-3" />
-                  프롬프트
-                </button>
-              </div>
+              <button
+                onClick={() => onCopy(c.sheet_prompt || '')}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] tb-press-soft"
+              >
+                <Copy className="w-3 h-3" />
+                복사
+              </button>
             </div>
             <textarea
               value={c.sheet_prompt || ''}
@@ -987,6 +988,8 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
   const cam = shot.camera || {};
   const blocking = shot.blocking || {};
   const emotion = shot.emotion || {};
+  const audio = shot.audio || null;
+  const dm = shot.dialogue_meta || null;
 
   return (
     <div className="rounded-2xl overflow-hidden border border-[#e2e8f0] bg-white shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
@@ -1005,6 +1008,11 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
           <span className="text-base font-bold text-[#0f172a] truncate">
             {shot.shot_label || SHOT_FALLBACK_LABEL[shot.shot_id] || shot.shot_type}
           </span>
+          {shot.duration_sec > 0 && (
+            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#334155] flex-shrink-0">
+              {shot.duration_sec}초
+            </span>
+          )}
         </div>
         <div className="hidden md:flex items-center gap-1 flex-shrink-0">
           {(shot.characters_in_frame || []).map((id) => (
@@ -1025,9 +1033,37 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
         {cam.lens && <Stat k="렌즈" v={cam.lens} />}
         {cam.aperture && <Stat k="조리개" v={cam.aperture} />}
         {cam.angle && <Stat k="앵글" v={cam.angle} />}
+        {cam.movement && <Stat k="무빙" v={cam.movement} />}
         {(blocking.A || blocking.B) && <Stat k="블로킹" v={[blocking.A && `A: ${blocking.A}`, blocking.B && `B: ${blocking.B}`].filter(Boolean).join(' / ')} />}
         {(emotion.A || emotion.B) && <Stat k="감정" v={[emotion.A && `A: ${emotion.A}`, emotion.B && `B: ${emotion.B}`].filter(Boolean).join(' / ')} />}
       </div>
+
+      {/* Audio strip (v2) */}
+      {audio && (audio.ambient || audio.foley || audio.sfx || audio.music_cue) && (
+        <div className="px-4 py-2.5 border-b border-[#e2e8f0] bg-[#fdf4ff] flex flex-wrap gap-x-4 gap-y-1.5 text-[12.5px]">
+          <span className="text-[10px] font-black text-[#a21caf] uppercase tracking-wider self-center">AUDIO</span>
+          {audio.ambient && audio.ambient !== '없음' && <Stat k="앰비언트" v={audio.ambient} />}
+          {audio.foley && audio.foley !== '없음' && <Stat k="폴리" v={audio.foley} />}
+          {audio.sfx && audio.sfx !== '없음' && <Stat k="SFX" v={audio.sfx} />}
+          {audio.music_cue && audio.music_cue !== '없음' && <Stat k="음악" v={audio.music_cue} />}
+          {audio.bgm_policy && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e9d5ff] text-[#a21caf] self-center">
+              {audio.bgm_policy}
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Dialogue meta strip — speaker / delivery (preserved from JSON) */}
+      {dm && (dm.speaker || dm.delivery) && (
+        <div className="px-4 py-2.5 border-b border-[#e2e8f0] bg-[#fefce8] flex flex-wrap gap-x-4 gap-y-1.5 text-[12.5px]">
+          <span className="text-[10px] font-black text-[#a16207] uppercase tracking-wider self-center">DIALOGUE</span>
+          {dm.speaker && (
+            <Stat k="화자" v={`${dm.speaker}${characters?.[dm.speaker]?.name ? ` · ${characters[dm.speaker].name}` : ''}`} />
+          )}
+          {dm.delivery && <Stat k="딜리버리" v={dm.delivery} />}
+        </div>
+      )}
 
       {/* 3-col: image | image+video prompts | dialogue */}
       <div className="grid grid-cols-1 md:grid-cols-[minmax(400px,520px)_minmax(0,1fr)_minmax(220px,320px)]">
@@ -1063,7 +1099,7 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
                 </span>
               </div>
               <button
-                onClick={() => onCopy(shot.i2i_prompt)}
+                onClick={() => onCopy(shot.image_prompt)}
                 className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] tb-press-soft flex-shrink-0"
               >
                 <Copy className="w-3 h-3" />
@@ -1071,8 +1107,8 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
               </button>
             </div>
             <textarea
-              value={shot.i2i_prompt}
-              onChange={(e) => onUpdate({ i2i_prompt: e.target.value })}
+              value={shot.image_prompt}
+              onChange={(e) => onUpdate({ image_prompt: e.target.value })}
               rows={5}
               placeholder="이미지 프롬프트..."
               className="w-full min-h-[110px] resize-y bg-white border border-[#e2e8f0] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"

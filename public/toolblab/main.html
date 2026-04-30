@@ -1137,9 +1137,9 @@
               </svg>
             </div>
             <div class="step-card-visual visual-step6">
-              <img src="/images/6class.png" alt="PRO 1 시네마틱 5컷 다이얼로그" onerror="this.style.display='none'" />
+              <img src="/images/cards/pro1.png" alt="PRO 1단계 시네마틱 5컷 다이얼로그" />
             </div>
-            <p class="step-card-label">PRO 1</p>
+            <p class="step-card-label">PRO 1단계</p>
             <p class="step-card-title">시네마틱 5컷 다이얼로그</p>
           </button>
 
@@ -1150,9 +1150,9 @@
               </svg>
             </div>
             <div class="step-card-visual visual-step4">
-              <img src="/images/4class.png" alt="PRO 2 광고영상 제작" />
+              <img src="/images/cards/pro2.png" alt="PRO 2단계 광고영상 제작" />
             </div>
-            <p class="step-card-label">PRO 2</p>
+            <p class="step-card-label">PRO 2단계</p>
             <p class="step-card-title">광고영상 제작</p>
           </button>
 
@@ -1163,11 +1163,24 @@
               </svg>
             </div>
             <div class="step-card-visual visual-step5">
-              <img src="/images/5class.png" alt="PRO 3 유튜브 수익화" />
+              <img src="/images/cards/pro3.png" alt="PRO 3단계 유튜브 수익화" />
             </div>
-            <p class="step-card-label">PRO 3</p>
+            <p class="step-card-label">PRO 3단계</p>
             <p class="step-card-title">유튜브 수익화과정</p>
             <span class="step-card-status">준비중</span>
+          </button>
+
+          <button type="button" class="step-card" data-step="step3">
+            <div class="step-card-check">
+              <svg viewBox="0 0 14 14" fill="none">
+                <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <div class="step-card-visual visual-step3">
+              <img src="/images/cards/pro4.png" alt="PRO 4단계 프리프로덕션" />
+            </div>
+            <p class="step-card-label">PRO 4단계</p>
+            <p class="step-card-title">프리프로덕션</p>
           </button>
 
         </div>
@@ -1189,9 +1202,9 @@
             </svg>
           </div>
           <div class="step-card-visual visual-step1">
-            <img src="/images/1class.png" alt="UP 1 영상기초다지기" />
+            <img src="/images/cards/up1.png" alt="UP 1단계 영상기초다지기" />
           </div>
-          <p class="step-card-label">UP 1</p>
+          <p class="step-card-label">UP 1단계</p>
           <p class="step-card-title">영상기초다지기</p>
         </button>
 
@@ -1202,10 +1215,23 @@
             </svg>
           </div>
           <div class="step-card-visual visual-step2">
-            <img src="/images/2class.png" alt="UP 2 뮤직영상" />
+            <img src="/images/cards/up2.png" alt="UP 2단계 뮤직영상 만들기" />
           </div>
-          <p class="step-card-label">UP 2</p>
-          <p class="step-card-title">영상 제작하기</p>
+          <p class="step-card-label">UP 2단계</p>
+          <p class="step-card-title">뮤직영상 만들기</p>
+        </button>
+
+        <button type="button" class="step-card" data-step="step2-1">
+          <div class="step-card-check">
+            <svg viewBox="0 0 14 14" fill="none">
+              <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <div class="step-card-visual visual-step2-1">
+            <img src="/images/cards/up3.jpg" alt="UP 3단계 인트로영상 만들기" />
+          </div>
+          <p class="step-card-label">UP 3단계</p>
+          <p class="step-card-title">인트로영상 만들기</p>
         </button>
 
       </div>
@@ -1219,7 +1245,7 @@
     <!-- ───────── VIDEO PANEL ───────── -->
     <section class="video-panel" id="videoPanel">
       <div class="video-panel-header">
-        <span class="video-panel-eyebrow" id="videoPanelEyebrow">UP 1</span>
+        <span class="video-panel-eyebrow" id="videoPanelEyebrow">UP 1단계</span>
         <h2 class="video-panel-title" id="videoPanelTitle">마스터 이미지 만들기</h2>
       </div>
 
@@ -1244,27 +1270,24 @@
     /* ──────────────── STEP DATA ──────────────── */
     const STEPS = {
       step1: {
-        label: 'UP 1', title: '영상기초다지기', ready: true,
+        label: 'UP 1단계', title: '영상기초다지기', ready: true,
         items: [
-          { id: 'talking',   title: '말하는 영상만들기',      desc: 'UP 1-1 · 말하는 영상',     thumb: '/images/step1/talking.png', url: '/lecture/step1?v=talking' },
-          { id: 'dance',     title: '춤추는 영상만들기',      desc: 'UP 1-2 · 춤추는 영상',     thumb: '/images/thumbs/step1-2.jpg',         url: '/lecture/step1?v=dance' },
-          { id: 'fly',       title: '날아가는 영상만들기',    desc: 'UP 1-3 · 날아가는 영상',   thumb: '/images/thumbs/step1-3.jpg',         url: '/lecture/step1?v=fly' },
-          { id: 'interview', title: '동물 인터뷰 만들기',     desc: 'UP 1-4 · 동물 인터뷰',     thumb: '/images/step1/master.png',           url: '/lecture/step1?v=interview' },
+          { id: 'talking',   title: '말하는 영상만들기',      desc: 'UP 1-1단계 · 말하는 영상',     thumb: '/images/step1/talking.png', url: '/lecture/step1?v=talking' },
+          { id: 'dance',     title: '춤추는 영상만들기',      desc: 'UP 1-2단계 · 춤추는 영상',     thumb: '/images/thumbs/step1-2.jpg',         url: '/lecture/step1?v=dance' },
+          { id: 'fly',       title: '날아가는 영상만들기',    desc: 'UP 1-3단계 · 날아가는 영상',   thumb: '/images/thumbs/step1-3.jpg',         url: '/lecture/step1?v=fly' },
+          { id: 'interview', title: '동물 인터뷰 만들기',     desc: 'UP 1-4단계 · 동물 인터뷰',     thumb: '/images/step1/master.png',           url: '/lecture/step1?v=interview' },
         ],
       },
       step2: {
-        label: 'UP 2', title: '영상 제작하기', ready: true,
-        items: [
-          { id: 'music', title: '뮤직 영상 만들기',   desc: '감성 뮤직 영상 스토리보드', thumb: '/images/thumbs/step2-1.jpg', url: '/lecture/step2' },
-          { id: 'intro', title: '인트로 영상 만들기', desc: '브랜드 인트로 영상 제작',   thumb: '/images/thumbs/step3-1.jpg', url: '/lecture/step2-1' },
-        ],
+        label: 'UP 2단계', title: '뮤직영상 만들기', url: '/lecture/step2', ready: true,
       },
-      step3: {
-        label: 'UP 3', title: '스토리 영상 만들기', url: '/lecture/step3', ready: true,
+      'step2-1': {
+        label: 'UP 3단계', title: '인트로영상 만들기', url: '/lecture/step2-1', ready: true,
       },
-      step6: { label: 'PRO 1', title: '시네마틱 5컷 다이얼로그', url: '/lecture/step6', ready: true },
-      step4: { label: 'PRO 2', title: '광고영상 제작',          url: '/lecture/step4', ready: true },
-      step5: { label: 'PRO 3', title: '유튜브 수익화과정',      url: null, ready: false },
+      step6: { label: 'PRO 1단계', title: '시네마틱 5컷 다이얼로그', url: '/lecture/step6', ready: true },
+      step4: { label: 'PRO 2단계', title: '광고영상 제작',          url: '/lecture/step4', ready: true },
+      step5: { label: 'PRO 3단계', title: '유튜브 수익화과정',      url: null, ready: false },
+      step3: { label: 'PRO 4단계', title: '프리프로덕션',           url: '/lecture/step3', ready: true },
 
       'zero-gmail':    { label: 'Step 01', title: '구글계정 가입하기',   url: '/zero/gmail',    ready: true },
       'zero-flow':     { label: 'Step 02', title: 'FLOW 가입하기',        url: '/zero/flow',     ready: true },

@@ -2,7 +2,10 @@
 
 import { useMemo, useState, useTransition } from "react";
 import * as S from "@/lib/uiStyles";
-import { CLASS_TYPE_LABEL, CLASS_TYPE_COLOR, formatKRW } from "@/lib/pricing";
+import {
+  CLASS_TYPE_LABEL, CLASS_TYPE_COLOR, formatKRW,
+  PRICING_SLOTS, formatClassLabel, pricingKey, lookupPricing,
+} from "@/lib/pricing";
 import {
   createSession,
   updateSession,
@@ -43,7 +46,22 @@ function userLabel(u) {
   return u.nickname || u.name || u.email || "이름없음";
 }
 
-export default function ScheduleClient({ me, sessions, staffUsers, memberUsers, pricing }) {
+function isPastSession(sess) {
+  return new Date(sess.startAt).getTime() < Date.now();
+}
+
+function canEditSession(me, sess) {
+  if (me.role === "SUPER_ADMIN") return true;
+  return sess.createdById === me.id;
+}
+
+function canDeleteSession(me, sess) {
+  if (me.role === "SUPER_ADMIN") return true;
+  if (sess.createdById !== me.id) return false;
+  return !isPastSession(sess);
+}
+
+export default function ScheduleClient({ me, sessions, staffUsers, memberUsers, pricing = {} }) {
   const today = new Date();
   const [viewYear,  setViewYear]  = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
@@ -106,11 +124,41 @@ export default function ScheduleClient({ me, sessions, staffUsers, memberUsers, 
         dateKey={selectedKey}
         sessions={selectedSessions}
         me={me}
-        onEdit={(sess) => setModal({ mode: "edit", session: sess })}
+        onEdit={(sess) => {
+          if (!canEditSession(me, sess)) {
+            alert("본인이 등록한 회차만 수정할 수 있습니다.");
+            return;
+          }
+          setModal({ mode: "edit", session: sess });
+        }}
         onAdd={() => setModal({ mode: "new", date: selectedKey })}
-        onDelete={(id) => {
-          if (!confirm("이 회차를 삭제할까요?")) return;
-          startTransition(() => deleteSession(id));
+        onDelete={(sess) => {
+          if (!canDeleteSession(me, sess)) {
+            if (me.role !== "SUPER_ADMIN" && sess.createdById !== me.id) {
+              alert("본인이 등록한 회차만 삭제할 수 있습니다.");
+            } else if (isPastSession(sess)) {
+              alert("이미 지난 일정은 삭제할 수 없습니다. 슈퍼관리자에게 문의하세요.");
+            } else {
+              alert("이 회차를 삭제할 권한이 없습니다.");
+            }
+            return;
+          }
+          if (!confirm("이 회차를 삭제할까요? 삭제 후에는 되돌릴 수 없습니다.")) return;
+          startTransition(async () => {
+            try {
+              await deleteSession(sess.id);
+              alert("회차가 삭제되었습니다.");
+            } catch (e) {
+              const msg = e?.message || "";
+              if (msg.includes("forbidden_past_date")) {
+                alert("이미 지난 일정은 삭제할 수 없습니다.");
+              } else if (msg.includes("forbidden_not_owner")) {
+                alert("본인이 등록한 회차만 삭제할 수 있습니다.");
+              } else {
+                alert("삭제에 실패했습니다.");
+              }
+            }
+          });
         }}
         onOpenEnroll={(sessId) => setEnrollPickerFor(sessId)}
         onSetStatus={(eid, status) => startTransition(() => setEnrollmentStatus(eid, status))}
@@ -127,12 +175,22 @@ export default function ScheduleClient({ me, sessions, staffUsers, memberUsers, 
           initialDate={modal.date}
           session={modal.session}
           staffUsers={staffUsers}
+          pricing={pricing}
           onClose={() => setModal(null)}
           onSave={(payload) => {
             startTransition(async () => {
-              if (modal.mode === "new") await createSession(payload);
-              else                       await updateSession(modal.session.id, payload);
-              setModal(null);
+              try {
+                if (modal.mode === "new") await createSession(payload);
+                else                       await updateSession(modal.session.id, payload);
+                setModal(null);
+              } catch (e) {
+                const msg = e?.message || "";
+                if (msg.includes("forbidden_not_owner")) {
+                  alert("본인이 등록한 회차만 수정할 수 있습니다.");
+                } else {
+                  alert("저장에 실패했습니다.");
+                }
+              }
             });
           }}
           pending={pending}
@@ -240,7 +298,7 @@ function CalendarGrid({ grid, sessionsByDay, selectedKey, onSelect }) {
                       fontSize: 11, fontWeight: 700, padding: "2px 6px", borderRadius: 6,
                       background: c.bg, color: c.fg, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
                     }}>
-                      {fmtTime(s.startAt)} {CLASS_TYPE_LABEL[s.classType].replace(" CLASS", "")}
+                      {fmtTime(s.startAt)} {formatClassLabel(s.classType, s.stepLevel)}
                     </div>
                   );
                 })}
@@ -276,7 +334,7 @@ function DayDetail({ dateKey, sessions, me, onEdit, onAdd, onDelete, onOpenEnrol
               sess={s}
               me={me}
               onEdit={() => onEdit(s)}
-              onDelete={() => onDelete(s.id)}
+              onDelete={() => onDelete(s)}
               onOpenEnroll={() => onOpenEnroll(s.id)}
               onSetStatus={onSetStatus}
               onRemoveEnroll={onRemoveEnroll}
@@ -296,6 +354,8 @@ const subAddBtn = {
 
 function SessionCard({ sess, me, onEdit, onDelete, onOpenEnroll, onSetStatus, onRemoveEnroll, pending }) {
   const c = CLASS_TYPE_COLOR[sess.classType];
+  const showEdit = canEditSession(me, sess);
+  const showDelete = canDeleteSession(me, sess);
   return (
     <div style={{
       border: "1px solid #e2e8f0", borderRadius: 12, padding: 16, background: "#fff",
@@ -305,12 +365,16 @@ function SessionCard({ sess, me, onEdit, onDelete, onOpenEnroll, onSetStatus, on
           <span style={{
             padding: "4px 10px", borderRadius: 6, fontSize: 12, fontWeight: 800,
             background: c.bg, color: c.fg,
-          }}>{CLASS_TYPE_LABEL[sess.classType]}</span>
+          }}>{formatClassLabel(sess.classType, sess.stepLevel)}</span>
           <span style={{ fontSize: 16, fontWeight: 800 }}>{fmtTime(sess.startAt)}</span>
         </div>
         <div style={{ display: "flex", gap: 6 }}>
-          <button onClick={onEdit} className="tb-press-soft" style={miniBtn} disabled={pending}>편집</button>
-          <button onClick={onDelete} className="tb-press-soft" style={{ ...miniBtn, color: "#dc2626" }} disabled={pending}>삭제</button>
+          {showEdit && (
+            <button onClick={onEdit} className="tb-press-soft" style={miniBtn} disabled={pending}>편집</button>
+          )}
+          {showDelete && (
+            <button onClick={onDelete} className="tb-press-soft" style={{ ...miniBtn, color: "#dc2626" }} disabled={pending}>삭제</button>
+          )}
         </div>
       </div>
 
@@ -437,12 +501,12 @@ function EnrollmentRow({ e, onSetStatus, onRemove, pending }) {
   );
 }
 
-function SessionModal({ mode, initialDate, session, staffUsers, onClose, onSave, pending }) {
+function SessionModal({ mode, initialDate, session, staffUsers, pricing, onClose, onSave, pending }) {
   const initial = session
     ? {
         date: dateKey(new Date(session.startAt)),
         startTime: fmtTime(session.startAt),
-        classType: session.classType,
+        slotKey: pricingKey(session.classType, session.stepLevel ?? 0),
         mainInstructorId: session.mainInstructorId || "",
         assistantInstructorId: session.assistantInstructorId || "",
         note: session.note || "",
@@ -450,7 +514,7 @@ function SessionModal({ mode, initialDate, session, staffUsers, onClose, onSave,
     : {
         date: initialDate,
         startTime: "14:00",
-        classType: "ZERO",
+        slotKey: pricingKey("ZERO", 0),
         mainInstructorId: "",
         assistantInstructorId: "",
         note: "",
@@ -458,6 +522,19 @@ function SessionModal({ mode, initialDate, session, staffUsers, onClose, onSave,
 
   const [form, setForm] = useState(initial);
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+
+  function buildPayload() {
+    const [classType, stepStr] = form.slotKey.split("_");
+    return {
+      date: form.date,
+      startTime: form.startTime,
+      classType,
+      stepLevel: Number(stepStr),
+      mainInstructorId: form.mainInstructorId,
+      assistantInstructorId: form.assistantInstructorId,
+      note: form.note,
+    };
+  }
 
   return (
     <ModalShell title={mode === "new" ? "회차 등록" : "회차 편집"} onClose={onClose}>
@@ -470,11 +547,15 @@ function SessionModal({ mode, initialDate, session, staffUsers, onClose, onSave,
             <input type="time" value={form.startTime} onChange={(e) => set("startTime", e.target.value)} style={S.input} />
           </Field>
         </Row>
-        <Field label="클래스">
-          <select value={form.classType} onChange={(e) => set("classType", e.target.value)} style={S.input}>
-            <option value="ZERO">ZERO CLASS (20,000원)</option>
-            <option value="UP">UP CLASS (30,000원)</option>
-            <option value="PRO">PRO CLASS (40,000원)</option>
+        <Field label="클래스 / 단계">
+          <select value={form.slotKey} onChange={(e) => set("slotKey", e.target.value)} style={S.input}>
+            {PRICING_SLOTS.map((slot) => {
+              const key = pricingKey(slot.classType, slot.stepLevel);
+              const row = lookupPricing(pricing, slot.classType, slot.stepLevel);
+              const label = formatClassLabel(slot.classType, slot.stepLevel);
+              const priceTxt = row ? ` (${row.pricePerPerson.toLocaleString("ko-KR")}원)` : "";
+              return <option key={key} value={key}>{label}{priceTxt}</option>;
+            })}
           </select>
         </Field>
         <Row>
@@ -492,7 +573,7 @@ function SessionModal({ mode, initialDate, session, staffUsers, onClose, onSave,
       <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 18 }}>
         <button onClick={onClose} className="tb-press-soft" style={miniBtn} disabled={pending}>취소</button>
         <button
-          onClick={() => onSave(form)}
+          onClick={() => onSave(buildPayload())}
           className="tb-press"
           style={{ ...miniBtn, background: "#016837", color: "#fff", border: "none", padding: "8px 18px", fontSize: 13 }}
           disabled={pending || !form.date || !form.startTime}

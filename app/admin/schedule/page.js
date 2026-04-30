@@ -8,6 +8,8 @@ import {
   calculateRevenue,
   viewerRevenueScope,
   maskRevenue,
+  buildPricingMap,
+  lookupPricing,
 } from "@/lib/pricing";
 import ScheduleClient from "./ScheduleClient";
 
@@ -41,23 +43,26 @@ export default async function SchedulePage() {
     prisma.pricingConfig.findMany(),
   ]);
 
-  const pricing = Object.fromEntries(pricingRows.map((p) => [p.classType, p]));
+  const pricingMap = buildPricingMap(pricingRows);
 
   // Server-side revenue computation, masked per viewer role.
   const viewSessions = sessions.map((sess) => {
     const att   = attendeeCount(sess.enrollments);
     const apply = applicantCount(sess.enrollments);
-    const rev   = calculateRevenue(att, pricing[sess.classType]);
+    const slot  = lookupPricing(pricingMap, sess.classType, sess.stepLevel);
+    const rev   = calculateRevenue(att, slot);
     const scope = viewerRevenueScope(me, sess);
     const masked = maskRevenue(rev, scope);
     return {
       id: sess.id,
       startAt: sess.startAt.toISOString(),
       classType: sess.classType,
+      stepLevel: sess.stepLevel,
       mainInstructor: sess.mainInstructor,
       assistantInstructor: sess.assistantInstructor,
       mainInstructorId: sess.mainInstructorId,
       assistantInstructorId: sess.assistantInstructorId,
+      createdById: sess.createdById,
       note: sess.note,
       enrollments: sess.enrollments.map((e) => ({
         id: e.id,
@@ -101,7 +106,7 @@ export default async function SchedulePage() {
           sessions={viewSessions}
           staffUsers={staffUsers}
           memberUsers={memberUsers}
-          pricing={pricing}
+          pricing={pricingMap}
         />
       </div>
     </div>

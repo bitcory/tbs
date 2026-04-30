@@ -55,6 +55,7 @@ model User {
 
   mainSessions      ClassSession[] @relation("MainInstructor")
   assistantSessions ClassSession[] @relation("AssistantInstructor")
+  createdSessions   ClassSession[] @relation("ClassSessionCreator")
   enrollments       Enrollment[]
 }
 
@@ -113,19 +114,23 @@ model ClassSession {
   id                    String    @id @default(cuid())
   startAt               DateTime
   classType             ClassType
+  stepLevel             Int       @default(1)
   mainInstructorId      String?
   assistantInstructorId String?
+  createdById           String?
   note                  String?   @db.Text
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
   mainInstructor      User? @relation("MainInstructor", fields: [mainInstructorId], references: [id], onDelete: SetNull)
   assistantInstructor User? @relation("AssistantInstructor", fields: [assistantInstructorId], references: [id], onDelete: SetNull)
+  createdBy           User? @relation("ClassSessionCreator", fields: [createdById], references: [id], onDelete: SetNull)
   enrollments         Enrollment[]
 
   @@index([startAt])
   @@index([mainInstructorId])
   @@index([assistantInstructorId])
+  @@index([createdById])
 }
 
 model Enrollment {
@@ -145,11 +150,14 @@ model Enrollment {
 
 model PricingConfig {
   id             String    @id @default(cuid())
-  classType      ClassType @unique
+  classType      ClassType
+  stepLevel      Int       @default(0)
   pricePerPerson Int
   toolbShare     Float     @default(0.50)
   mainShare      Float     @default(0.35)
   assistantShare Float     @default(0.15)
   updatedAt      DateTime  @updatedAt
   updatedById    String?
+
+  @@unique([classType, stepLevel])
 }
