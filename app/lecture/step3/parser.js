@@ -74,6 +74,17 @@ export function parseCinematicJson(raw, previous) {
     const mergedScenes = Array.from(scenesMap.values())
       .sort((a, b) => sortByLeadingNum(a.sceneId, b.sceneId));
 
+    // Merge characters from this scene into top-level characters[] (dedupe by name).
+    const existingChars = existing.characters || [];
+    const charMap = new Map(existingChars.map((c) => [c.name || c.id, c]));
+    (json.scene.characters || []).forEach((c) => {
+      const key = c.name || c.id;
+      if (!key) return;
+      const prev = charMap.get(key) || {};
+      charMap.set(key, { ...prev, ...c });
+    });
+    const mergedChars = Array.from(charMap.values());
+
     const existingClips = existing.videoClips || [];
     const clipsMap = new Map(existingClips.map((c) => [c.id, c]));
     (json.videoClips || []).forEach((c) => clipsMap.set(c.id, c));
@@ -100,6 +111,7 @@ export function parseCinematicJson(raw, previous) {
       scenes: mergedScenes,
       videoClips: mergedClips,
       music: { ...existingMusic, tracks: mergedTracks, sfx: mergedSfx },
+      characters: mergedChars,
     };
     if (!merged.project) merged.project = { title: '씬별 제작 진행 중', subtitle: `${mergedScenes.length}개 씬 완료` };
     else merged.project = { ...merged.project, subtitle: `${mergedScenes.length}개 씬 완료` };

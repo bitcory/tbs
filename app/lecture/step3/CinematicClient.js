@@ -236,7 +236,7 @@ export default function CinematicClient() {
               <Gem className="w-3.5 h-3.5" />
               젬 가이드
             </div>
-            <a href="https://gemini.google.com/" target="_blank" rel="noreferrer"
+            <a href="https://gemini.google.com/gem/1RntwRH_DcDRUBlVdvPPPlRNrSsFd_n0z?usp=sharing" target="_blank" rel="noreferrer"
               className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full tb-pill-primary text-sm font-bold transition">
               <ExternalLink className="w-3.5 h-3.5" /> 프리프로덕션 젬 열기
             </a>
@@ -300,7 +300,9 @@ export default function CinematicClient() {
                   />
                 )}
                 {tab === 'overview' && <OverviewPlaceholder data={data} />}
-                {tab === 'characters' && <PlaceholderCard label="캐릭터" />}
+                {tab === 'characters' && (
+                  <CharactersTab characters={data.characters || []} onCopy={copyText} copiedId={copiedId} />
+                )}
                 {tab === 'video' && <PlaceholderCard label="영상" />}
                 {tab === 'music' && <PlaceholderCard label="음악" />}
                 {tab === 'voice' && <PlaceholderCard label="보이스" />}
@@ -366,6 +368,94 @@ function OverviewPlaceholder({ data }) {
       <h3 className="text-base font-extrabold mb-3">{p.title || '프로젝트'}</h3>
       {p.subtitle && <p className="text-sm text-[#64748b] mb-3">{p.subtitle}</p>}
       <p className="text-xs text-[#94a3b8]">개요 탭의 풍부한 표시는 Phase 2에서 구현 예정입니다. 지금은 [이미지] 탭에서 씬별 프롬프트를 확인하세요.</p>
+    </div>
+  );
+}
+
+function CharactersTab({ characters, onCopy, copiedId }) {
+  if (!characters || characters.length === 0) {
+    return (
+      <div className="text-center py-12 text-sm text-[#94a3b8]">
+        등록된 캐릭터가 없습니다. JSON에 <code className="px-1.5 py-0.5 rounded bg-[#f1f5f9] text-[#475569]">characters</code> 배열 또는 씬의 <code className="px-1.5 py-0.5 rounded bg-[#f1f5f9] text-[#475569]">scene.characters</code>가 포함되어야 합니다.
+      </div>
+    );
+  }
+  return (
+    <div className="space-y-4">
+      {characters.map((c, i) => {
+        const stc = TAB_COLORS[i % TAB_COLORS.length];
+        const name = c.name || c.id || `Character ${i + 1}`;
+        const promptText = c.prompt || c.promptBase || '';
+        const appearance = c.appearance && typeof c.appearance === 'object' ? c.appearance : null;
+
+        return (
+          <div key={i} className="rounded-2xl overflow-hidden border-2 border-[#0f172a] bg-white">
+            <div className="px-4 py-2.5 border-b-2 border-[#0f172a] flex items-center justify-between gap-2 flex-wrap"
+                 style={{ background: stc.bg }}>
+              <div className="flex items-center gap-2 flex-wrap min-w-0">
+                <User className="w-4 h-4 text-[#0f172a]" />
+                <span className="text-sm font-bold text-[#0f172a] truncate">{name}</span>
+                {c.nameEn && (
+                  <span className="text-[11px] text-[#475569] font-medium">{c.nameEn}</span>
+                )}
+                {c.age && (
+                  <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded bg-white/70 text-[#475569] border border-[#0f172a]/20">
+                    {c.age}
+                  </span>
+                )}
+                {c.role && (
+                  <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded bg-white/70 text-[#475569] border border-[#0f172a]/20">
+                    {c.role}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {c.description && (
+              <div className="px-4 py-2 text-xs text-[#475569] border-b border-[#e2e8f0] leading-relaxed">
+                {c.description}
+              </div>
+            )}
+
+            <div className="p-4 space-y-3">
+              {c.outfit && (
+                <div className="rounded-lg border border-[#e2e8f0] bg-white overflow-hidden">
+                  <div className="px-3 py-1.5 bg-[#f8fafc] border-b border-[#e2e8f0]">
+                    <span className="text-[10px] font-bold text-[#475569] uppercase tracking-wider">의상</span>
+                  </div>
+                  <div className="p-3 text-sm text-[#0f172a] leading-relaxed">{c.outfit}</div>
+                </div>
+              )}
+
+              {appearance && Object.keys(appearance).length > 0 && (
+                <div className="rounded-lg border border-[#e2e8f0] bg-white overflow-hidden">
+                  <div className="px-3 py-1.5 bg-[#f8fafc] border-b border-[#e2e8f0]">
+                    <span className="text-[10px] font-bold text-[#475569] uppercase tracking-wider">외형</span>
+                  </div>
+                  <dl className="p-3 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
+                    {Object.entries(appearance).map(([k, v]) => (
+                      <div key={k} className="flex gap-2 min-w-0">
+                        <dt className="text-[#94a3b8] font-bold shrink-0 w-16 capitalize">{k}</dt>
+                        <dd className="text-[#0f172a] truncate" title={String(v)}>{String(v)}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              )}
+
+              {promptText && (
+                <div className="rounded-lg border-2 border-[#e2e8f0] overflow-hidden bg-[#fef9c3]/30">
+                  <div className="px-3 py-1.5 bg-white flex items-center justify-between border-b border-[#e2e8f0]">
+                    <span className="text-[10px] font-bold text-[#475569] uppercase tracking-wider">캐릭터 프롬프트</span>
+                    <CopyBtn text={promptText} id={`char-${i}`} label="EN 복사" onCopy={onCopy} copiedId={copiedId} />
+                  </div>
+                  <div className="p-3 text-sm text-[#0f172a] leading-relaxed font-mono whitespace-pre-wrap">{promptText}</div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
