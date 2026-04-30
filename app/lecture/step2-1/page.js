@@ -426,7 +426,7 @@ export default function Step2_1Page() {
       <section className="tb-hero">
         <div className="tb-hero-glow" />
         <div className="tb-hero-row">
-          <span className="tb-hero-eyebrow">TB STUDY · STEP 2-1</span>
+          <span className="tb-hero-eyebrow">TB STUDY · UP 2-1</span>
           <h1 className="tb-hero-title">인트로영상 만들기</h1>
         </div>
       </section>

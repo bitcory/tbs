@@ -17,19 +17,22 @@ const ROLE_BADGE = {
 const ZERO_STEP = 100;
 
 const STEP1_OPTIONS = [
-  { step: 11, label: "Step 1-1 · 말하는" },
-  { step: 12, label: "Step 1-2 · 춤추는" },
-  { step: 13, label: "Step 1-3 · 날아가는" },
-  { step: 14, label: "Step 1-4 · 동물 인터뷰" },
+  { step: 11, label: "UP 1-1 · 말하는" },
+  { step: 12, label: "UP 1-2 · 춤추는" },
+  { step: 13, label: "UP 1-3 · 날아가는" },
+  { step: 14, label: "UP 1-4 · 동물 인터뷰" },
 ];
 
 const SINGLE_STEPS = [
-  { step: 2, label: "Step 2" },
-  { step: 21, label: "Step 2-1" },
-  { step: 3, label: "Step 3" },
+  { step: 2, label: "UP 2" },
+  { step: 21, label: "UP 2-1" },
+  { step: 3, label: "UP 3" },
 ];
 
-const PRO_STEPS = [{ step: 4, label: "Step 4" }];
+const PRO_STEPS = [
+  { step: 6, label: "PRO 1" },
+  { step: 4, label: "PRO 2" },
+];
 
 export default async function AdminPage() {
   const me = await requireAdmin();
@@ -79,7 +82,7 @@ export default async function AdminPage() {
                   <th style={th}>전화번호</th>
                   <th style={th}>권한</th>
                   <th style={th}>ZERO 전체</th>
-                  <th style={th}>Step 1</th>
+                  <th style={th}>UP 1</th>
                   {SINGLE_STEPS.map((s) => (
                     <th key={s.step} style={th}>{s.label}</th>
                   ))}

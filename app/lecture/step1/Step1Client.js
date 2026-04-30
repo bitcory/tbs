@@ -117,7 +117,7 @@ export default function Step1Client({ variant = 'talking' }) {
   const VARIANTS = {
     talking: {
       label: '말하는 프롬프트',
-      sub: 'Step 1-1',
+      sub: 'UP 1-1',
       prompt: `The character is a native Korean speaker.
 All dialogue must be spoken in Korean ONLY.
 English is strictly prohibited.
@@ -139,7 +139,7 @@ Subtitles, title, text is strictly prohibited.`,
     },
     dance: {
       label: '춤추는 영상 프롬프트',
-      sub: 'Step 1-2',
+      sub: 'UP 1-2',
       prompts: [
         {
           title: '브레이크댄스',
@@ -176,12 +176,12 @@ Style: futuristic lighting, neon highlights, smooth motion.`,
     },
     fly: {
       label: '날아가는 영상 프롬프트',
-      sub: 'Step 1-3',
+      sub: 'UP 1-3',
       prompt: `Ultra-realistic cinematic aerial rear follow shot using the uploaded image as exact identity reference. Camera strictly positioned behind the subject, slight rear-left tracking only. Wide-angle cinematic lens with subtle telephoto compression. Very far camera distance subject appears small in frame. Low altitude flight just above ocean surface. High-speed forward motion. Subject seen only from behind. Fully horizontal flying posture. Arms stretched outward like wings. Legs slightly bent. Clothing pushed backward from wind resistance. Environment: open ocean at sunset. Large ocean dominating frame. Infinite cinematic horizon in upper third. Smooth reflective water with extreme horizontal motion blur streaks. Subtle haze near horizon. Lighting: Low golden sunset directly in front of subject. Strong backlit rim light outlining arms and shoulders. Intense golden reflections across water surface. Sky gradient from peach and pink into deep blue ocean shadows. Hyper-realistic DSLR photography. No CGI look. Extreme 8K clarity. Mood: freedom, speed, solitude. Important: Camera must stay behind subject. No side profile. Subject far from camera. Water motion blur very strong.`,
     },
     interview: {
       label: '동물 인터뷰 프롬프트',
-      sub: 'Step 1-4',
+      sub: 'UP 1-4',
       prompt: `An anthropomorphic animal character speaks directly to the camera in an interview style.
 Setup:
 - Medium close-up, eye-level framing

@@ -84,8 +84,9 @@ Vercel이 자동 배포함.
 | Step 2 | `/lecture/step2` | `2` | 뮤직 영상 만들기 |
 | Step 2-1 | `/lecture/step2-1` | `21` | 인트로 영상 만들기 (Step 2 하위) |
 | Step 3 | `/lecture/step3` | `3` | 스토리 영상 만들기 (기/승/전/결) |
-| Step 4 | `/lecture/step4` | `4` | 광고영상 만들기 (Hook/Build/Climax/CTA) |
-| Step 5 | — | — | 준비중 (비활성) |
+| Step 4 | `/lecture/step4` | `4` | PRO 2 · 광고영상 만들기 (Hook/Build/Climax/CTA) |
+| Step 6 | `/lecture/step6` | `6` | PRO 1 · 시네마틱 5컷 다이얼로그 (캐릭터 A/B + S01~S05) |
+| Step 5 | — | — | PRO 3 · 유튜브 수익화 (준비중) |
 
 > **Step 1 구조**: `/lecture/step1/page.js` 는 서버 컴포넌트 게이트로, `?v=` 쿼리를 읽어 `requireStepAccess([11|12|13|14, 1])` 로 variant별 접근을 강제한 뒤 `Step1Client` 에 `variant` prop 으로 전달한다. 레거시 `1` 을 보유한 사용자는 네 variant 모두 접근 가능(하위 호환).
 >

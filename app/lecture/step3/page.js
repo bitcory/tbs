@@ -361,7 +361,7 @@ export default function Step3Page() {
       <section className="tb-hero">
         <div className="tb-hero-glow" />
         <div className="tb-hero-row">
-          <span className="tb-hero-eyebrow">TB STUDY · STEP 3</span>
+          <span className="tb-hero-eyebrow">TB STUDY · UP 3</span>
           <h1 className="tb-hero-title">스토리 영상 만들기</h1>
         </div>
       </section>

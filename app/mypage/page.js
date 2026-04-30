@@ -42,8 +42,11 @@ export default async function MyPage() {
       </section>
 
       <div style={{ ...S.pageWrap, maxWidth: "100%", padding: "28px 20px 80px", marginTop: -48, position: "relative" }}>
-        <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginBottom: 16 }}>
+        <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginBottom: 16, flexWrap: "wrap" }}>
           <Link href="/" className="glass-hoverable" style={S.ghostBtn}>← 홈으로</Link>
+          {isAdmin && (
+            <Link href="/admin/schedule" className="glass-hoverable" style={S.ghostBtn}>강의 일정</Link>
+          )}
           {isAdmin && (
             <Link href="/admin" className="glass-hoverable" style={S.primaryPill}>관리자 페이지</Link>
           )}
@@ -88,7 +91,7 @@ export default async function MyPage() {
                   }}
                 >
                   <span style={S.badge(ok ? S.badgeGreen : S.badgeGray)}>
-                    Step {n} {ok ? "✓ 허용" : "✕ 차단"}
+                    UP {n} {ok ? "✓ 허용" : "✕ 차단"}
                   </span>
                   <MaterialRequestButton
                     step={n}

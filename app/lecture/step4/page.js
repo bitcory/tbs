@@ -1026,7 +1026,7 @@ export default function Step4Page() {
       <section className="tb-hero">
         <div className="tb-hero-glow" />
         <div className="tb-hero-row">
-          <span className="tb-hero-eyebrow">TB STUDY · STEP 4</span>
+          <span className="tb-hero-eyebrow">TB STUDY · PRO 2</span>
           <h1 className="tb-hero-title">광고영상 만들기</h1>
         </div>
       </section>
@@ -1039,6 +1039,10 @@ export default function Step4Page() {
         </Link>
         <span className="text-[11px] font-bold tracking-[0.18em] text-[#00996D] uppercase hidden sm:inline">TOOLB LAB</span>
         <div className="ml-auto flex items-center gap-2">
+          <span className="text-[11px] sm:text-xs font-bold tracking-[0.14em] text-[#00774f] uppercase flex items-center gap-1">
+            <Upload className="w-3 h-3" />
+            JSON 업로드
+          </span>
           <button
             onClick={() => openUpload('character')}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full tb-pill-ghost text-xs sm:text-sm font-bold transition"
@@ -1051,7 +1055,7 @@ export default function Step4Page() {
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full tb-pill-primary text-xs sm:text-sm font-bold transition"
           >
             <ImageIcon className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">이미지 </span>프롬프트
+            <span className="hidden sm:inline">이미지</span>
           </button>
           <button
             onClick={() => openUpload('video_prompts')}
@@ -1062,7 +1066,7 @@ export default function Step4Page() {
             title={!storyboard ? '이미지 프롬프트를 먼저 업로드하세요' : ''}
           >
             <Film className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">영상 </span>프롬프트
+            <span className="hidden sm:inline">영상</span>
           </button>
         </div>
       </div>
