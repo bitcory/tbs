@@ -538,7 +538,7 @@ export default function Step2_1Page() {
               className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full tb-pill-primary text-sm font-bold transition"
             >
               <ExternalLink className="w-3.5 h-3.5" />
-              2-1단계 젬 가이드 열기
+              인트로영상 젬가이드 열기
             </a>
             <a
               href="https://kr.pinterest.com/"

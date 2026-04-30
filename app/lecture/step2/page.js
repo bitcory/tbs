@@ -554,7 +554,7 @@ export default function Step2Page() {
               className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full tb-pill-primary text-sm font-bold transition"
             >
               <ExternalLink className="w-3.5 h-3.5" />
-              2단계 젬 가이드 열기
+              뮤직영상 만들기 젬 가이드 열기
             </a>
             <a
               href="https://kr.pinterest.com/"
@@ -661,21 +661,21 @@ export default function Step2Page() {
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full tb-pill-primary text-sm font-bold transition"
                   >
                     <ImageIcon className="w-3.5 h-3.5" />
-                    이미지 전체
+                    3*3그리드
                   </button>
                   <button
                     onClick={() => copyText(allImagePromptsGrok)}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0f172a] hover:opacity-90 text-white text-sm font-bold tb-press"
                   >
                     <ImageIcon className="w-3.5 h-3.5" />
-                    GROK 복사
+                    이미지 프롬프트
                   </button>
                   <button
                     onClick={() => copyText(allVideoPrompts)}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[#334155] text-sm font-bold tb-press-soft"
                   >
                     <Film className="w-3.5 h-3.5" />
-                    영상 전체
+                    영상 프롬프트
                   </button>
                 </div>
               </div>
