@@ -5,10 +5,17 @@ import * as S from "@/lib/uiStyles";
 import { CLASS_TYPE_COLOR, formatClassLabel } from "@/lib/pricing";
 import { updatePricing } from "./actions";
 
+const TABS = [
+  { key: "ZERO", label: "ZERO CLASS" },
+  { key: "UP",   label: "UP CLASS" },
+  { key: "PRO",  label: "PRO CLASS" },
+];
+
 export default function PricingClient({ initial }) {
   const [rows, setRows] = useState(initial);
   const [pending, startTransition] = useTransition();
   const [msg, setMsg] = useState(null);
+  const [activeTab, setActiveTab] = useState("ZERO");
 
   function update(idx, patch) {
     setRows((rs) => rs.map((r, i) => (i === idx ? { ...r, ...patch } : r)));
@@ -28,6 +35,7 @@ export default function PricingClient({ initial }) {
     setMsg(null);
     const bad = rows.find((r) => Math.abs(r.toolbShare + r.mainShare + r.assistantShare - 1) > 0.001);
     if (bad) {
+      setActiveTab(bad.classType);
       setMsg({ type: "err", text: `${formatClassLabel(bad.classType, bad.stepLevel)} 요율 합이 100%가 아닙니다.` });
       return;
     }
@@ -41,10 +49,75 @@ export default function PricingClient({ initial }) {
     });
   }
 
+  const tabSums = TABS.reduce((acc, t) => {
+    const tabRows = rows.filter((r) => r.classType === t.key);
+    acc[t.key] = tabRows.every(
+      (r) => Math.abs(r.toolbShare + r.mainShare + r.assistantShare - 1) < 0.001
+    );
+    return acc;
+  }, {});
+
   return (
     <div style={{ ...S.card }}>
+      <div
+        style={{
+          display: "flex",
+          gap: 6,
+          padding: 4,
+          marginBottom: 18,
+          background: "#f1f5f9",
+          borderRadius: 12,
+        }}
+      >
+        {TABS.map((t) => {
+          const active = activeTab === t.key;
+          const c = CLASS_TYPE_COLOR[t.key];
+          const ok = tabSums[t.key];
+          return (
+            <button
+              key={t.key}
+              type="button"
+              onClick={() => setActiveTab(t.key)}
+              className="tb-press-soft"
+              style={{
+                flex: 1,
+                padding: "10px 12px",
+                borderRadius: 9,
+                border: "none",
+                cursor: "pointer",
+                fontFamily: "inherit",
+                fontSize: 13,
+                fontWeight: 800,
+                letterSpacing: "0.04em",
+                background: active ? c.bg : "transparent",
+                color: active ? c.fg : "#64748b",
+                boxShadow: active ? "0 1px 3px rgba(15,23,42,0.08)" : "none",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 6,
+              }}
+            >
+              {t.label}
+              {!ok && (
+                <span
+                  title="요율 합이 100%가 아닌 항목이 있습니다"
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: "50%",
+                    background: "#dc2626",
+                  }}
+                />
+              )}
+            </button>
+          );
+        })}
+      </div>
+
       <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
         {rows.map((r, idx) => {
+          if (r.classType !== activeTab) return null;
           const c = CLASS_TYPE_COLOR[r.classType];
           const sum = r.toolbShare + r.mainShare + r.assistantShare;
           const sumOk = Math.abs(sum - 1) < 0.001;
