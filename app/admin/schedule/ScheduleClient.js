@@ -639,21 +639,92 @@ const DATE_CHIPS = [
   { label: "모레",   delta: 2 },
   { label: "+7일",   delta: 7 },
   { label: "+14일",  delta: 14 },
+  { label: "+21일",  delta: 21 },
+  { label: "+30일",  delta: 30 },
 ];
 
+function daysInMonth(year, month1) {
+  // month1: 1..12
+  return new Date(year, month1, 0).getDate();
+}
+
+function parseDateKey(key) {
+  // "YYYY-MM-DD" → { year, month1, day }
+  const [y, m, d] = (key || "").split("-").map((s) => parseInt(s, 10));
+  if (!y || !m || !d) {
+    const t = new Date();
+    return { year: t.getFullYear(), month1: t.getMonth() + 1, day: t.getDate() };
+  }
+  return { year: y, month1: m, day: d };
+}
+
+function buildDateKey(year, month1, day) {
+  const max = daysInMonth(year, month1);
+  const safeDay = Math.min(Math.max(1, day), max);
+  return `${year}-${pad2(month1)}-${pad2(safeDay)}`;
+}
+
 function DatePicker({ value, onChange }) {
-  const todayKey = dateKey(new Date());
+  const today = new Date();
+  const todayKey = dateKey(today);
+  const { year, month1, day } = parseDateKey(value);
+
+  const yearOptions = [];
+  for (let y = today.getFullYear() - 1; y <= today.getFullYear() + 2; y++) {
+    yearOptions.push(y);
+  }
+  const monthOptions = Array.from({ length: 12 }, (_, i) => i + 1);
+  const dayOptions = Array.from({ length: daysInMonth(year, month1) }, (_, i) => i + 1);
+
+  function update(next) {
+    const merged = { year, month1, day, ...next };
+    onChange(buildDateKey(merged.year, merged.month1, merged.day));
+  }
+
+  const cellStyle = { ...S.input, padding: "10px 12px", textAlign: "center", fontWeight: 600 };
+
+  // chip preview: weekday + M/D (e.g., 목 5/1)
+  function chipDetail(delta) {
+    const target = shiftDateKey(todayKey, delta);
+    const { month1: tm, day: td } = parseDateKey(target);
+    const dow = WEEKDAYS[new Date(`${target}T00:00:00`).getDay()];
+    return { target, dow, label: `${tm}/${td}` };
+  }
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      <input
-        type="date"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        style={S.input}
-      />
+      <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: 8 }}>
+        <select
+          value={year}
+          onChange={(e) => update({ year: Number(e.target.value) })}
+          style={cellStyle}
+        >
+          {yearOptions.map((y) => (
+            <option key={y} value={y}>{y}년</option>
+          ))}
+        </select>
+        <select
+          value={month1}
+          onChange={(e) => update({ month1: Number(e.target.value) })}
+          style={cellStyle}
+        >
+          {monthOptions.map((m) => (
+            <option key={m} value={m}>{m}월</option>
+          ))}
+        </select>
+        <select
+          value={day}
+          onChange={(e) => update({ day: Number(e.target.value) })}
+          style={cellStyle}
+        >
+          {dayOptions.map((d) => (
+            <option key={d} value={d}>{d}일</option>
+          ))}
+        </select>
+      </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
         {DATE_CHIPS.map((c) => {
-          const target = shiftDateKey(todayKey, c.delta);
+          const { target, dow, label } = chipDetail(c.delta);
           const active = value === target;
           return (
             <button
@@ -671,9 +742,13 @@ function DatePicker({ value, onChange }) {
                 fontWeight: 700,
                 cursor: "pointer",
                 fontFamily: "inherit",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
               }}
             >
-              {c.label}
+              <span>{c.label}</span>
+              <span style={{ opacity: 0.7, fontWeight: 500 }}>· {dow} {label}</span>
             </button>
           );
         })}
