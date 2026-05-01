@@ -14,10 +14,11 @@ const VALID_SLOTS = new Set([
 ]);
 
 function parseStartAt(dateStr, timeStr) {
-  // dateStr: "YYYY-MM-DD", timeStr: "HH:MM"
+  // dateStr: "YYYY-MM-DD", timeStr: "HH:MM" — always interpret as KST (UTC+9)
+  // so production (Vercel UTC) and local dev produce the same instant.
   if (!dateStr) return null;
   const t = timeStr && /^\d{2}:\d{2}$/.test(timeStr) ? timeStr : "00:00";
-  const iso = `${dateStr}T${t}:00`;
+  const iso = `${dateStr}T${t}:00+09:00`;
   const d = new Date(iso);
   return isNaN(d.getTime()) ? null : d;
 }

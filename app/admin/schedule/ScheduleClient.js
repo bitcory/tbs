@@ -24,6 +24,30 @@ function fmtTime(iso) {
   return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 }
 
+// "HH:MM" (24h) → { period: "AM"|"PM", hour12: 1..12, minute: 0..59 }
+function to12h(hhmm) {
+  const [hStr, mStr] = (hhmm || "00:00").split(":");
+  const h24 = Math.max(0, Math.min(23, parseInt(hStr, 10) || 0));
+  const minute = Math.max(0, Math.min(59, parseInt(mStr, 10) || 0));
+  const period = h24 < 12 ? "AM" : "PM";
+  const hour12 = h24 % 12 === 0 ? 12 : h24 % 12;
+  return { period, hour12, minute };
+}
+// inverse: dropdown values → "HH:MM"
+function to24h(period, hour12, minute) {
+  const h12 = Math.max(1, Math.min(12, Number(hour12) || 12));
+  const m = Math.max(0, Math.min(59, Number(minute) || 0));
+  const base = h12 % 12; // 12→0, 1→1 ... 11→11
+  const h24 = period === "PM" ? base + 12 : base;
+  return `${pad2(h24)}:${pad2(m)}`;
+}
+// add days to YYYY-MM-DD string, return YYYY-MM-DD
+function shiftDateKey(baseKey, deltaDays) {
+  const base = baseKey ? new Date(`${baseKey}T00:00:00`) : new Date();
+  const d = new Date(base.getFullYear(), base.getMonth(), base.getDate() + deltaDays);
+  return dateKey(d);
+}
+
 function buildMonthGrid(year, month) {
   const first = new Date(year, month, 1);
   const startDay = first.getDay();
@@ -539,14 +563,12 @@ function SessionModal({ mode, initialDate, session, staffUsers, pricing, onClose
   return (
     <ModalShell title={mode === "new" ? "회차 등록" : "회차 편집"} onClose={onClose}>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <Row>
-          <Field label="날짜">
-            <input type="date" value={form.date} onChange={(e) => set("date", e.target.value)} style={S.input} />
-          </Field>
-          <Field label="시작 시각">
-            <input type="time" value={form.startTime} onChange={(e) => set("startTime", e.target.value)} style={S.input} />
-          </Field>
-        </Row>
+        <Field label="날짜">
+          <DatePicker value={form.date} onChange={(v) => set("date", v)} />
+        </Field>
+        <Field label="시작 시각">
+          <TimePicker value={form.startTime} onChange={(v) => set("startTime", v)} />
+        </Field>
         <Field label="클래스 / 단계">
           <select value={form.slotKey} onChange={(e) => set("slotKey", e.target.value)} style={S.input}>
             {PRICING_SLOTS.map((slot) => {
@@ -607,6 +629,104 @@ function Field({ label, children }) {
     <div>
       <label style={S.label}>{label}</label>
       {children}
+    </div>
+  );
+}
+
+const DATE_CHIPS = [
+  { label: "오늘",   delta: 0 },
+  { label: "내일",   delta: 1 },
+  { label: "모레",   delta: 2 },
+  { label: "+7일",   delta: 7 },
+  { label: "+14일",  delta: 14 },
+];
+
+function DatePicker({ value, onChange }) {
+  const todayKey = dateKey(new Date());
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <input
+        type="date"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        style={S.input}
+      />
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+        {DATE_CHIPS.map((c) => {
+          const target = shiftDateKey(todayKey, c.delta);
+          const active = value === target;
+          return (
+            <button
+              key={c.label}
+              type="button"
+              onClick={() => onChange(target)}
+              className="tb-press-soft"
+              style={{
+                padding: "5px 11px",
+                borderRadius: 999,
+                border: `1px solid ${active ? "#016837" : "#cbd5e1"}`,
+                background: active ? "#dcfce7" : "#fff",
+                color: active ? "#166534" : "#475569",
+                fontSize: 12,
+                fontWeight: 700,
+                cursor: "pointer",
+                fontFamily: "inherit",
+              }}
+            >
+              {c.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+const HOUR_OPTIONS = Array.from({ length: 12 }, (_, i) => i + 1); // 1..12
+const MINUTE_OPTIONS = [0, 15, 30, 45];
+
+function TimePicker({ value, onChange }) {
+  const { period, hour12, minute } = to12h(value);
+  // snap minute to nearest preset for the dropdown display
+  const snappedMinute = MINUTE_OPTIONS.includes(minute)
+    ? minute
+    : MINUTE_OPTIONS.reduce((a, b) => (Math.abs(b - minute) < Math.abs(a - minute) ? b : a));
+
+  function update(next) {
+    const merged = { period, hour12, minute: snappedMinute, ...next };
+    onChange(to24h(merged.period, merged.hour12, merged.minute));
+  }
+
+  const cellStyle = { ...S.input, padding: "10px 12px", textAlign: "center", fontWeight: 600 };
+
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+      <select
+        value={period}
+        onChange={(e) => update({ period: e.target.value })}
+        style={cellStyle}
+      >
+        <option value="AM">오전</option>
+        <option value="PM">오후</option>
+      </select>
+      <select
+        value={hour12}
+        onChange={(e) => update({ hour12: Number(e.target.value) })}
+        style={cellStyle}
+      >
+        {HOUR_OPTIONS.map((h) => (
+          <option key={h} value={h}>{h}시</option>
+        ))}
+      </select>
+      <select
+        value={snappedMinute}
+        onChange={(e) => update({ minute: Number(e.target.value) })}
+        style={cellStyle}
+      >
+        {MINUTE_OPTIONS.map((m) => (
+          <option key={m} value={m}>{pad2(m)}분</option>
+        ))}
+      </select>
     </div>
   );
 }
