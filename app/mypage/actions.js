@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { sendMaterialsEmail } from "@/lib/email";
-import { hasStepMaterials } from "@/lib/stepMaterials";
+import { hasStepMaterials, MYPAGE_STEP_ORDER } from "@/lib/stepMaterials";
 import { logConsent } from "@/lib/consent";
 
 export async function updateProfile(formData) {
@@ -93,7 +93,7 @@ export async function requestMaterials(step) {
   const s = await auth();
   if (!s?.user) return { ok: false, message: "로그인이 필요합니다." };
 
-  if (![1, 2, 3].includes(step)) {
+  if (!MYPAGE_STEP_ORDER.includes(step)) {
     return { ok: false, message: "잘못된 단계입니다." };
   }
 
@@ -101,10 +101,11 @@ export async function requestMaterials(step) {
   if (!me) return { ok: false, message: "회원 정보를 찾을 수 없습니다." };
   if (!me.email) return { ok: false, message: "등록된 이메일이 없습니다." };
 
+  const variantCodes = step === 1 ? [1, 11, 12, 13, 14] : [step];
   const allowed =
     me.role === "STAFF" ||
     me.role === "SUPER_ADMIN" ||
-    me.stepAccess.includes(step);
+    variantCodes.some((c) => me.stepAccess.includes(c));
   if (!allowed) {
     return { ok: false, message: `Step ${step} 접근 권한이 없습니다.` };
   }

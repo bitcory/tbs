@@ -7,8 +7,8 @@ import ProfileEditor from "./ProfileEditor";
 import BankInfoEditor from "./BankInfoEditor";
 import MaterialRequestButton from "./MaterialRequestButton";
 import { updateProfile, updateBankInfo, requestMaterials } from "./actions";
-import { hasStepMaterials } from "@/lib/stepMaterials";
-import { stepLabel } from "@/lib/stepLabel";
+import { hasStepMaterials, MYPAGE_STEP_ORDER } from "@/lib/stepMaterials";
+import { stepLabel, stepCourseTitle } from "@/lib/stepLabel";
 import {
   Home, Calendar, ShieldCheck, LogOut,
   Camera, Search, Film, MessagesSquare, ArrowUpRight,
@@ -89,9 +89,13 @@ export default async function MyPage() {
             단계 접근권한 & 강의자료
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {[1, 2, 3].map((n) => {
-              const ok = me.stepAccess.includes(n) || me.role !== "USER";
+            {MYPAGE_STEP_ORDER.map((n) => {
+              const variantCodes = n === 1 ? [1, 11, 12, 13, 14] : [n];
+              const ok =
+                me.role !== "USER" ||
+                variantCodes.some((c) => me.stepAccess.includes(c));
               const ready = hasStepMaterials(n);
+              const title = stepCourseTitle(n);
               return (
                 <div
                   key={n}
@@ -107,9 +111,16 @@ export default async function MyPage() {
                     flexWrap: "wrap",
                   }}
                 >
-                  <span style={S.badge(ok ? S.badgeGreen : S.badgeGray)}>
-                    {stepLabel(n)} {ok ? "✓ 허용" : "✕ 차단"}
-                  </span>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 0 }}>
+                    <span style={{ ...S.badge(ok ? S.badgeGreen : S.badgeGray), alignSelf: "flex-start" }}>
+                      {stepLabel(n)} {ok ? "✓ 허용" : "✕ 차단"}
+                    </span>
+                    {title && (
+                      <span style={{ fontSize: 13, fontWeight: 600, color: "#334155", lineHeight: 1.4 }}>
+                        {title}
+                      </span>
+                    )}
+                  </div>
                   <MaterialRequestButton
                     step={n}
                     hasAccess={ok}
