@@ -113,7 +113,6 @@ export default function Step1Client({ variant = 'talking' }) {
   const [hydrated, setHydrated] = useState(false);
   const [toolView, setToolView] = useState(null);
   const [speakPromptOpen, setSpeakPromptOpen] = useState(false);
-  const DEFAULT_GEM_GUIDE_URL = 'https://gemini.google.com/gem/13HOLZGAzOKloWSBnxejnMvWDOJHNvdyu?usp=sharing';
 
   const VARIANTS = {
     talking: {
@@ -180,7 +179,7 @@ Camera: slow motion emphasis on wave transitions. no bgm`,
     interview: {
       label: '동물 인터뷰 프롬프트',
       sub: 'UP 1-4',
-      gemGuideUrl: 'https://gemini.google.com/gem/40b0bdd6951f?usp=sharing',
+      promptUrl: 'https://gemini.google.com/gem/40b0bdd6951f?usp=sharing',
       prompt: `An anthropomorphic animal character speaks directly to the camera in an interview style.
 Setup:
 - Medium close-up, eye-level framing
@@ -204,7 +203,6 @@ Subtitles, title, text is strictly prohibited.`,
 
   const currentVariant = VARIANTS[variant] || VARIANTS.talking;
   const SPEAK_PROMPT = currentVariant.prompt;
-  const gemGuideUrl = currentVariant.gemGuideUrl || DEFAULT_GEM_GUIDE_URL;
   const promptRef = useRef(null);
 
   // Load cache on mount
@@ -525,7 +523,7 @@ Subtitles, title, text is strictly prohibited.`,
               젬 가이드
             </div>
             <a
-              href={gemGuideUrl}
+              href="https://gemini.google.com/gem/13HOLZGAzOKloWSBnxejnMvWDOJHNvdyu?usp=sharing"
               target="_blank"
               rel="noreferrer"
               className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full tb-pill-primary text-sm font-bold transition"
@@ -568,17 +566,33 @@ Subtitles, title, text is strictly prohibited.`,
 
           {/* Variant prompt */}
           <div className="p-4 border-t border-[#e2e8f0]">
-            <button
-              onClick={() => setSpeakPromptOpen(true)}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-full text-sm font-bold text-white hover:opacity-90 tb-press"
-              style={{
-                background: 'linear-gradient(112.34deg, #A855F7 -38.67%, #6D28D9 99.56%)',
-                boxShadow: '0 10px 24px rgba(109, 40, 217, 0.3)',
-              }}
-            >
-              <Mic className="w-4 h-4" />
-              {currentVariant.label}
-            </button>
+            {currentVariant.promptUrl ? (
+              <a
+                href={currentVariant.promptUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-full text-sm font-bold text-white hover:opacity-90 tb-press"
+                style={{
+                  background: 'linear-gradient(112.34deg, #A855F7 -38.67%, #6D28D9 99.56%)',
+                  boxShadow: '0 10px 24px rgba(109, 40, 217, 0.3)',
+                }}
+              >
+                <ExternalLink className="w-4 h-4" />
+                {currentVariant.label}
+              </a>
+            ) : (
+              <button
+                onClick={() => setSpeakPromptOpen(true)}
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-full text-sm font-bold text-white hover:opacity-90 tb-press"
+                style={{
+                  background: 'linear-gradient(112.34deg, #A855F7 -38.67%, #6D28D9 99.56%)',
+                  boxShadow: '0 10px 24px rgba(109, 40, 217, 0.3)',
+                }}
+              >
+                <Mic className="w-4 h-4" />
+                {currentVariant.label}
+              </button>
+            )}
           </div>
         </aside>
 
