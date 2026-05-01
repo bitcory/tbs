@@ -148,18 +148,16 @@ Subtitles, title, text is strictly prohibited.`,
 2-5s: Fast footwork and top rock moves, smooth and rhythmic.
 5-8s: Transition into power moves, including a clean windmill spin.
 8-10s: Ends with a freeze pose, holding balance with strong lighting.
-Camera: dynamic tracking shot, slight slow motion on power moves.
-Style: cinematic, high contrast, sharp details, realistic motion. no bgm`,
+Camera: dynamic tracking shot, slight slow motion on power moves. no bgm`,
         },
         {
           title: '탭댄스',
-          prompt: `A 10-second video of a dancer performing tap dance on a wooden stage.
+          prompt: `A 10-second video of a dancer performing tap dance.
 0-3s: Starts with light rhythmic tapping, feet close-up.
 3-6s: Fast synchronized footwork with clear sound emphasis.
 6-8s: Spins while maintaining tap rhythm.
 8-10s: Ends with a sharp final stomp and pose.
-Camera: low angle focusing on feet, smooth zoom out at the end.
-Style: warm lighting, stage atmosphere, realistic shadows.`,
+Camera: low angle focusing on feet, smooth zoom out at the end. no bgm`,
         },
         {
           title: '웨이/팝핀',
@@ -169,8 +167,7 @@ Style: warm lighting, stage atmosphere, realistic shadows.`,
 5-7s: Body wave moving smoothly down to legs.
 7-9s: Quick popping hits synchronized with beats.
 9-10s: Freeze with a stylish pose.
-Camera: slow motion emphasis on wave transitions.
-Style: futuristic lighting, neon highlights, smooth motion.`,
+Camera: slow motion emphasis on wave transitions. no bgm`,
         },
       ],
     },
@@ -217,14 +214,14 @@ Subtitles, title, text is strictly prohibited.`,
           setTemplate(normalize(parsed));
         }
       }
-    } catch (e) {}
+    } catch (e) { }
     setHydrated(true);
   }, []);
 
   // Auto-save
   useEffect(() => {
     if (!hydrated) return;
-    try { localStorage.setItem(CACHE_KEY, JSON.stringify(template)); } catch (e) {}
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify(template)); } catch (e) { }
   }, [template, hydrated]);
 
   // Auto-resize prompt textarea
@@ -497,22 +494,20 @@ Subtitles, title, text is strictly prohibited.`,
               </a>
               <button
                 onClick={() => setToolView(toolView === 'frame-extractor' ? null : 'frame-extractor')}
-                className={`w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition ${
-                  toolView === 'frame-extractor'
-                    ? 'tb-pill-primary'
-                    : 'text-[#334155] bg-[#f1f5f9] hover:bg-[#e2e8f0] tb-press-soft'
-                }`}
+                className={`w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition ${toolView === 'frame-extractor'
+                  ? 'tb-pill-primary'
+                  : 'text-[#334155] bg-[#f1f5f9] hover:bg-[#e2e8f0] tb-press-soft'
+                  }`}
               >
                 <Film className="w-4 h-4" />
                 프레임추출기
               </button>
               <button
                 onClick={() => setToolView(toolView === 'watermark-remover' ? null : 'watermark-remover')}
-                className={`w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition ${
-                  toolView === 'watermark-remover'
-                    ? 'tb-pill-primary'
-                    : 'text-[#334155] bg-[#f1f5f9] hover:bg-[#e2e8f0] tb-press-soft'
-                }`}
+                className={`w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition ${toolView === 'watermark-remover'
+                  ? 'tb-pill-primary'
+                  : 'text-[#334155] bg-[#f1f5f9] hover:bg-[#e2e8f0] tb-press-soft'
+                  }`}
               >
                 <Droplets className="w-4 h-4" />
                 워터마크제거
@@ -591,149 +586,148 @@ Subtitles, title, text is strictly prohibited.`,
           ) : toolView === 'watermark-remover' ? (
             <WatermarkRemover accentColor="#00996D" />
           ) : (
-          <>
-          {sections.length > 0 && (
-            <div className="flex-shrink-0 px-4 py-3 border-b border-[#e2e8f0] bg-[#ecfdf5]/40 rounded-t-2xl">
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[12px] font-bold uppercase tracking-wider text-[#64748b] flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00996D]" />
-                  이미지 프롬프트
-                </span>
-                <button
-                  onClick={() => copyText(promptString)}
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[12px] font-bold text-[#334155] tb-press-soft"
-                >
-                  <Copy className="w-3 h-3" />
-                  복사
-                </button>
-              </div>
-              <textarea
-                ref={promptRef}
-                value={promptString}
-                readOnly
-                placeholder="템플릿을 로드하면 자동으로 생성됩니다..."
-                className="w-full min-h-[60px] resize-none bg-white border border-[#e2e8f0] rounded-xl p-2.5 text-[13px] leading-relaxed text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
-              />
-            </div>
-          )}
-
-          {sections.length === 0 ? (
-            <div className="flex-1 flex flex-col items-center justify-center text-center p-10">
-              <h3 className="text-lg font-bold text-[#0f172a] mb-2">템플릿을 로드하세요</h3>
-              <p className="text-sm text-[#64748b] mb-5 leading-relaxed">
-                JSON 업로드 버튼을 클릭하여 템플릿을 불러오거나,<br />
-                기본 샘플이 자동으로 로드됩니다.
-              </p>
-              <button
-                onClick={() => { setUploadOpen(true); setUploadError(''); }}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-full tb-pill-primary text-sm font-bold transition"
-              >
-                <Upload className="w-3.5 h-3.5" />
-                JSON 업로드 시작
-              </button>
-            </div>
-          ) : (
             <>
-              {/* Tab bar */}
-              <div className="flex-shrink-0 flex gap-1.5 p-3 border-b border-[#e2e8f0] bg-white overflow-x-auto">
-                {sections.map((s, i) => {
-                  const tc = TAB_COLORS[i % TAB_COLORS.length];
-                  const isActive = i === activeTab;
-                  return (
+              {sections.length > 0 && (
+                <div className="flex-shrink-0 px-4 py-3 border-b border-[#e2e8f0] bg-[#ecfdf5]/40 rounded-t-2xl">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[12px] font-bold uppercase tracking-wider text-[#64748b] flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#00996D]" />
+                      이미지 프롬프트
+                    </span>
                     <button
-                      key={i}
-                      onClick={() => setActiveTab(i)}
-                      className={`flex items-center gap-1.5 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${
-                        isActive
-                          ? 'tb-pill-primary'
-                          : 'text-[#64748b] bg-[#f1f5f9] hover:bg-[#e2e8f0] tb-press-soft'
-                      }`}
+                      onClick={() => copyText(promptString)}
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[12px] font-bold text-[#334155] tb-press-soft"
                     >
-                      <span
-                        className="w-1.5 h-1.5 rounded-full"
-                        style={{ background: isActive ? '#fff' : tc.dot, opacity: isActive ? 1 : 0.6 }}
-                      />
-                      {s.section_label_ko || s.section_id}
+                      <Copy className="w-3 h-3" />
+                      복사
                     </button>
-                  );
-                })}
-              </div>
+                  </div>
+                  <textarea
+                    ref={promptRef}
+                    value={promptString}
+                    readOnly
+                    placeholder="템플릿을 로드하면 자동으로 생성됩니다..."
+                    className="w-full min-h-[60px] resize-none bg-white border border-[#e2e8f0] rounded-xl p-2.5 text-[13px] leading-relaxed text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
+                  />
+                </div>
+              )}
 
-              {/* Tab content */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {currentSection && (currentSection.components || []).filter(c => c.is_active !== false).map(comp => {
-                  const tc = TAB_COLORS[activeTab % TAB_COLORS.length];
-                  return (
-                    <div key={comp.component_id} className="space-y-2">
-                      <div className="flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-wider text-[#64748b] px-1">
-                        <Layers className="w-3 h-3" />
-                        {comp.component_label_ko || comp.component_id}
-                      </div>
-                      <div className="space-y-1.5">
-                        {(comp.attributes || []).map(attr => {
-                          const displayVal = getDisplayValue(attr);
-                          const engVal = Array.isArray(attr.value) ? attr.value.join(', ') : (attr.value || '');
-                          const isInactive = attr.is_active === false;
-                          const isNoneVal = ['none', '없음', 'n/a', '-', ''].includes(String(attr.value || '').trim().toLowerCase());
-                          const opacity = isInactive ? 0.55 : isNoneVal ? 0.5 : 1;
-                          return (
-                            <div
-                              key={attr.attr_id}
-                              className="bg-white border border-[#e2e8f0] rounded-2xl overflow-hidden shadow-[0_2px_8px_rgba(15,23,42,0.04)]"
-                              style={{ opacity }}
-                            >
-                              <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-[#e2e8f0] bg-[#f8fafc]">
-                                <div className="flex items-center gap-1.5 text-sm font-bold text-[#0f172a] min-w-0">
-                                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: tc.dot }} />
-                                  <span className="truncate">{attr.label_ko || attr.label || attr.attr_id}</span>
-                                  {attr.is_locked && (
-                                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#fef3c7] border border-[#fcd34d] text-[#92400e] flex-shrink-0">고정</span>
-                                  )}
-                                  {isInactive && (
-                                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#fee2e2] border border-[#fca5a5] text-[#b91c1c] flex-shrink-0">비활성</span>
-                                  )}
+              {sections.length === 0 ? (
+                <div className="flex-1 flex flex-col items-center justify-center text-center p-10">
+                  <h3 className="text-lg font-bold text-[#0f172a] mb-2">템플릿을 로드하세요</h3>
+                  <p className="text-sm text-[#64748b] mb-5 leading-relaxed">
+                    JSON 업로드 버튼을 클릭하여 템플릿을 불러오거나,<br />
+                    기본 샘플이 자동으로 로드됩니다.
+                  </p>
+                  <button
+                    onClick={() => { setUploadOpen(true); setUploadError(''); }}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-full tb-pill-primary text-sm font-bold transition"
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    JSON 업로드 시작
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {/* Tab bar */}
+                  <div className="flex-shrink-0 flex gap-1.5 p-3 border-b border-[#e2e8f0] bg-white overflow-x-auto">
+                    {sections.map((s, i) => {
+                      const tc = TAB_COLORS[i % TAB_COLORS.length];
+                      const isActive = i === activeTab;
+                      return (
+                        <button
+                          key={i}
+                          onClick={() => setActiveTab(i)}
+                          className={`flex items-center gap-1.5 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${isActive
+                            ? 'tb-pill-primary'
+                            : 'text-[#64748b] bg-[#f1f5f9] hover:bg-[#e2e8f0] tb-press-soft'
+                            }`}
+                        >
+                          <span
+                            className="w-1.5 h-1.5 rounded-full"
+                            style={{ background: isActive ? '#fff' : tc.dot, opacity: isActive ? 1 : 0.6 }}
+                          />
+                          {s.section_label_ko || s.section_id}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Tab content */}
+                  <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                    {currentSection && (currentSection.components || []).filter(c => c.is_active !== false).map(comp => {
+                      const tc = TAB_COLORS[activeTab % TAB_COLORS.length];
+                      return (
+                        <div key={comp.component_id} className="space-y-2">
+                          <div className="flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-wider text-[#64748b] px-1">
+                            <Layers className="w-3 h-3" />
+                            {comp.component_label_ko || comp.component_id}
+                          </div>
+                          <div className="space-y-1.5">
+                            {(comp.attributes || []).map(attr => {
+                              const displayVal = getDisplayValue(attr);
+                              const engVal = Array.isArray(attr.value) ? attr.value.join(', ') : (attr.value || '');
+                              const isInactive = attr.is_active === false;
+                              const isNoneVal = ['none', '없음', 'n/a', '-', ''].includes(String(attr.value || '').trim().toLowerCase());
+                              const opacity = isInactive ? 0.55 : isNoneVal ? 0.5 : 1;
+                              return (
+                                <div
+                                  key={attr.attr_id}
+                                  className="bg-white border border-[#e2e8f0] rounded-2xl overflow-hidden shadow-[0_2px_8px_rgba(15,23,42,0.04)]"
+                                  style={{ opacity }}
+                                >
+                                  <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-[#e2e8f0] bg-[#f8fafc]">
+                                    <div className="flex items-center gap-1.5 text-sm font-bold text-[#0f172a] min-w-0">
+                                      <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: tc.dot }} />
+                                      <span className="truncate">{attr.label_ko || attr.label || attr.attr_id}</span>
+                                      {attr.is_locked && (
+                                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#fef3c7] border border-[#fcd34d] text-[#92400e] flex-shrink-0">고정</span>
+                                      )}
+                                      {isInactive && (
+                                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#fee2e2] border border-[#fca5a5] text-[#b91c1c] flex-shrink-0">비활성</span>
+                                      )}
+                                    </div>
+                                    <div className="flex items-center gap-1 flex-shrink-0">
+                                      <button
+                                        onClick={() => copyText(engVal)}
+                                        className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[12px] font-bold text-[#64748b] tb-press-soft"
+                                      >
+                                        <Copy className="w-3 h-3" />
+                                        복사
+                                      </button>
+                                      <button
+                                        onClick={() => pasteText(currentSection.section_id, comp.component_id, attr.attr_id)}
+                                        className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[12px] font-bold text-[#64748b] tb-press-soft"
+                                      >
+                                        <Clipboard className="w-3 h-3" />
+                                        붙여넣기
+                                      </button>
+                                    </div>
+                                  </div>
+                                  <div className="flex gap-2 p-3 items-stretch">
+                                    <div className="flex-1 min-w-0 text-sm font-semibold text-[#334155] leading-relaxed py-1.5 px-2.5 rounded-xl bg-[#f8fafc] border border-[#e2e8f0]">
+                                      {displayVal}
+                                    </div>
+                                    <div className="w-px bg-[#e2e8f0] self-stretch" />
+                                    <textarea
+                                      rows={2}
+                                      value={engVal}
+                                      placeholder="영문 값 입력..."
+                                      onChange={(e) => updateAttr(currentSection.section_id, comp.component_id, attr.attr_id, e.target.value)}
+                                      className="flex-1 min-w-0 resize-none text-[13px] leading-relaxed text-[#0f172a] py-1.5 px-2.5 rounded-xl bg-white border border-[#e2e8f0] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
+                                    />
+                                  </div>
                                 </div>
-                                <div className="flex items-center gap-1 flex-shrink-0">
-                                  <button
-                                    onClick={() => copyText(engVal)}
-                                    className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[12px] font-bold text-[#64748b] tb-press-soft"
-                                  >
-                                    <Copy className="w-3 h-3" />
-                                    복사
-                                  </button>
-                                  <button
-                                    onClick={() => pasteText(currentSection.section_id, comp.component_id, attr.attr_id)}
-                                    className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[12px] font-bold text-[#64748b] tb-press-soft"
-                                  >
-                                    <Clipboard className="w-3 h-3" />
-                                    붙여넣기
-                                  </button>
-                                </div>
-                              </div>
-                              <div className="flex gap-2 p-3 items-stretch">
-                                <div className="flex-1 min-w-0 text-sm font-semibold text-[#334155] leading-relaxed py-1.5 px-2.5 rounded-xl bg-[#f8fafc] border border-[#e2e8f0]">
-                                  {displayVal}
-                                </div>
-                                <div className="w-px bg-[#e2e8f0] self-stretch" />
-                                <textarea
-                                  rows={2}
-                                  value={engVal}
-                                  placeholder="영문 값 입력..."
-                                  onChange={(e) => updateAttr(currentSection.section_id, comp.component_id, attr.attr_id, e.target.value)}
-                                  className="flex-1 min-w-0 resize-none text-[13px] leading-relaxed text-[#0f172a] py-1.5 px-2.5 rounded-xl bg-white border border-[#e2e8f0] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
-                                />
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
             </>
-          )}
-          </>
           )}
         </main>
       </div>
