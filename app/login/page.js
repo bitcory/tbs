@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth, signIn } from "@/auth";
 import * as S from "@/lib/uiStyles";
+import KakaoInAppGuard from "./KakaoInAppGuard";
 
 export default async function LoginPage() {
   const session = await auth();
@@ -10,6 +11,7 @@ export default async function LoginPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#f8fafc", color: "#0f172a" }} className="auth-scroll">
+      <KakaoInAppGuard />
       <section style={S.hero}>
         <div style={{ position: "relative", zIndex: 2 }}>
           <span style={S.heroEyebrow}>TB STUDY</span>

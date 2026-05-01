@@ -23,6 +23,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         });
       }
     },
+    // OAuth 콜백이 동시에 두 번 처리되면 User row가 두 개 만들어지는 race condition이 있음
+    // (특히 카카오톡 인앱브라우저에서 종종 발생). Account 연결이 끝난 시점에 같은 이름/계정없음/직전 1분 내 생성된 고아 row를 정리한다.
+    async linkAccount({ user }) {
+      if (!user?.id || !user?.name) return;
+      const cutoff = new Date(Date.now() - 60_000);
+      await prisma.user.deleteMany({
+        where: {
+          id: { not: user.id },
+          name: user.name,
+          onboarded: false,
+          createdAt: { gte: cutoff },
+          accounts: { none: {} },
+          sessions: { none: {} },
+        },
+      });
+    },
   },
   callbacks: {
     async session({ session, user }) {
