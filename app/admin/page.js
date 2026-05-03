@@ -40,56 +40,89 @@ const PAGE_SIZE = 30;
 export default async function AdminPage({ searchParams }) {
   const sp = (await searchParams) || {};
   const q = (typeof sp.q === "string" ? sp.q : "").trim();
+  const tab = sp.tab === "staff" ? "staff" : "user";
   const pageRaw = parseInt(typeof sp.page === "string" ? sp.page : "1", 10);
   const reqPage = Math.max(1, Number.isFinite(pageRaw) ? pageRaw : 1);
 
   const me = await requireAdmin();
   const isSuper = me.role === "SUPER_ADMIN";
 
-  // 운영진(STAFF / SUPER_ADMIN)은 항상 상단에 전체 표시 (검색·페이지네이션 무관).
-  // 일반회원(USER)만 검색 + 페이지네이션 적용.
+  // 검색 OR 절. 활성 탭에만 적용.
+  const searchOR = q
+    ? [
+        { nickname: { contains: q, mode: "insensitive" } },
+        { name:     { contains: q, mode: "insensitive" } },
+        { email:    { contains: q, mode: "insensitive" } },
+        { phone:    { contains: q } },
+      ]
+    : null;
+
   const userWhere = {
     role: "USER",
-    ...(q
-      ? {
-          OR: [
-            { nickname: { contains: q, mode: "insensitive" } },
-            { name:     { contains: q, mode: "insensitive" } },
-            { email:    { contains: q, mode: "insensitive" } },
-            { phone:    { contains: q } },
-          ],
-        }
-      : {}),
+    ...(searchOR && tab === "user" ? { OR: searchOR } : {}),
+  };
+  const staffWhere = {
+    role: { in: ["STAFF", "SUPER_ADMIN"] },
+    ...(searchOR && tab === "staff" ? { OR: searchOR } : {}),
   };
 
-  const [staffUsers, filteredCount, totalUserCount] = await Promise.all([
-    prisma.user.findMany({
-      where: { role: { in: ["STAFF", "SUPER_ADMIN"] } },
-      orderBy: [{ role: "desc" }, { createdAt: "asc" }], // SUPER_ADMIN → STAFF (enum 순서: USER, STAFF, SUPER_ADMIN → desc 시 SUPER_ADMIN 우선)
-    }),
-    prisma.user.count({ where: userWhere }),
+  // 5개 쿼리 단일 round-trip 으로 병렬 실행.
+  const [
+    userTotalCount,
+    staffTotalCount,
+    userFilteredCount,
+    userRowsRaw,
+    staffUsers,
+  ] = await Promise.all([
     prisma.user.count({ where: { role: "USER" } }),
+    prisma.user.count({ where: { role: { in: ["STAFF", "SUPER_ADMIN"] } } }),
+    prisma.user.count({ where: userWhere }),
+    prisma.user.findMany({
+      where: userWhere,
+      orderBy: { createdAt: "desc" },
+      skip: (reqPage - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.user.findMany({
+      where: staffWhere,
+      orderBy: [{ role: "desc" }, { createdAt: "asc" }],
+    }),
   ]);
-  const totalPages = Math.max(1, Math.ceil(filteredCount / PAGE_SIZE));
+
+  const totalPages = Math.max(1, Math.ceil(userFilteredCount / PAGE_SIZE));
   const page = Math.min(reqPage, totalPages);
 
-  const userRows = await prisma.user.findMany({
-    where: userWhere,
-    orderBy: { createdAt: "desc" },
-    skip: (page - 1) * PAGE_SIZE,
-    take: PAGE_SIZE,
-  });
+  // 만약 reqPage 가 totalPages 를 초과해 빈 결과가 나오면 클램프된 페이지로 fallback.
+  const userRows = (userRowsRaw.length === 0 && reqPage > 1 && userFilteredCount > 0)
+    ? await prisma.user.findMany({
+        where: userWhere,
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * PAGE_SIZE,
+        take: PAGE_SIZE,
+      })
+    : userRowsRaw;
 
-  const start = filteredCount === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
-  const end = Math.min(page * PAGE_SIZE, filteredCount);
+  const filteredCount = tab === "staff" ? staffUsers.length : userFilteredCount;
+  const start = tab === "staff"
+    ? (staffUsers.length === 0 ? 0 : 1)
+    : (userFilteredCount === 0 ? 0 : (page - 1) * PAGE_SIZE + 1);
+  const end = tab === "staff"
+    ? staffUsers.length
+    : Math.min(page * PAGE_SIZE, userFilteredCount);
 
-  function pageHref(p) {
+  // URL 헬퍼 — 다른 param 보존
+  function buildHref({ tab: t = tab, q: nq = q, page: np = 1 } = {}) {
     const params = new URLSearchParams();
-    if (q) params.set("q", q);
-    if (p > 1) params.set("page", String(p));
+    if (nq) params.set("q", nq);
+    if (t === "staff") params.set("tab", "staff");
+    if (np > 1) params.set("page", String(np));
     const qs = params.toString();
     return qs ? `/admin?${qs}` : "/admin";
   }
+  const pageHref = (p) => buildHref({ page: p });
+  const tabHref = (t) => buildHref({ tab: t, page: 1 });
+
+  const visibleRows = tab === "staff" ? staffUsers : userRows;
 
   return (
     <div style={{ minHeight: "100vh", background: "#f8fafc", color: "#0f172a" }} className="auth-scroll">
@@ -98,7 +131,7 @@ export default async function AdminPage({ searchParams }) {
           <span style={S.heroEyebrow}>ADMIN</span>
           <h1 style={S.heroTitle}>관리자 페이지</h1>
           <p style={S.heroSubtitle}>
-            운영진 {staffUsers.length}명 · 일반 회원 {totalUserCount}명 · 내 권한 <b>{ROLE_LABEL[me.role]}</b>
+            운영진 {staffTotalCount}명 · 일반 회원 {userTotalCount}명 · 내 권한 <b>{ROLE_LABEL[me.role]}</b>
             {!isSuper && " (운영진은 단계 권한만 변경 가능)"}
           </p>
         </div>
@@ -114,13 +147,62 @@ export default async function AdminPage({ searchParams }) {
           <Link href="/" className="glass-hoverable" style={S.ghostBtn}>← 홈으로</Link>
         </div>
 
+        {/* Tabs */}
+        <div
+          style={{
+            display: "flex",
+            gap: 4,
+            marginBottom: 14,
+            borderBottom: "1px solid #e2e8f0",
+          }}
+        >
+          {[
+            { key: "user",  label: "일반 회원", count: userTotalCount },
+            { key: "staff", label: "운영진",   count: staffTotalCount },
+          ].map((t) => {
+            const active = tab === t.key;
+            return (
+              <Link
+                key={t.key}
+                href={tabHref(t.key)}
+                style={{
+                  padding: "12px 20px",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: active ? "#016837" : "#64748b",
+                  borderBottom: active ? "3px solid #016837" : "3px solid transparent",
+                  marginBottom: -1,
+                  textDecoration: "none",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                }}
+              >
+                {t.label}
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    padding: "2px 8px",
+                    borderRadius: 999,
+                    background: active ? "#dcfce7" : "#f1f5f9",
+                    color: active ? "#016837" : "#64748b",
+                  }}
+                >
+                  {t.count}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+
         <AdminSearchBox
           initialQ={q}
           resultLabel={
             (q
               ? `"${q}" 검색 결과 ${filteredCount}명`
-              : `일반 회원 ${filteredCount}명`) +
-            (filteredCount > 0 ? ` · ${start}-${end} 표시 중` : "")
+              : `${tab === "staff" ? "운영진" : "일반 회원"} ${filteredCount}명`) +
+            (tab === "user" && filteredCount > 0 ? ` · ${start}-${end} 표시 중` : "")
           }
         />
 
@@ -154,37 +236,7 @@ export default async function AdminPage({ searchParams }) {
                 </tr>
               </thead>
               <tbody>
-                {[
-                  ...staffUsers.map((u) => ({ kind: "user", u })),
-                  ...(staffUsers.length > 0 && userRows.length > 0
-                    ? [{ kind: "divider" }]
-                    : []),
-                  ...userRows.map((u) => ({ kind: "user", u })),
-                ].map((row, idx) => {
-                  if (row.kind === "divider") {
-                    return (
-                      <tr key="divider-staff-user">
-                        <td
-                          colSpan={isSuper ? 13 : 12}
-                          style={{
-                            padding: "8px 12px",
-                            background: "#f8fafc",
-                            color: "#64748b",
-                            fontSize: 11,
-                            fontWeight: 800,
-                            letterSpacing: "0.14em",
-                            textTransform: "uppercase",
-                            borderTop: "1px solid #e2e8f0",
-                            borderBottom: "1px solid #e2e8f0",
-                          }}
-                        >
-                          일반 회원
-                          {q && ` · "${q}" 검색 결과 ${filteredCount}명`}
-                        </td>
-                      </tr>
-                    );
-                  }
-                  const u = row.u;
+                {visibleRows.map((u) => {
                   const isSelf = u.id === me.id;
                   const isTargetSuper = u.role === "SUPER_ADMIN";
                   const canEditRole = isSuper && !isSelf && !isTargetSuper;
@@ -350,13 +402,17 @@ export default async function AdminPage({ searchParams }) {
                     </tr>
                   );
                 })}
-                {userRows.length === 0 && (
+                {visibleRows.length === 0 && (
                   <tr>
                     <td
                       colSpan={isSuper ? 13 : 12}
                       style={{ padding: "40px 12px", textAlign: "center", color: "#94a3b8", fontSize: 14, borderTop: "1px solid #e2e8f0" }}
                     >
-                      {q ? `"${q}" 검색 결과가 없습니다.` : "표시할 일반 회원이 없습니다."}
+                      {q
+                        ? `"${q}" 검색 결과가 없습니다.`
+                        : tab === "staff"
+                        ? "운영진이 없습니다."
+                        : "표시할 일반 회원이 없습니다."}
                     </td>
                   </tr>
                 )}
@@ -365,8 +421,8 @@ export default async function AdminPage({ searchParams }) {
           </div>
         </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
+        {/* Pagination — user 탭에서만 */}
+        {tab === "user" && totalPages > 1 && (
           <nav
             style={{
               display: "flex",

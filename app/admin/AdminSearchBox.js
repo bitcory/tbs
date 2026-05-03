@@ -1,29 +1,32 @@
 "use client";
 
 import { useState, useEffect, useTransition } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
-// 입력 → 300ms 디바운스 → URL push (?q=...). 서버 컴포넌트가 새 결과를 렌더링.
+// 입력 → 150ms 디바운스 → URL push (q 변경, page 리셋, 다른 param 은 보존).
 export default function AdminSearchBox({ initialQ = "", resultLabel = "" }) {
   const [value, setValue] = useState(initialQ);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (value === initialQ) return;
     const t = setTimeout(() => {
       const trimmed = value.trim();
-      const params = new URLSearchParams();
+      const params = new URLSearchParams(searchParams);
       if (trimmed) params.set("q", trimmed);
-      // 검색이 바뀌면 페이지는 1로 리셋 (page param 미설정)
+      else params.delete("q");
+      // 검색이 바뀌면 페이지는 1로 리셋
+      params.delete("page");
       const qs = params.toString();
       startTransition(() => {
         router.push(qs ? `${pathname}?${qs}` : pathname);
       });
-    }, 300);
+    }, 150);
     return () => clearTimeout(t);
-  }, [value, initialQ, router, pathname]);
+  }, [value, initialQ, router, pathname, searchParams]);
 
   // initialQ 가 외부(다른 링크 등)에서 바뀌면 입력값도 동기화
   useEffect(() => {
