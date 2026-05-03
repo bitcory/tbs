@@ -5,6 +5,7 @@ import { toggleStepAccess } from "./actions";
 import RoleSelect from "./RoleSelect";
 import DeleteUserButton from "./DeleteUserButton";
 import StepGroupDropdown from "./StepGroupDropdown";
+import AdminSearchBox from "./AdminSearchBox";
 import * as S from "@/lib/uiStyles";
 
 const ROLE_LABEL = { USER: "일반", STAFF: "운영진", SUPER_ADMIN: "슈퍼" };
@@ -34,12 +35,61 @@ const PRO_STEPS = [
   { step: 3, label: "PRO 4" },
 ];
 
-export default async function AdminPage() {
+const PAGE_SIZE = 30;
+
+export default async function AdminPage({ searchParams }) {
+  const sp = (await searchParams) || {};
+  const q = (typeof sp.q === "string" ? sp.q : "").trim();
+  const pageRaw = parseInt(typeof sp.page === "string" ? sp.page : "1", 10);
+  const reqPage = Math.max(1, Number.isFinite(pageRaw) ? pageRaw : 1);
+
   const me = await requireAdmin();
   const isSuper = me.role === "SUPER_ADMIN";
-  const users = await prisma.user.findMany({
-    orderBy: [{ role: "desc" }, { createdAt: "asc" }],
+
+  // 운영진(STAFF / SUPER_ADMIN)은 항상 상단에 전체 표시 (검색·페이지네이션 무관).
+  // 일반회원(USER)만 검색 + 페이지네이션 적용.
+  const userWhere = {
+    role: "USER",
+    ...(q
+      ? {
+          OR: [
+            { nickname: { contains: q, mode: "insensitive" } },
+            { name:     { contains: q, mode: "insensitive" } },
+            { email:    { contains: q, mode: "insensitive" } },
+            { phone:    { contains: q } },
+          ],
+        }
+      : {}),
+  };
+
+  const [staffUsers, filteredCount, totalUserCount] = await Promise.all([
+    prisma.user.findMany({
+      where: { role: { in: ["STAFF", "SUPER_ADMIN"] } },
+      orderBy: [{ role: "desc" }, { createdAt: "asc" }], // SUPER_ADMIN → STAFF (enum 순서: USER, STAFF, SUPER_ADMIN → desc 시 SUPER_ADMIN 우선)
+    }),
+    prisma.user.count({ where: userWhere }),
+    prisma.user.count({ where: { role: "USER" } }),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(filteredCount / PAGE_SIZE));
+  const page = Math.min(reqPage, totalPages);
+
+  const userRows = await prisma.user.findMany({
+    where: userWhere,
+    orderBy: { createdAt: "desc" },
+    skip: (page - 1) * PAGE_SIZE,
+    take: PAGE_SIZE,
   });
+
+  const start = filteredCount === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+  const end = Math.min(page * PAGE_SIZE, filteredCount);
+
+  function pageHref(p) {
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    if (p > 1) params.set("page", String(p));
+    const qs = params.toString();
+    return qs ? `/admin?${qs}` : "/admin";
+  }
 
   return (
     <div style={{ minHeight: "100vh", background: "#f8fafc", color: "#0f172a" }} className="auth-scroll">
@@ -48,7 +98,7 @@ export default async function AdminPage() {
           <span style={S.heroEyebrow}>ADMIN</span>
           <h1 style={S.heroTitle}>관리자 페이지</h1>
           <p style={S.heroSubtitle}>
-            총 회원 {users.length}명 · 내 권한 <b>{ROLE_LABEL[me.role]}</b>
+            운영진 {staffUsers.length}명 · 일반 회원 {totalUserCount}명 · 내 권한 <b>{ROLE_LABEL[me.role]}</b>
             {!isSuper && " (운영진은 단계 권한만 변경 가능)"}
           </p>
         </div>
@@ -63,6 +113,16 @@ export default async function AdminPage() {
           <Link href="/mypage" className="glass-hoverable" style={S.ghostBtn}>마이페이지</Link>
           <Link href="/" className="glass-hoverable" style={S.ghostBtn}>← 홈으로</Link>
         </div>
+
+        <AdminSearchBox
+          initialQ={q}
+          resultLabel={
+            (q
+              ? `"${q}" 검색 결과 ${filteredCount}명`
+              : `일반 회원 ${filteredCount}명`) +
+            (filteredCount > 0 ? ` · ${start}-${end} 표시 중` : "")
+          }
+        />
 
         <div style={{ ...S.card, padding: 0, overflow: "hidden" }}>
           <div style={{ overflowX: "auto" }}>
@@ -94,7 +154,37 @@ export default async function AdminPage() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((u) => {
+                {[
+                  ...staffUsers.map((u) => ({ kind: "user", u })),
+                  ...(staffUsers.length > 0 && userRows.length > 0
+                    ? [{ kind: "divider" }]
+                    : []),
+                  ...userRows.map((u) => ({ kind: "user", u })),
+                ].map((row, idx) => {
+                  if (row.kind === "divider") {
+                    return (
+                      <tr key="divider-staff-user">
+                        <td
+                          colSpan={isSuper ? 13 : 12}
+                          style={{
+                            padding: "8px 12px",
+                            background: "#f8fafc",
+                            color: "#64748b",
+                            fontSize: 11,
+                            fontWeight: 800,
+                            letterSpacing: "0.14em",
+                            textTransform: "uppercase",
+                            borderTop: "1px solid #e2e8f0",
+                            borderBottom: "1px solid #e2e8f0",
+                          }}
+                        >
+                          일반 회원
+                          {q && ` · "${q}" 검색 결과 ${filteredCount}명`}
+                        </td>
+                      </tr>
+                    );
+                  }
+                  const u = row.u;
                   const isSelf = u.id === me.id;
                   const isTargetSuper = u.role === "SUPER_ADMIN";
                   const canEditRole = isSuper && !isSelf && !isTargetSuper;
@@ -260,14 +350,101 @@ export default async function AdminPage() {
                     </tr>
                   );
                 })}
+                {userRows.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={isSuper ? 13 : 12}
+                      style={{ padding: "40px 12px", textAlign: "center", color: "#94a3b8", fontSize: 14, borderTop: "1px solid #e2e8f0" }}
+                    >
+                      {q ? `"${q}" 검색 결과가 없습니다.` : "표시할 일반 회원이 없습니다."}
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <nav
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: 8,
+              marginTop: 18,
+              flexWrap: "wrap",
+            }}
+          >
+            {page > 1 ? (
+              <Link href={pageHref(page - 1)} className="tb-press-soft" style={pageBtn}>
+                ‹ 이전
+              </Link>
+            ) : (
+              <span style={{ ...pageBtn, opacity: 0.4, cursor: "not-allowed" }}>‹ 이전</span>
+            )}
+
+            {pageNumbers(page, totalPages).map((p, i) =>
+              p === "…" ? (
+                <span key={`gap-${i}`} style={{ padding: "0 6px", color: "#94a3b8" }}>…</span>
+              ) : p === page ? (
+                <span
+                  key={p}
+                  style={{ ...pageBtn, background: "#016837", color: "#fff", fontWeight: 800, border: "1px solid #016837" }}
+                >
+                  {p}
+                </span>
+              ) : (
+                <Link key={p} href={pageHref(p)} className="tb-press-soft" style={pageBtn}>
+                  {p}
+                </Link>
+              )
+            )}
+
+            {page < totalPages ? (
+              <Link href={pageHref(page + 1)} className="tb-press-soft" style={pageBtn}>
+                다음 ›
+              </Link>
+            ) : (
+              <span style={{ ...pageBtn, opacity: 0.4, cursor: "not-allowed" }}>다음 ›</span>
+            )}
+          </nav>
+        )}
       </div>
     </div>
   );
 }
+
+// 1 … 4 5 [6] 7 8 … 23 형태로 페이지 번호 배열 만들기
+function pageNumbers(current, total) {
+  const out = [];
+  const window = 1; // current ± window
+  const lo = Math.max(2, current - window);
+  const hi = Math.min(total - 1, current + window);
+  out.push(1);
+  if (lo > 2) out.push("…");
+  for (let i = lo; i <= hi; i++) out.push(i);
+  if (hi < total - 1) out.push("…");
+  if (total > 1) out.push(total);
+  return out;
+}
+
+const pageBtn = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  minWidth: 36,
+  height: 36,
+  padding: "0 12px",
+  borderRadius: 8,
+  border: "1px solid #e2e8f0",
+  background: "#fff",
+  color: "#0f172a",
+  fontSize: 13,
+  fontWeight: 600,
+  textDecoration: "none",
+};
 
 const th = { textAlign: "left", padding: "14px 12px", fontWeight: 700, fontSize: 12, letterSpacing: "0.05em", textTransform: "uppercase", color: "#64748b", whiteSpace: "nowrap" };
 const td = { padding: "14px 12px", verticalAlign: "middle", color: "#0f172a", whiteSpace: "nowrap" };

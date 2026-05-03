@@ -50,7 +50,7 @@ function shiftDateKey(baseKey, deltaDays) {
   return dateKey(d);
 }
 
-function buildMonthGrid(year, month) {
+function buildMonthGrid(year, month, todayKey) {
   const first = new Date(year, month, 1);
   const startDay = first.getDay();
   const start = new Date(year, month, 1 - startDay);
@@ -61,7 +61,7 @@ function buildMonthGrid(year, month) {
       date: d,
       key: dateKey(d),
       inMonth: d.getMonth() === month,
-      isToday: dateKey(d) === dateKey(new Date()),
+      isToday: dateKey(d) === todayKey,
     });
   }
   return cells;
@@ -89,11 +89,18 @@ function canDeleteSession(me, sess) {
   return !isPastSession(sess);
 }
 
-export default function ScheduleClient({ me, sessions, staffUsers, memberUsers, pricing = {} }) {
-  const today = new Date();
-  const [viewYear,  setViewYear]  = useState(today.getFullYear());
-  const [viewMonth, setViewMonth] = useState(today.getMonth());
-  const [selectedKey, setSelectedKey] = useState(dateKey(today));
+export default function ScheduleClient({ me, sessions, staffUsers, memberUsers, pricing = {}, serverNowIso }) {
+  // 서버에서 받은 ISO 시각으로 today 를 고정 — SSR ↔ 클라이언트 hydration 사이
+  // new Date() 로 인한 mismatch (React #418) 를 막는다.
+  const today = useMemo(
+    () => (serverNowIso ? new Date(serverNowIso) : new Date()),
+    [serverNowIso]
+  );
+  const todayKey = useMemo(() => dateKey(today), [today]);
+
+  const [viewYear,  setViewYear]  = useState(() => today.getFullYear());
+  const [viewMonth, setViewMonth] = useState(() => today.getMonth());
+  const [selectedKey, setSelectedKey] = useState(() => todayKey);
   const [modal, setModal] = useState(null); // null | {mode:'new', date} | {mode:'edit', session}
   const [enrollPickerFor, setEnrollPickerFor] = useState(null); // sessionId
   const [pending, startTransition] = useTransition();
@@ -112,7 +119,7 @@ export default function ScheduleClient({ me, sessions, staffUsers, memberUsers, 
     return m;
   }, [sessions]);
 
-  const grid = useMemo(() => buildMonthGrid(viewYear, viewMonth), [viewYear, viewMonth]);
+  const grid = useMemo(() => buildMonthGrid(viewYear, viewMonth, todayKey), [viewYear, viewMonth, todayKey]);
   const selectedSessions = sessionsByDay.get(selectedKey) || [];
 
   function gotoMonth(delta) {
@@ -284,7 +291,7 @@ const addBtn = {
 
 function CalendarGrid({ grid, sessionsByDay, selectedKey, onSelect }) {
   return (
-    <div style={{
+    <div className="tb-cal" style={{
       background: "#fff", borderRadius: 14,
       border: "1px solid rgba(15,23,42,0.06)", boxShadow: "0 4px 14px rgba(15,23,42,0.05)",
       overflow: "hidden",
@@ -310,6 +317,7 @@ function CalendarGrid({ grid, sessionsByDay, selectedKey, onSelect }) {
             <button
               key={cell.key + i}
               onClick={() => onSelect(cell.key)}
+              className="tb-cal-cell"
               style={{
                 position: "relative",
                 minHeight: 92,
@@ -324,18 +332,18 @@ function CalendarGrid({ grid, sessionsByDay, selectedKey, onSelect }) {
                 outlineOffset: -2,
               }}
             >
-              <div style={{
+              <div className="tb-cal-date" style={{
                 fontSize: 13, fontWeight: cell.isToday ? 800 : 600,
                 color: dow === 0 ? "#dc2626" : dow === 6 ? "#2563eb" : (cell.inMonth ? "#0f172a" : "#cbd5e1"),
                 marginBottom: 4,
               }}>
                 {cell.date.getDate()}
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <div className="tb-cal-chips" style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 {items.slice(0, 3).map((s) => {
                   const c = CLASS_TYPE_COLOR[s.classType];
                   return (
-                    <div key={s.id} style={{
+                    <div key={s.id} className="tb-cal-chip" style={{
                       fontSize: 11, fontWeight: 700, padding: "2px 6px", borderRadius: 6,
                       background: c.bg, color: c.fg, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
                     }}>
@@ -344,13 +352,39 @@ function CalendarGrid({ grid, sessionsByDay, selectedKey, onSelect }) {
                   );
                 })}
                 {items.length > 3 && (
-                  <div style={{ fontSize: 11, color: "#64748b" }}>+{items.length - 3}</div>
+                  <div className="tb-cal-more" style={{ fontSize: 11, color: "#64748b" }}>+{items.length - 3}</div>
                 )}
               </div>
             </button>
           );
         })}
       </div>
+
+      {/* Mobile: 좁은 칸에 텍스트가 깨지는 걸 방지하려고
+          chip 텍스트는 숨기고 컬러 바만 노출. 셀 높이도 압축. */}
+      <style jsx>{`
+        @media (max-width: 640px) {
+          .tb-cal :global(.tb-cal-cell) {
+            min-height: 64px !important;
+            padding: 4px !important;
+          }
+          .tb-cal :global(.tb-cal-date) {
+            font-size: 12px !important;
+            margin-bottom: 2px !important;
+          }
+          .tb-cal :global(.tb-cal-chip) {
+            padding: 0 !important;
+            height: 4px !important;
+            font-size: 0 !important;
+            line-height: 0 !important;
+            border-radius: 2px !important;
+          }
+          .tb-cal :global(.tb-cal-more) {
+            font-size: 9px !important;
+            margin-top: 2px;
+          }
+        }
+      `}</style>
     </div>
   );
 }
@@ -427,6 +461,24 @@ function SessionCard({ sess, me, onEdit, onDelete, onOpenEnroll, onSetStatus, on
         <Info label="참가" value={`${sess.counts.attendees}명`} highlight />
       </div>
 
+      {sess.note && sess.note.trim() && (
+        <div style={{
+          background: "#fffbeb",
+          border: "1px solid #fde68a",
+          borderRadius: 10,
+          padding: "10px 12px",
+          marginBottom: 10,
+          fontSize: 13,
+          lineHeight: 1.6,
+          color: "#78350f",
+          whiteSpace: "pre-line",
+          wordBreak: "break-word",
+        }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: "#92400e", marginBottom: 4, letterSpacing: "0.04em" }}>📝 메모</div>
+          {sess.note}
+        </div>
+      )}
+
       {sess.scope.canSeeAnything && (
         <RevenueBox revenue={sess.revenue} scope={sess.scope} />
       )}
@@ -469,10 +521,10 @@ function Info({ label, value, highlight }) {
 
 function RevenueBox({ revenue, scope }) {
   const items = [
-    scope.canSeeTotal     && { k: "총합계", v: revenue.total,     accent: "#0f172a" },
-    scope.canSeeToolb     && { k: "툴비 (50%)",   v: revenue.toolb,     accent: "#016837" },
-    scope.canSeeMain      && { k: "주강사 (35%)", v: revenue.main,      accent: "#1d4ed8" },
-    scope.canSeeAssistant && { k: "보조강사 (15%)", v: revenue.assistant, accent: "#7e22ce" },
+    scope.canSeeTotal     && { k: "총합계",   v: revenue.total,     accent: "#0f172a" },
+    scope.canSeeToolb     && { k: "툴비",     v: revenue.toolb,     accent: "#016837" },
+    scope.canSeeMain      && { k: "주강사",   v: revenue.main,      accent: "#1d4ed8" },
+    scope.canSeeAssistant && { k: "보조강사", v: revenue.assistant, accent: "#7e22ce" },
   ].filter(Boolean);
 
   if (items.length === 0) return null;
@@ -617,13 +669,26 @@ function SessionModal({ mode, initialDate, session, staffUsers, pricing, onClose
         </Field>
         <Field label="클래스 / 단계">
           <select value={form.slotKey} onChange={(e) => set("slotKey", e.target.value)} style={S.input}>
-            {SESSION_STEP_OPTIONS.map((slot) => {
-              const key = pricingKey(slot.classType, slot.stepLevel);
-              const row = lookupPricing(pricing, slot.classType, slot.stepLevel);
-              const label = formatClassLabel(slot.classType, slot.stepLevel);
-              const priceTxt = row ? ` (${row.pricePerPerson.toLocaleString("ko-KR")}원)` : "";
-              return <option key={key} value={key}>{label}{priceTxt}</option>;
-            })}
+            {(() => {
+              const known = new Set(
+                SESSION_STEP_OPTIONS.map((o) => pricingKey(o.classType, o.stepLevel))
+              );
+              // 기존(legacy) slot — 예: stepLevel=1 (UP 1단계 parent) — 이 dropdown 에
+              // 없으면 편집 시 visible state 와 form state 가 어긋난다. 동적으로 추가.
+              const opts = known.has(form.slotKey)
+                ? SESSION_STEP_OPTIONS
+                : (() => {
+                    const [ct, lv] = form.slotKey.split("_");
+                    return [{ classType: ct, stepLevel: Number(lv) }, ...SESSION_STEP_OPTIONS];
+                  })();
+              return opts.map((slot) => {
+                const key = pricingKey(slot.classType, slot.stepLevel);
+                const row = lookupPricing(pricing, slot.classType, slot.stepLevel);
+                const label = formatClassLabel(slot.classType, slot.stepLevel);
+                const priceTxt = row ? ` (${row.pricePerPerson.toLocaleString("ko-KR")}원)` : "";
+                return <option key={key} value={key}>{label}{priceTxt}</option>;
+              });
+            })()}
           </select>
         </Field>
         <Row>

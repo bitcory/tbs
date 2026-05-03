@@ -107,6 +107,7 @@ export default async function SchedulePage() {
           staffUsers={staffUsers}
           memberUsers={memberUsers}
           pricing={pricingMap}
+          serverNowIso={new Date().toISOString()}
         />
       </div>
     </div>
