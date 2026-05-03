@@ -4,8 +4,9 @@ import { useMemo, useState, useTransition } from "react";
 import * as S from "@/lib/uiStyles";
 import {
   CLASS_TYPE_LABEL, CLASS_TYPE_COLOR, formatKRW,
-  PRICING_SLOTS, formatClassLabel, pricingKey, lookupPricing,
+  PRICING_SLOTS, SESSION_STEP_OPTIONS, formatClassLabel, pricingKey, lookupPricing,
 } from "@/lib/pricing";
+import { sessionMaterialsStep, hasStepMaterials } from "@/lib/stepMaterials";
 import {
   createSession,
   updateSession,
@@ -13,6 +14,7 @@ import {
   addEnrollment,
   setEnrollmentStatus,
   removeEnrollment,
+  sendMaterialsForEnrollment,
 } from "./actions";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
@@ -190,6 +192,19 @@ export default function ScheduleClient({ me, sessions, staffUsers, memberUsers, 
           if (!confirm("참가자에서 제외할까요?")) return;
           startTransition(() => removeEnrollment(eid));
         }}
+        onSendMaterials={(eid) => {
+          if (!confirm("이 수강생의 이메일로 강의자료를 발송할까요?")) return;
+          startTransition(async () => {
+            try {
+              const r = await sendMaterialsForEnrollment(eid);
+              if (r?.ok) alert("✅ " + r.message);
+              else       alert("⚠ " + (r?.message || "발송에 실패했습니다."));
+            } catch (e) {
+              console.error(e);
+              alert("⚠ 발송에 실패했습니다.");
+            }
+          });
+        }}
         pending={pending}
       />
 
@@ -338,7 +353,7 @@ function CalendarGrid({ grid, sessionsByDay, selectedKey, onSelect }) {
   );
 }
 
-function DayDetail({ dateKey, sessions, me, onEdit, onAdd, onDelete, onOpenEnroll, onSetStatus, onRemoveEnroll, pending }) {
+function DayDetail({ dateKey, sessions, me, onEdit, onAdd, onDelete, onOpenEnroll, onSetStatus, onRemoveEnroll, onSendMaterials, pending }) {
   return (
     <div style={{
       background: "#fff", borderRadius: 14, padding: 20,
@@ -362,6 +377,7 @@ function DayDetail({ dateKey, sessions, me, onEdit, onAdd, onDelete, onOpenEnrol
               onOpenEnroll={() => onOpenEnroll(s.id)}
               onSetStatus={onSetStatus}
               onRemoveEnroll={onRemoveEnroll}
+              onSendMaterials={onSendMaterials}
               pending={pending}
             />
           ))}
@@ -376,7 +392,7 @@ const subAddBtn = {
   color: "#0f172a", background: "#fff", border: "1px solid #e2e8f0", cursor: "pointer",
 };
 
-function SessionCard({ sess, me, onEdit, onDelete, onOpenEnroll, onSetStatus, onRemoveEnroll, pending }) {
+function SessionCard({ sess, me, onEdit, onDelete, onOpenEnroll, onSetStatus, onRemoveEnroll, onSendMaterials, pending }) {
   const c = CLASS_TYPE_COLOR[sess.classType];
   const showEdit = canEditSession(me, sess);
   const showDelete = canDeleteSession(me, sess);
@@ -426,8 +442,10 @@ function SessionCard({ sess, me, onEdit, onDelete, onOpenEnroll, onSetStatus, on
               <EnrollmentRow
                 key={e.id}
                 e={e}
+                session={sess}
                 onSetStatus={(status) => onSetStatus(e.id, status)}
                 onRemove={() => onRemoveEnroll(e.id)}
+                onSendMaterials={() => onSendMaterials(e.id)}
                 pending={pending}
               />
             ))}
@@ -483,7 +501,17 @@ const STATUS_STYLE = {
   CANCELLED: { label: "취소", bg: "#fee2e2", fg: "#b91c1c" },
 };
 
-function EnrollmentRow({ e, onSetStatus, onRemove, pending }) {
+function EnrollmentRow({ e, session, onSetStatus, onRemove, onSendMaterials, pending }) {
+  const matStep = session ? sessionMaterialsStep(session.classType, session.stepLevel) : null;
+  const materialsReady = !!matStep && hasStepMaterials(matStep);
+  const isAttended = e.status === "ATTENDED";
+  const canSendMaterials = materialsReady && isAttended;
+  const sendTitle = !materialsReady
+    ? "이 단계의 자료는 아직 준비중입니다"
+    : !isAttended
+    ? "참가 확정된 수강생에게만 발송할 수 있습니다"
+    : "수강생 이메일로 강의자료 발송";
+
   return (
     <li style={{
       display: "flex", justifyContent: "space-between", alignItems: "center",
@@ -499,6 +527,22 @@ function EnrollmentRow({ e, onSetStatus, onRemove, pending }) {
         </span>
       </div>
       <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+        <button
+          onClick={onSendMaterials}
+          disabled={pending || !canSendMaterials}
+          className="tb-press-soft"
+          title={sendTitle}
+          style={{
+            ...miniBtn,
+            padding: "4px 10px", fontSize: 11,
+            color: canSendMaterials ? "#1d4ed8" : "#94a3b8",
+            background: canSendMaterials ? "#eff6ff" : "#fff",
+            borderColor: canSendMaterials ? "#bfdbfe" : "#e2e8f0",
+            fontWeight: canSendMaterials ? 700 : 500,
+          }}
+        >
+          {!materialsReady ? "📩 준비중" : "📩 자료발송"}
+        </button>
         {["APPLIED", "ATTENDED", "CANCELLED"].map((st) => (
           <button
             key={st}
@@ -571,7 +615,7 @@ function SessionModal({ mode, initialDate, session, staffUsers, pricing, onClose
         </Field>
         <Field label="클래스 / 단계">
           <select value={form.slotKey} onChange={(e) => set("slotKey", e.target.value)} style={S.input}>
-            {PRICING_SLOTS.map((slot) => {
+            {SESSION_STEP_OPTIONS.map((slot) => {
               const key = pricingKey(slot.classType, slot.stepLevel);
               const row = lookupPricing(pricing, slot.classType, slot.stepLevel);
               const label = formatClassLabel(slot.classType, slot.stepLevel);

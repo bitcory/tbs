@@ -5,10 +5,7 @@ import { prisma } from "@/lib/prisma";
 import * as S from "@/lib/uiStyles";
 import ProfileEditor from "./ProfileEditor";
 import BankInfoEditor from "./BankInfoEditor";
-import MaterialRequestButton from "./MaterialRequestButton";
-import { updateProfile, updateBankInfo, requestMaterials } from "./actions";
-import { hasStepMaterials, MYPAGE_STEP_ORDER } from "@/lib/stepMaterials";
-import { stepLabel, stepCourseTitle } from "@/lib/stepLabel";
+import { updateProfile, updateBankInfo } from "./actions";
 import {
   Home, Calendar, ShieldCheck, LogOut,
   Camera, Search, Film, MessagesSquare, ArrowUpRight,
@@ -85,52 +82,6 @@ export default async function MyPage() {
             <span style={{ color: "#64748b", fontSize: 13 }}>가입일 {new Date(me.createdAt).toLocaleDateString("ko-KR")}</span>
           </div>
 
-          <div style={{ fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 10 }}>
-            단계 접근권한 & 강의자료
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {MYPAGE_STEP_ORDER.map((n) => {
-              const variantCodes = n === 1 ? [1, 11, 12, 13, 14] : [n];
-              const ok =
-                me.role !== "USER" ||
-                variantCodes.some((c) => me.stepAccess.includes(c));
-              const ready = hasStepMaterials(n);
-              const title = stepCourseTitle(n);
-              return (
-                <div
-                  key={n}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 12,
-                    padding: "12px 14px",
-                    background: "#f8fafc",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: 14,
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 0 }}>
-                    <span style={{ ...S.badge(ok ? S.badgeGreen : S.badgeGray), alignSelf: "flex-start" }}>
-                      {stepLabel(n)} {ok ? "✓ 허용" : "✕ 차단"}
-                    </span>
-                    {title && (
-                      <span style={{ fontSize: 13, fontWeight: 600, color: "#334155", lineHeight: 1.4 }}>
-                        {title}
-                      </span>
-                    )}
-                  </div>
-                  <MaterialRequestButton
-                    step={n}
-                    hasAccess={ok}
-                    ready={ready}
-                    requestMaterials={requestMaterials}
-                  />
-                </div>
-              );
-            })}
-          </div>
         </div>
 
           <div style={S.card}>

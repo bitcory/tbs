@@ -179,7 +179,7 @@ Camera: slow motion emphasis on wave transitions. no bgm`,
     interview: {
       label: '동물 인터뷰 프롬프트',
       sub: 'UP 1-4',
-      promptUrl: 'https://gemini.google.com/gem/40b0bdd6951f?usp=sharing',
+      promptUrl: 'https://chatgpt.com/g/g-69f72e1f8f088191af1c9daea0952113-up-class-dongmul-inteobyu-hagi-4-4',
       prompt: `An anthropomorphic animal character speaks directly to the camera in an interview style.
 Setup:
 - Medium close-up, eye-level framing
