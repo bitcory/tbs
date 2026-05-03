@@ -7,7 +7,6 @@ import ProfileEditor from "./ProfileEditor";
 import BankInfoEditor from "./BankInfoEditor";
 import { updateProfile, updateBankInfo } from "./actions";
 import {
-  Home, Calendar, ShieldCheck, LogOut,
   Camera, Search, Film, MessagesSquare, ArrowUpRight,
 } from "lucide-react";
 
@@ -44,21 +43,18 @@ export default async function MyPage() {
       </section>
 
       <div style={{ ...S.pageWrap, maxWidth: "100%", padding: "28px 20px 80px", marginTop: -48, position: "relative" }}>
-        <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginBottom: 16, flexWrap: "wrap" }}>
-          <Link href="/" className="glass-hoverable" style={{ ...S.ghostBtn, display: "inline-flex", alignItems: "center", gap: 6 }}>
-            <Home size={14} strokeWidth={2.4} />
-            홈으로
+        <div className="mypage-nav" style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginBottom: 16, flexWrap: "wrap" }}>
+          <Link href="/" className="glass-hoverable mypage-nav-btn" style={S.ghostBtn}>
+            홈
           </Link>
           {isAdmin && (
-            <Link href="/admin/schedule" className="glass-hoverable" style={{ ...S.ghostBtn, display: "inline-flex", alignItems: "center", gap: 6 }}>
-              <Calendar size={14} strokeWidth={2.4} />
-              강의 일정
+            <Link href="/admin/schedule" className="glass-hoverable mypage-nav-btn" style={S.ghostBtn}>
+              강의일정
             </Link>
           )}
           {isAdmin && (
-            <Link href="/admin" className="glass-hoverable" style={{ ...S.primaryPill, display: "inline-flex", alignItems: "center", gap: 6 }}>
-              <ShieldCheck size={14} strokeWidth={2.4} />
-              관리자 페이지
+            <Link href="/admin" className="glass-hoverable mypage-nav-btn" style={S.primaryPill}>
+              관리자
             </Link>
           )}
           <form
@@ -67,12 +63,22 @@ export default async function MyPage() {
               await signOut({ redirectTo: "/login" });
             }}
           >
-            <button className="glass-hoverable" style={{ ...S.ghostBtn, display: "inline-flex", alignItems: "center", gap: 6 }}>
-              <LogOut size={14} strokeWidth={2.4} />
+            <button className="glass-hoverable mypage-nav-btn" style={S.ghostBtn}>
               로그아웃
             </button>
           </form>
         </div>
+
+        {/* 모바일에서 4개 버튼이 한 줄에 들어가도록 padding 과 font 축소 */}
+        <style>{`
+          @media (max-width: 640px) {
+            .mypage-nav { flex-wrap: nowrap !important; gap: 6px !important; }
+            .mypage-nav-btn { padding: 8px 12px !important; font-size: 12px !important; }
+          }
+          @media (max-width: 360px) {
+            .mypage-nav-btn { padding: 6px 10px !important; font-size: 11px !important; }
+          }
+        `}</style>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr))", gap: 18, marginBottom: 18 }}>
           <div style={S.card}>
