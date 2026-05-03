@@ -34,14 +34,16 @@ function validateClassSlot(classType, stepLevel) {
   return lvl;
 }
 
-async function assertCanModify(me, sessionId, { blockPastDate = false } = {}) {
+async function assertCanModify(me, sessionId, { blockPastDate = false, allowMainInstructor = false } = {}) {
   if (me.role === "SUPER_ADMIN") return;
   const sess = await prisma.classSession.findUnique({
     where: { id: sessionId },
-    select: { createdById: true, startAt: true },
+    select: { createdById: true, mainInstructorId: true, startAt: true },
   });
   if (!sess) throw new Error("session_not_found");
-  if (sess.createdById !== me.id) throw new Error("forbidden_not_owner");
+  const isCreator = sess.createdById === me.id;
+  const isMainInstructor = allowMainInstructor && sess.mainInstructorId === me.id;
+  if (!isCreator && !isMainInstructor) throw new Error("forbidden_not_owner");
   if (blockPastDate && sess.startAt.getTime() < Date.now()) {
     throw new Error("forbidden_past_date");
   }
@@ -69,7 +71,7 @@ export async function createSession(input) {
 
 export async function updateSession(sessionId, input) {
   const me = await requireAdmin();
-  await assertCanModify(me, sessionId);
+  await assertCanModify(me, sessionId, { allowMainInstructor: true });
   const startAt = parseStartAt(input.date, input.startTime);
   if (!startAt) throw new Error("invalid_date");
   const stepLevel = validateClassSlot(input.classType, input.stepLevel);

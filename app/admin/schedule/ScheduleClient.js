@@ -78,7 +78,9 @@ function isPastSession(sess) {
 
 function canEditSession(me, sess) {
   if (me.role === "SUPER_ADMIN") return true;
-  return sess.createdById === me.id;
+  if (sess.createdById === me.id) return true;
+  if (sess.mainInstructorId === me.id) return true;
+  return false;
 }
 
 function canDeleteSession(me, sess) {
