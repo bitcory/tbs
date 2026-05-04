@@ -32,6 +32,7 @@ const SINGLE_STEPS = [
 const PRO_STEPS = [
   { step: 6, label: "PRO 1" },
   { step: 4, label: "PRO 2" },
+  { step: 5, label: "PRO 3" },
   { step: 3, label: "PRO 4" },
 ];
 
@@ -405,7 +406,7 @@ export default async function AdminPage({ searchParams }) {
                 {visibleRows.length === 0 && (
                   <tr>
                     <td
-                      colSpan={isSuper ? 13 : 12}
+                      colSpan={isSuper ? 14 : 13}
                       style={{ padding: "40px 12px", textAlign: "center", color: "#94a3b8", fontSize: 14, borderTop: "1px solid #e2e8f0" }}
                     >
                       {q

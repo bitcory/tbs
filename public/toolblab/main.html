@@ -1167,7 +1167,6 @@
             </div>
             <p class="step-card-label">PRO 3단계</p>
             <p class="step-card-title">유튜브 수익화과정</p>
-            <span class="step-card-status">준비중</span>
           </button>
 
           <button type="button" class="step-card" data-step="step3">
@@ -1286,7 +1285,7 @@
       },
       step6: { label: 'PRO 1단계', title: '시네마틱 5컷 다이얼로그', url: '/lecture/step6', ready: true },
       step4: { label: 'PRO 2단계', title: '광고영상 제작',          url: '/lecture/step4', ready: true },
-      step5: { label: 'PRO 3단계', title: '유튜브 수익화과정',      url: null, ready: false },
+      step5: { label: 'PRO 3단계', title: '유튜브 수익화과정',      url: '/lecture/step5', ready: true },
       step3: { label: 'PRO 4단계', title: '프리프로덕션',           url: '/lecture/step3', ready: true },
 
       'zero-gmail':    { label: 'Step 01', title: '구글계정 가입하기',   url: '/zero/gmail',    ready: true },
@@ -1359,8 +1358,8 @@
     function classOfStep(step) {
       if (!step) return null;
       if (step.startsWith('zero-')) return 'zero';
-      if (step === 'step4' || step === 'step5') return 'pro';
-      if (step === 'step1' || step === 'step2' || step === 'step3') return 'up';
+      if (step === 'step4' || step === 'step5' || step === 'step6') return 'pro';
+      if (step === 'step1' || step === 'step2' || step === 'step3' || step === 'step2-1') return 'up';
       return null;
     }
 
