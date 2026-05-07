@@ -11,7 +11,7 @@ import dynamic from 'next/dynamic';
 const FrameExtractor = dynamic(() => import('@/app/components/FrameExtractor'), { ssr: false });
 const WatermarkRemover = dynamic(() => import('@/app/components/WatermarkRemover'), { ssr: false });
 
-const CACHE_KEY = 'toolb_step5_music_v1';
+const CACHE_KEY = 'toolb_step5_music_v2';
 
 const ACCENT = '#d97706';
 const ACCENT_DARK = '#b45309';
@@ -56,14 +56,32 @@ function cleanJson(raw) {
 }
 
 function normalizeScene(s) {
+  let chars_in = [];
+  if (Array.isArray(s.chars_in)) {
+    chars_in = s.chars_in.filter((x) => typeof x === 'string');
+  } else if (s.char_in === true) {
+    // back-compat: 옛 단일 boolean → char_1 등장으로 간주
+    chars_in = ['char_1'];
+  }
   return {
     id: typeof s.id === 'number' ? s.id : Number(s.id) || 0,
     sub: s.sub || '',
     phase: s.phase || 'intro',
-    char_in: !!s.char_in,
+    chars_in,
     motif: s.motif || '',
     prompt: s.prompt || '',
     imageUpload: '',
+  };
+}
+
+function normalizeMaster(m, idx, prevById) {
+  const id = m.id || `char_${idx + 1}`;
+  return {
+    id,
+    description: m.description || '',
+    prompt: m.prompt || '',
+    character_sheet_prompt: m.character_sheet_prompt || '',
+    imageUpload: prevById[id] || '',
   };
 }
 
@@ -82,13 +100,24 @@ function parsePart(raw, prev) {
 
   if (part === 1) {
     if (!json.meta) throw new Error('part 1에는 meta가 필요합니다.');
-    if (!json.master_character) throw new Error('part 1에는 master_character가 필요합니다.');
+    // v2.3: master_characters 배열 / 옛 단일형(master_character)도 수용
+    let masterArr = null;
+    if (Array.isArray(json.master_characters) && json.master_characters.length > 0) {
+      masterArr = json.master_characters;
+    } else if (json.master_character && typeof json.master_character === 'object') {
+      masterArr = [json.master_character];
+    }
+    if (!masterArr) throw new Error('part 1에는 master_characters 배열이 필요합니다.');
+
+    const prevById = {};
+    (prev?.master_characters || []).forEach((m) => {
+      if (m?.id) prevById[m.id] = m.imageUpload || '';
+    });
+
     return {
       meta: json.meta,
-      master_character: {
-        ...json.master_character,
-        imageUpload: prev?.master_character?.imageUpload || '',
-      },
+      input_mode: json.input_mode || prev?.input_mode || 'text_only',
+      master_characters: masterArr.map((m, i) => normalizeMaster(m, i, prevById)),
       scenes: incoming.map((s) => {
         const old = prev?.scenes?.find((x) => x.id === s.id);
         return { ...s, imageUpload: old?.imageUpload || '' };
@@ -232,7 +261,7 @@ export default function Step5Page() {
       const raw = localStorage.getItem(CACHE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (parsed?.meta && Array.isArray(parsed?.scenes)) {
+        if (parsed?.meta && Array.isArray(parsed?.scenes) && Array.isArray(parsed?.master_characters)) {
           setData(parsed);
         }
       }
@@ -295,10 +324,12 @@ export default function Step5Page() {
     });
   };
 
-  const updateMaster = (patch) => {
+  const updateMaster = (id, patch) => {
     setData((prev) => prev && {
       ...prev,
-      master_character: { ...prev.master_character, ...patch },
+      master_characters: (prev.master_characters || []).map((m) =>
+        m.id === id ? { ...m, ...patch } : m
+      ),
     });
   };
 
@@ -316,7 +347,7 @@ export default function Step5Page() {
     reader.readAsDataURL(file);
   };
 
-  const handleMasterImageFile = (file) => {
+  const handleMasterImageFile = (id, file) => {
     if (!file || !file.type.startsWith('image/')) {
       showToast('이미지 파일만 업로드 가능합니다.');
       return;
@@ -326,7 +357,7 @@ export default function Step5Page() {
       return;
     }
     const reader = new FileReader();
-    reader.onload = (e) => updateMaster({ imageUpload: String(e.target.result) });
+    reader.onload = (e) => updateMaster(id, { imageUpload: String(e.target.result) });
     reader.readAsDataURL(file);
   };
 
@@ -775,13 +806,21 @@ export default function Step5Page() {
               {/* Content */}
               <div className="flex-1 overflow-y-auto p-5">
                 {view === 'master' ? (
-                  <MasterCard
-                    master={data.master_character}
-                    onCopy={copyText}
-                    onUpdatePrompt={(v) => updateMaster({ prompt: v })}
-                    onImageFile={handleMasterImageFile}
-                    onClearImage={() => updateMaster({ imageUpload: '' })}
-                  />
+                  <div className="space-y-4">
+                    {(data.master_characters || []).map((m, idx) => (
+                      <MasterCard
+                        key={m.id || idx}
+                        master={m}
+                        index={idx}
+                        total={data.master_characters.length}
+                        onCopy={copyText}
+                        onUpdatePrompt={(v) => updateMaster(m.id, { character_sheet_prompt: v })}
+                        onUpdateRefShot={(v) => updateMaster(m.id, { prompt: v })}
+                        onImageFile={(file) => handleMasterImageFile(m.id, file)}
+                        onClearImage={() => updateMaster(m.id, { imageUpload: '' })}
+                      />
+                    ))}
+                  </div>
                 ) : view === 'titles' ? (
                   <TitlesCard titles={data.titles || []} onCopy={copyText} />
                 ) : (
@@ -891,7 +930,7 @@ export default function Step5Page() {
                 <span className="text-[#94a3b8]">·</span>
                 <span className="text-[#64748b]">part 1은 추가로</span>
                 <code className="bg-[#fef3c7] px-1.5 py-0.5 rounded text-[#b45309] font-mono">meta</code>
-                <code className="bg-[#fef3c7] px-1.5 py-0.5 rounded text-[#b45309] font-mono">master_character</code>
+                <code className="bg-[#fef3c7] px-1.5 py-0.5 rounded text-[#b45309] font-mono">master_characters[]</code>
               </div>
               {data && (
                 <div className="text-[12px] bg-[#fffbeb] border border-[#fde68a] rounded-xl px-3 py-2 text-[#b45309] font-semibold">
@@ -902,7 +941,7 @@ export default function Step5Page() {
                 value={jsonInput}
                 onChange={(e) => setJsonInput(e.target.value)}
                 className="w-full h-[260px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] focus:outline-none focus:border-[#d97706] focus:ring-[3px] focus:ring-[#d97706]/20"
-                placeholder='{"part": 1, "total_parts": 2, "meta": {...}, "master_character": {...}, "scenes": [{...}]}'
+                placeholder='{"part": 1, "total_parts": 2, "meta": {...}, "master_characters": [{"id":"char_1", ...}], "scenes": [{...}]}'
               />
               {uploadError && (
                 <div className="text-sm text-[#b91c1c] bg-[#fee2e2] border border-[#fca5a5] rounded-xl px-3 py-2 font-semibold">
@@ -938,17 +977,22 @@ export default function Step5Page() {
   );
 }
 
-function MasterCard({ master, onCopy, onUpdatePrompt, onImageFile, onClearImage }) {
+function MasterCard({ master, index = 0, total = 1, onCopy, onUpdatePrompt, onUpdateRefShot, onImageFile, onClearImage }) {
   if (!master) return null;
+  const labelNum = total > 1 ? ` ${index + 1}` : '';
+  const idLabel = master.id ? master.id.toUpperCase() : `CHAR_${index + 1}`;
   return (
     <div className="rounded-2xl overflow-hidden border border-[#e2e8f0] bg-white shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
       <div className="px-4 py-3 border-b border-[#e2e8f0] flex items-center justify-between gap-3 bg-[#fffbeb]/60">
         <div className="flex items-center gap-2.5 min-w-0">
           <span className="text-[12px] font-black px-2 py-0.5 rounded-full bg-[#d97706]/15 text-[#b45309] flex items-center gap-1">
             <User className="w-3 h-3" />
-            MASTER
+            MASTER{labelNum}
           </span>
-          <span className="text-base font-bold text-[#0f172a] truncate">마스터 캐릭터</span>
+          <span className="text-base font-bold text-[#0f172a] truncate">마스터 캐릭터{labelNum}</span>
+          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#64748b] hidden sm:inline">
+            {idLabel}
+          </span>
         </div>
       </div>
 
@@ -981,6 +1025,28 @@ function MasterCard({ master, onCopy, onUpdatePrompt, onImageFile, onClearImage 
               </p>
             </div>
           )}
+          {master.prompt && (
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#94a3b8]">Reference shot 프롬프트 (한 줄)</span>
+                </div>
+                <button
+                  onClick={() => onCopy(master.prompt || '')}
+                  className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[10px] font-bold text-[#64748b] tb-press-soft"
+                >
+                  <Copy className="w-2.5 h-2.5" />
+                  복사
+                </button>
+              </div>
+              <textarea
+                value={master.prompt || ''}
+                onChange={(e) => onUpdateRefShot(e.target.value)}
+                rows={2}
+                className="w-full resize-y bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-2 text-[12px] leading-relaxed font-mono text-[#475569] focus:outline-none focus:border-[#d97706] focus:ring-[3px] focus:ring-[#d97706]/20"
+              />
+            </div>
+          )}
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-1.5 min-w-0">
@@ -988,7 +1054,7 @@ function MasterCard({ master, onCopy, onUpdatePrompt, onImageFile, onClearImage 
                 <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">캐릭터 시트 프롬프트 (English)</span>
               </div>
               <button
-                onClick={() => onCopy(master.prompt || '')}
+                onClick={() => onCopy(master.character_sheet_prompt || '')}
                 className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] tb-press-soft"
               >
                 <Copy className="w-3 h-3" />
@@ -996,7 +1062,7 @@ function MasterCard({ master, onCopy, onUpdatePrompt, onImageFile, onClearImage 
               </button>
             </div>
             <textarea
-              value={master.prompt || ''}
+              value={master.character_sheet_prompt || ''}
               onChange={(e) => onUpdatePrompt(e.target.value)}
               rows={10}
               placeholder="character sheet prompt..."
@@ -1031,14 +1097,19 @@ function SceneCard({ scene, onCopy, onUpdate, onImageFile, onClearImage }) {
         >
           {PHASE_LABEL[scene.phase] || scene.phase}
         </span>
-        {scene.char_in && (
-          <span
-            className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#fef3c7] text-[#b45309] border border-[#fde68a] inline-flex items-center gap-0.5"
-            title="마스터 캐릭터 등장"
-          >
-            <User className="w-2.5 h-2.5" />
-          </span>
-        )}
+        {Array.isArray(scene.chars_in) && scene.chars_in.length > 0 && scene.chars_in.map((charId) => {
+          const num = String(charId).replace(/^char_/, '');
+          return (
+            <span
+              key={charId}
+              className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#fef3c7] text-[#b45309] border border-[#fde68a] inline-flex items-center gap-0.5"
+              title={`마스터 ${num} 등장`}
+            >
+              <User className="w-2.5 h-2.5" />
+              <span>{num}</span>
+            </span>
+          );
+        })}
       </div>
 
       {/* Lyric */}
