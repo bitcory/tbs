@@ -7,7 +7,7 @@ import ProfileEditor from "./ProfileEditor";
 import BankInfoEditor from "./BankInfoEditor";
 import { updateProfile, updateBankInfo } from "./actions";
 import {
-  Camera, Search, Film, MessagesSquare, ArrowUpRight,
+  Camera, Search, Film, MessagesSquare, ArrowUpRight, MessageSquarePlus,
 } from "lucide-react";
 
 const ROLE_LABEL = {
@@ -88,6 +88,29 @@ export default async function MyPage() {
             <span style={{ color: "#64748b", fontSize: 13 }}>가입일 {new Date(me.createdAt).toLocaleDateString("ko-KR")}</span>
           </div>
 
+          <Link
+            href="/mypage/suggestions"
+            className="tb-press"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 10,
+              width: "100%",
+              padding: "18px 22px",
+              borderRadius: 14,
+              background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+              color: "#fff",
+              fontSize: 15,
+              fontWeight: 800,
+              textDecoration: "none",
+              border: "1px solid rgba(255,255,255,0.35)",
+              boxShadow: "0 10px 22px rgba(99,102,241,0.32), inset 1.5px 1.5px 0.5px 0 rgba(255,255,255,0.5), inset -1px -1px 0.5px 1px rgba(255,255,255,0.18)",
+            }}
+          >
+            <MessageSquarePlus size={20} strokeWidth={2.4} />
+            운영건의함 — 운영진에게 의견 보내기
+          </Link>
         </div>
 
           <div style={S.card}>

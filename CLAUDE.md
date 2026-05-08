@@ -148,6 +148,18 @@ Vercel이 자동 배포함.
 `translateY(1px) scale(0.94)` + `inset 0 2px 4px rgba(0,0,0,0.12)` 정도의 눌림
 shadow를 직접 CSS 로 넣는다.
 
+## 운영건의함 & 개인정보 노출 규칙
+
+| 영역 | 규칙 |
+|------|------|
+| `/mypage/suggestions` | 본인 글만 조회/수정/삭제. `prisma.suggestion.findMany({ where: { userId: me.id } })` 로만 쿼리 |
+| `/admin/suggestions` | `requireSuggestionViewer()` 게이트. SUPER 또는 `User.canViewSuggestions=true` STAFF 만 진입. 작성자 닉네임만 표시(이메일/전화 미노출). 삭제는 SUPER 만 |
+| 전화번호 노출 | SUPER 만 평문, STAFF 는 `lib/format.js#maskPhone` (앞3-****-뒤4) 사용. STAFF 의 `/admin` 검색에서도 phone 컬럼 제외 |
+| 권한 부여 | `app/admin/page.js` 운영진 탭의 "건의함 열람" 토글 (`toggleSuggestionViewer` server action, `requireSuperAdmin` 게이트) |
+
+새 관리자 페이지/컴포넌트에서 회원의 `phone` 을 표시할 때는 반드시
+`isSuper ? phone : maskPhone(phone)` 패턴을 사용한다 (본인 행 제외).
+
 ## Key Files
 - `/public/toolblab/main.html` — 메인 랜딩 (히어로 + 카드 캐러셀 + 미디어 패널)
 - `/app/page.js` — iframe 래퍼

@@ -11,6 +11,7 @@ import {
   buildPricingMap,
   lookupPricing,
 } from "@/lib/pricing";
+import { maskPhone } from "@/lib/format";
 import ScheduleClient from "./ScheduleClient";
 
 export default async function SchedulePage() {
@@ -42,6 +43,13 @@ export default async function SchedulePage() {
     }),
     prisma.pricingConfig.findMany(),
   ]);
+
+  // 전화번호는 슈퍼 관리자만 전체 노출. STAFF 에게는 마스킹된 값 전달.
+  const isSuper = me.role === "SUPER_ADMIN";
+  const safeMemberUsers = memberUsers.map((u) => ({
+    ...u,
+    phone: isSuper ? u.phone : maskPhone(u.phone),
+  }));
 
   const pricingMap = buildPricingMap(pricingRows);
 
@@ -105,7 +113,7 @@ export default async function SchedulePage() {
           me={{ id: me.id, role: me.role }}
           sessions={viewSessions}
           staffUsers={staffUsers}
-          memberUsers={memberUsers}
+          memberUsers={safeMemberUsers}
           pricing={pricingMap}
           serverNowIso={new Date().toISOString()}
         />

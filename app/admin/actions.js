@@ -38,3 +38,12 @@ export async function toggleStepAccess(userId, step, enabled) {
   });
   revalidatePath("/admin");
 }
+
+export async function toggleSuggestionViewer(userId, enabled) {
+  await requireSuperAdmin();
+  await prisma.user.update({
+    where: { id: userId },
+    data: { canViewSuggestions: !!enabled },
+  });
+  revalidatePath("/admin");
+}

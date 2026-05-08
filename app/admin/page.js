@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
-import { toggleStepAccess } from "./actions";
+import { toggleStepAccess, toggleSuggestionViewer } from "./actions";
 import RoleSelect from "./RoleSelect";
 import DeleteUserButton from "./DeleteUserButton";
 import StepGroupDropdown from "./StepGroupDropdown";
 import AdminSearchBox from "./AdminSearchBox";
 import * as S from "@/lib/uiStyles";
+import { maskPhone } from "@/lib/format";
 
 const ROLE_LABEL = { USER: "일반", STAFF: "운영진", SUPER_ADMIN: "슈퍼" };
 const ROLE_BADGE = {
@@ -48,13 +49,21 @@ export default async function AdminPage({ searchParams }) {
   const me = await requireAdmin();
   const isSuper = me.role === "SUPER_ADMIN";
 
+  // 운영건의함 열람 권한 — 슈퍼 또는 슈퍼가 지정한 STAFF
+  const meRow = await prisma.user.findUnique({
+    where: { id: me.id },
+    select: { canViewSuggestions: true },
+  });
+  const canViewSuggestions = isSuper || !!meRow?.canViewSuggestions;
+
   // 검색 OR 절. 활성 탭에만 적용.
+  // 전화번호 검색은 슈퍼 관리자만 — STAFF 는 닉/이름/이메일만 검색.
   const searchOR = q
     ? [
         { nickname: { contains: q, mode: "insensitive" } },
         { name:     { contains: q, mode: "insensitive" } },
         { email:    { contains: q, mode: "insensitive" } },
-        { phone:    { contains: q } },
+        ...(isSuper ? [{ phone: { contains: q } }] : []),
       ]
     : null;
 
@@ -141,6 +150,9 @@ export default async function AdminPage({ searchParams }) {
       <div style={{ ...S.pageWrap, maxWidth: "100%", padding: "28px 16px 80px", marginTop: -48, position: "relative", color: "#0f172a" }}>
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginBottom: 16, flexWrap: "wrap" }}>
           <Link href="/admin/schedule" className="glass-hoverable" style={S.ghostBtn}>강의 일정</Link>
+          {canViewSuggestions && (
+            <Link href="/admin/suggestions" className="glass-hoverable" style={S.ghostBtn}>운영건의함</Link>
+          )}
           {isSuper && (
             <Link href="/admin/pricing" className="glass-hoverable" style={S.ghostBtn}>단가/요율</Link>
           )}
@@ -213,7 +225,7 @@ export default async function AdminPage({ searchParams }) {
               <thead>
                 {/* Group header row */}
                 <tr style={{ background: "#f1f5f9", color: "#334155", fontSize: 11 }}>
-                  <th colSpan={4} style={groupTh("#64748b")}>기본 정보</th>
+                  <th colSpan={tab === "staff" ? 5 : 4} style={groupTh("#64748b")}>기본 정보</th>
                   <th colSpan={1} style={groupTh("#64748b")}>ZERO CLASS</th>
                   <th colSpan={1 + SINGLE_STEPS.length} style={groupTh("#00996D")}>UP CLASS</th>
                   <th colSpan={PRO_STEPS.length} style={groupTh("#1E293B")}>PRO CLASS</th>
@@ -224,6 +236,7 @@ export default async function AdminPage({ searchParams }) {
                   <th style={th}>이메일</th>
                   <th style={th}>전화번호</th>
                   <th style={th}>권한</th>
+                  {tab === "staff" && <th style={th}>건의함 열람</th>}
                   <th style={th}>ZERO 전체</th>
                   <th style={th}>UP 1</th>
                   {SINGLE_STEPS.map((s) => (
@@ -250,7 +263,9 @@ export default async function AdminPage({ searchParams }) {
                         {isSelf && <span style={{ marginLeft: 6, fontSize: 11, color: "#94a3b8" }}>(나)</span>}
                       </td>
                       <td style={{ ...td, color: "#64748b" }}>{u.email ?? "-"}</td>
-                      <td style={{ ...td, color: "#64748b" }}>{u.phone ?? "-"}</td>
+                      <td style={{ ...td, color: "#64748b" }}>
+                        {isSuper || isSelf ? (u.phone ?? "-") : maskPhone(u.phone)}
+                      </td>
                       <td style={td}>
                         {canEditRole ? (
                           <RoleSelect userId={u.id} role={u.role} />
@@ -258,6 +273,46 @@ export default async function AdminPage({ searchParams }) {
                           <span style={S.badge(ROLE_BADGE[u.role])}>{ROLE_LABEL[u.role]}</span>
                         )}
                       </td>
+
+                      {/* 건의함 열람 (운영진 탭 전용) */}
+                      {tab === "staff" && (() => {
+                        const isTargetSuperAdmin = u.role === "SUPER_ADMIN";
+                        const enabled = isTargetSuperAdmin || u.canViewSuggestions;
+                        const canToggle = isSuper && !isTargetSuperAdmin;
+                        return (
+                          <td style={td}>
+                            {canToggle ? (
+                              <form
+                                action={async () => {
+                                  "use server";
+                                  await toggleSuggestionViewer(u.id, !enabled);
+                                }}
+                              >
+                                <button
+                                  className="tb-press-soft"
+                                  style={{
+                                    ...S.badge(enabled ? S.badgePurple : S.badgeGray),
+                                    border: "none",
+                                    cursor: "pointer",
+                                    fontFamily: "inherit",
+                                  }}
+                                >
+                                  {enabled ? "✓ 허용" : "✕ 차단"}
+                                </button>
+                              </form>
+                            ) : (
+                              <span
+                                style={{
+                                  ...S.badge(enabled ? S.badgePurple : S.badgeGray),
+                                  opacity: 0.6,
+                                }}
+                              >
+                                {isTargetSuperAdmin ? "자동" : enabled ? "허용" : "-"}
+                              </span>
+                            )}
+                          </td>
+                        );
+                      })()}
 
                       {/* ZERO CLASS (single toggle) */}
                       {(() => {
@@ -406,7 +461,7 @@ export default async function AdminPage({ searchParams }) {
                 {visibleRows.length === 0 && (
                   <tr>
                     <td
-                      colSpan={isSuper ? 14 : 13}
+                      colSpan={(isSuper ? 14 : 13) + (tab === "staff" ? 1 : 0)}
                       style={{ padding: "40px 12px", textAlign: "center", color: "#94a3b8", fontSize: 14, borderTop: "1px solid #e2e8f0" }}
                     >
                       {q
