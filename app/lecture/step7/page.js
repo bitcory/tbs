@@ -409,14 +409,6 @@ export default function Step7Page() {
                     <span className="text-sm text-[#0f172a] font-bold flex-1">{data.production.aspect_ratio}</span>
                   </div>
                 )}
-                {data.boards.map((b) => (
-                  <div key={b.label} className="flex items-start gap-2">
-                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">B {b.label} 페이싱</span>
-                    <span className="text-sm text-[#0f172a] font-bold flex-1 font-mono">
-                      {b.panels.map(p => p.duration_seconds).join('-')} ({b.duration_seconds}초)
-                    </span>
-                  </div>
-                ))}
                 {data.scene?.title && (
                   <div className="flex items-start gap-2 pt-1.5 border-t border-[#e2e8f0] mt-1.5">
                     <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">씬</span>
@@ -478,7 +470,7 @@ export default function Step7Page() {
               젬 가이드
             </div>
             <a
-              href="https://gemini.google.com/"
+              href="https://chatgpt.com/g/g-69ff2603eee08191bede6ce918be0f6a-pro-class-meolti-yeongsangmandeulgi-v4-0"
               target="_blank"
               rel="noreferrer"
               className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full tb-pill-primary text-sm font-bold transition"

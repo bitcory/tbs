@@ -126,10 +126,6 @@ export function serializeBoardToPrompt(board, data) {
   out.push('');
   out.push(`Aspect ratio ${data.production?.aspect_ratio || '16:9'}. Ultra-detailed, magazine-spread quality.`);
 
-  // Per-board copy footer — explicit hand-off line for the video generator.
-  out.push('');
-  out.push(`Please make a video referring to the images for each scene. No bgm`);
-
   return out.join('\n');
 }
 
