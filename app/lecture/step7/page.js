@@ -5,14 +5,14 @@ import Link from 'next/link';
 import {
   ArrowLeft, Upload, Copy, ExternalLink, Gem, X,
   Clapperboard, Image as ImageIcon, Film, MessageSquare, Music, Scissors, Droplets, Wrench, Trash2,
-  Languages, Camera, Mic, Tag as TagIcon, Layers, Sparkles, ScrollText,
+  Languages, Camera, Layers, Sparkles, ScrollText, Clock,
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { serializeBoardToPrompt, serializeAllBoards } from './serialize';
 const FrameExtractor = dynamic(() => import('@/app/components/FrameExtractor'), { ssr: false });
 const WatermarkRemover = dynamic(() => import('@/app/components/WatermarkRemover'), { ssr: false });
 
-const CACHE_KEY = 'toolb_step7_cinematic_ad_v3_3';
+const CACHE_KEY = 'toolb_step7_cinematic_v6';
 
 const FUNCTION_LABEL = {
   establishing: '오프닝',
@@ -31,23 +31,7 @@ const FUNCTION_LABEL = {
   bridge_frame_start: '브릿지 시작',
 };
 
-const VOICE_LABEL = {
-  narration: '내레이션',
-  dialogue: '대사',
-  vo: 'VO',
-  tagline: '태그라인',
-  none: '침묵',
-};
-
-const VOICE_COLOR = {
-  narration: { bg: '#fef3c7', fg: '#a16207', dot: '#f59e0b' },
-  dialogue:  { bg: '#fce7f3', fg: '#9d174d', dot: '#ec4899' },
-  vo:        { bg: '#dbeafe', fg: '#1e40af', dot: '#3b82f6' },
-  tagline:   { bg: '#fee2e2', fg: '#b91c1c', dot: '#ef4444' },
-  none:      { bg: '#f1f5f9', fg: '#64748b', dot: '#cbd5e1' },
-};
-
-const BOARD_DOT = ['#0ea5e9', '#8b5cf6'];
+const BOARD_DOT = { A: '#0ea5e9', B: '#8b5cf6' };
 
 function cleanJson(raw) {
   const cleaned = String(raw || '').trim()
@@ -62,53 +46,25 @@ function cleanJson(raw) {
   }
 }
 
-// Accept either a real storyboard object or the schema-doc form
-// (schema_definition + embedded examples). When the user pastes the schema
-// itself we transparently use the first available example.
+// Accept either a real storyboard object or the schema-doc form (schema_definition + examples).
+// When the user pastes the schema itself, transparently use the first embedded example.
 function unwrapDoc(json) {
   if (json && typeof json === 'object' && (json.boards || json.scene || json.project)) {
     return json;
   }
   if (json && typeof json === 'object') {
-    if (json.example_audio_mode_narration?.boards) return json.example_audio_mode_narration;
-    if (json.example_audio_mode_dialogue?.boards) return json.example_audio_mode_dialogue;
+    for (const key of Object.keys(json)) {
+      if (key.startsWith('example_') && json[key]?.boards) return json[key];
+    }
   }
   return json;
-}
-
-function parseTimecodeStart(tc) {
-  if (!tc) return null;
-  const part = String(tc).split(/[-–—]/)[0]?.trim();
-  const m = part?.match(/(\d+):(\d+)/);
-  return m ? parseInt(m[1], 10) * 60 + parseInt(m[2], 10) : null;
-}
-
-function parseTimecodeEnd(tc) {
-  if (!tc) return null;
-  const parts = String(tc).split(/[-–—]/);
-  const part = parts[parts.length - 1]?.trim();
-  const m = part?.match(/(\d+):(\d+)/);
-  return m ? parseInt(m[1], 10) * 60 + parseInt(m[2], 10) : null;
-}
-
-function deriveDurationLabel(panels) {
-  if (!panels || panels.length === 0) return '';
-  const startTc = panels[0].timecode || '';
-  const endTc = panels[panels.length - 1].timecode || '';
-  const startStr = String(startTc).split(/[-–—]/)[0]?.trim() || '';
-  const endParts = String(endTc).split(/[-–—]/);
-  const endStr = endParts[endParts.length - 1]?.trim() || '';
-  const start = parseTimecodeStart(startTc);
-  const end = parseTimecodeEnd(endTc);
-  if (start == null || end == null) return '';
-  const dur = end - start;
-  return `${startStr}–${endStr} (${dur} SECONDS)`;
 }
 
 function parsePanel(p, pi) {
   return {
     number: typeof p.number === 'number' ? p.number : pi + 1,
     timecode: p.timecode || '',
+    duration_seconds: typeof p.duration_seconds === 'number' ? p.duration_seconds : 0,
     function: p.function || '',
     is_bridge: !!p.is_bridge,
     image_prompt_en: p.image_prompt_en || '',
@@ -118,20 +74,10 @@ function parsePanel(p, pi) {
       sound_dialogue: p.labels?.sound_dialogue || '',
       transition: p.labels?.transition || '',
     },
-    voice: p.voice ? {
-      type: p.voice.type || 'none',
-      speaker: p.voice.speaker || '',
-      line_ko: p.voice.line_ko || '',
-      line_en: p.voice.line_en || '',
-      delivery: p.voice.delivery || '',
-      char_count_ko: typeof p.voice.char_count_ko === 'number'
-        ? p.voice.char_count_ko
-        : (p.voice.line_ko ? [...p.voice.line_ko].length : 0),
-    } : null,
   };
 }
 
-function parseV3(raw) {
+function parseV6(raw) {
   let json = cleanJson(raw);
   json = unwrapDoc(json);
 
@@ -142,64 +88,21 @@ function parseV3(raw) {
   if (!json.project) throw new Error('project 객체가 필요합니다.');
   if (!json.scene) throw new Error('scene 객체가 필요합니다.');
 
-  let boards = json.boards.map((b, i) => ({
-    index: typeof b.index === 'number' ? b.index : i + 1,
-    part_label: b.part_label || `${i + 1} OF ${json.boards.length}`,
+  const mode = json.mode === 'B' ? 'B' : 'A';
+
+  const boards = json.boards.map((b, i) => ({
+    label: b.label || (i === 0 ? 'A' : 'B'),
     title_suffix: b.title_suffix || '',
-    duration_label: b.duration_label || '',
-    main_frame: {
-      prompt_en: b.main_frame?.prompt_en || '',
-    },
+    duration_seconds: typeof b.duration_seconds === 'number' ? b.duration_seconds : 10,
+    main_frame: { prompt_en: b.main_frame?.prompt_en || '' },
     panels: (Array.isArray(b.panels) ? b.panels : []).map(parsePanel),
     production_notes: Array.isArray(b.production_notes) ? b.production_notes : [],
     moodboard_keywords: Array.isArray(b.moodboard_keywords) ? b.moodboard_keywords : [],
   }));
 
-  // Auto-split: 1 board × 12 panels → 2 boards × 6 panels (Scene 1 / Scene 2).
-  // Each scene becomes a self-contained 6-panel master prompt (3×2 grid).
-  const originalMode = json.mode === 'B' ? 'B' : 'A';
-  let splitFromA = false;
-  if (boards.length === 1 && boards[0].panels.length === 12) {
-    const src = boards[0];
-    const panels1 = src.panels.slice(0, 6);
-    const panels2 = src.panels.slice(6, 12);
-    boards = [
-      {
-        index: 1,
-        part_label: '1 OF 2',
-        title_suffix: src.title_suffix || 'SETUP',
-        duration_label: deriveDurationLabel(panels1) || src.duration_label,
-        main_frame: { prompt_en: src.main_frame?.prompt_en || '' },
-        panels: panels1,
-        production_notes: src.production_notes,
-        moodboard_keywords: src.moodboard_keywords,
-      },
-      {
-        index: 2,
-        part_label: '2 OF 2',
-        title_suffix: 'CLIMAX',
-        duration_label: deriveDurationLabel(panels2) || src.duration_label,
-        main_frame: { prompt_en: src.main_frame?.prompt_en || '' },
-        panels: panels2,
-        production_notes: src.production_notes,
-        moodboard_keywords: src.moodboard_keywords,
-      },
-    ];
-    splitFromA = true;
-  }
-
-  // After split, treat as Mode B so the serializer emits "PART 1 OF 2" headers
-  // and the proper 6-panel (3×2) grid layout per board.
-  const effectiveMode = splitFromA ? 'B' : originalMode;
-
   return {
-    version: json.version || '3.0',
-    mode: effectiveMode,
-    originalMode,
-    splitFromA,
-    audio_mode: json.audio_mode || 'silent',
-    copy_direction: json.copy_direction || null,
-    tagline: json.tagline || null,
+    version: json.version || '6.0',
+    mode,
     project: json.project,
     scene: json.scene,
     consistency_lock: json.consistency_lock || null,
@@ -212,7 +115,7 @@ function parseV3(raw) {
 
 export default function Step7Page() {
   const [data, setData] = useState(null);
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'B1' | 'B2'
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'A' | 'B'
   const [uploadOpen, setUploadOpen] = useState(false);
   const [jsonInput, setJsonInput] = useState('');
   const [uploadError, setUploadError] = useState('');
@@ -254,7 +157,7 @@ export default function Step7Page() {
   const loadJson = () => {
     setUploadError('');
     try {
-      const parsed = parseV3(jsonInput);
+      const parsed = parseV6(jsonInput);
       setData(parsed);
       setActiveTab('overview');
       setUploadOpen(false);
@@ -293,10 +196,10 @@ export default function Step7Page() {
   };
 
   // The master-prompt copy targets the active tab:
-  //   • Scene tab (B1/B2) → only that scene's prompt
-  //   • Overview tab → all scenes joined
-  const activeBoardIndex = data && activeTab.startsWith('B')
-    ? parseInt(activeTab.slice(1), 10) - 1
+  //   • Board tab (A / B) → only that board's prompt
+  //   • Overview tab → all boards joined
+  const activeBoardIndex = data && (activeTab === 'A' || activeTab === 'B')
+    ? data.boards.findIndex(b => b.label === activeTab)
     : -1;
   const activeBoard = activeBoardIndex >= 0 ? data?.boards?.[activeBoardIndex] : null;
 
@@ -306,16 +209,8 @@ export default function Step7Page() {
         : serializeAllBoards(data).map(({ title, prompt }) => `### ${title}\n\n${prompt}`).join('\n\n———\n\n'))
     : '';
   const masterPromptButtonLabel = activeBoard
-    ? `Scene ${activeBoard.index} 프롬프트`
+    ? `Board ${activeBoard.label} 프롬프트`
     : '마스터 프롬프트 전체';
-
-  const allCopyLines = data
-    ? data.boards
-        .flatMap((b) => b.panels.filter(p => p.voice?.line_ko).map(p =>
-          `[P${p.number} ${p.timecode}] ${p.voice.speaker ? p.voice.speaker + ': ' : ''}${p.voice.line_ko}`
-        ))
-        .join('\n')
-    : '';
 
   return (
     <div className="min-h-screen md:h-screen md:flex md:flex-col md:overflow-hidden bg-[#f8fafc] text-[#0f172a]">
@@ -437,7 +332,7 @@ export default function Step7Page() {
         <div className="tb-hero-glow" />
         <div className="tb-hero-row">
           <span className="tb-hero-eyebrow">TB STUDY · PRO 2</span>
-          <h1 className="tb-hero-title">시네마 광고영상</h1>
+          <h1 className="tb-hero-title">멀티영상 만들기</h1>
         </div>
       </section>
 
@@ -493,16 +388,8 @@ export default function Step7Page() {
                 <div className="flex items-start gap-2">
                   <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">모드</span>
                   <span className="text-sm text-[#0f172a] font-bold flex-1">
-                    {data.splitFromA
-                      ? 'A · 12패널 → 6+6 분할'
-                      : data.mode === 'B'
-                        ? 'B · 6+6 (12초)'
-                        : 'A · 12패널 (15초)'}
+                    {data.mode === 'B' ? 'B · A+B (10초+10초 = 20초)' : 'A · 1보드 (10초)'}
                   </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">오디오</span>
-                  <span className="text-sm text-[#0f172a] font-bold flex-1 uppercase">{data.audio_mode}</span>
                 </div>
                 {data.project?.total_duration_seconds > 0 && (
                   <div className="flex items-start gap-2">
@@ -522,6 +409,14 @@ export default function Step7Page() {
                     <span className="text-sm text-[#0f172a] font-bold flex-1">{data.production.aspect_ratio}</span>
                   </div>
                 )}
+                {data.boards.map((b) => (
+                  <div key={b.label} className="flex items-start gap-2">
+                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">B {b.label} 페이싱</span>
+                    <span className="text-sm text-[#0f172a] font-bold flex-1 font-mono">
+                      {b.panels.map(p => p.duration_seconds).join('-')} ({b.duration_seconds}초)
+                    </span>
+                  </div>
+                ))}
                 {data.scene?.title && (
                   <div className="flex items-start gap-2 pt-1.5 border-t border-[#e2e8f0] mt-1.5">
                     <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">씬</span>
@@ -589,7 +484,7 @@ export default function Step7Page() {
               className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full tb-pill-primary text-sm font-bold transition"
             >
               <ExternalLink className="w-3.5 h-3.5" />
-              시네마 광고영상 젬 열기
+              멀티영상 젬 열기
             </a>
             <a
               href="https://kr.pinterest.com/"
@@ -663,7 +558,7 @@ export default function Step7Page() {
               </div>
               <h3 className="text-lg font-bold text-[#0f172a] mb-2">JSON을 불러와서 시작하세요</h3>
               <p className="text-sm text-[#64748b] mb-5 leading-relaxed">
-                젬에서 받은 시네마 광고영상 스토리보드 JSON(v3)을 붙여넣으면<br />
+                젬에서 받은 멀티영상 스토리보드 JSON(v6)을 붙여넣으면<br />
                 보드별로 마스터 프롬프트가 즉시 만들어집니다.
               </p>
               <button
@@ -681,14 +576,19 @@ export default function Step7Page() {
                 <div className="flex items-center gap-2 min-w-0">
                   <Clapperboard className="w-4 h-4 text-[#00996D] flex-shrink-0" />
                   <h2 className="text-base font-black text-[#0f172a] uppercase truncate">
-                    {data.project?.title || '시네마 광고영상'}
+                    {data.project?.title || '멀티영상 만들기'}
                   </h2>
                   <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#64748b] flex-shrink-0">
-                    {data.boards.length}씬
+                    {data.boards.length}보드
                   </span>
                   <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#64748b] flex-shrink-0">
                     {data.boards.reduce((acc, b) => acc + b.panels.length, 0)}패널
                   </span>
+                  {data.project?.total_duration_seconds > 0 && (
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#64748b] flex-shrink-0">
+                      {data.project.total_duration_seconds}초
+                    </span>
+                  )}
                   {data.production?.aspect_ratio && (
                     <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#64748b] flex-shrink-0">
                       {data.production.aspect_ratio}
@@ -703,15 +603,6 @@ export default function Step7Page() {
                     <ScrollText className="w-3.5 h-3.5" />
                     {masterPromptButtonLabel}
                   </button>
-                  {allCopyLines && (
-                    <button
-                      onClick={() => copyText(allCopyLines)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#6d28d9] hover:opacity-90 text-white text-sm font-bold tb-press"
-                    >
-                      <Mic className="w-3.5 h-3.5" />
-                      카피 전체
-                    </button>
-                  )}
                 </div>
               </div>
 
@@ -726,10 +617,10 @@ export default function Step7Page() {
                   <Layers className="w-3.5 h-3.5" />
                   개요
                 </button>
-                {data.boards.map((b, i) => {
-                  const tabId = `B${i + 1}`;
+                {data.boards.map((b) => {
+                  const tabId = b.label;
                   const isActive = activeTab === tabId;
-                  const dot = BOARD_DOT[i] || '#94a3b8';
+                  const dot = BOARD_DOT[b.label] || '#94a3b8';
                   return (
                     <button
                       key={tabId}
@@ -742,9 +633,9 @@ export default function Step7Page() {
                         className="w-1.5 h-1.5 rounded-full"
                         style={{ background: isActive ? '#fff' : dot, opacity: isActive ? 1 : 0.7 }}
                       />
-                      <span>Scene {b.index || i + 1}</span>
+                      <span>Board {b.label}</span>
                       <span className="text-[10px] font-semibold opacity-60">
-                        {b.panels.length}패널{b.title_suffix ? ` · ${b.title_suffix}` : ''}
+                        {b.duration_seconds}초{b.title_suffix ? ` · ${b.title_suffix}` : ''}
                       </span>
                     </button>
                   );
@@ -755,21 +646,16 @@ export default function Step7Page() {
               <div className="flex-1 overflow-y-auto p-5 space-y-5">
                 {activeTab === 'overview' ? (
                   <OverviewCard data={data} onCopy={copyText} />
-                ) : (() => {
-                  const idx = parseInt(activeTab.replace('B', ''), 10) - 1;
-                  const board = data.boards[idx];
-                  if (!board) return null;
-                  return (
-                    <BoardView
-                      board={board}
-                      boardIndex={idx}
-                      data={data}
-                      onCopy={copyText}
-                      onUpdateBoard={(patch) => updateBoard(idx, patch)}
-                      onUpdatePanel={(panelIdx, patch) => updatePanel(idx, panelIdx, patch)}
-                    />
-                  );
-                })()}
+                ) : activeBoard ? (
+                  <BoardView
+                    board={activeBoard}
+                    boardIndex={activeBoardIndex}
+                    data={data}
+                    onCopy={copyText}
+                    onUpdateBoard={(patch) => updateBoard(activeBoardIndex, patch)}
+                    onUpdatePanel={(panelIdx, patch) => updatePanel(activeBoardIndex, panelIdx, patch)}
+                  />
+                ) : null}
               </div>
             </>
           )}
@@ -788,7 +674,7 @@ export default function Step7Page() {
           >
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#e2e8f0]">
               <span className="text-base font-bold text-[#0f172a] uppercase tracking-wider">
-                시네마 광고영상 JSON 업로드 (v3)
+                멀티영상 JSON 업로드 (v6)
               </span>
               <button
                 onClick={() => setUploadOpen(false)}
@@ -799,17 +685,14 @@ export default function Step7Page() {
             </div>
             <div className="flex-1 overflow-y-auto p-5 space-y-3 min-h-0">
               <p className="text-sm text-[#64748b] leading-relaxed">
-                Cinematic Storyboard v3 JSON을 붙여넣으세요. 필요한 필드:
-                <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">project</code>,
-                <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">scene</code>,
-                <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">boards[]</code>.
+                Cinematic Storyboard v6 JSON을 붙여넣으세요. Mode A는 1보드(10초/6패널), Mode B는 2보드(20초/12패널) 구조입니다.
                 마크다운 코드블록(```json)은 자동 제거됩니다.
               </p>
               <textarea
                 value={jsonInput}
                 onChange={(e) => setJsonInput(e.target.value)}
                 className="w-full h-[260px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
-                placeholder='{"version": "3.0", "mode": "A|B", "audio_mode": "...", "project": {...}, "scene": {...}, "boards": [...]}'
+                placeholder='{"version": "6.0", "mode": "A|B", "project": {...}, "scene": {...}, "boards": [...]}'
               />
               {uploadError && (
                 <div className="text-sm text-[#b91c1c] bg-[#fee2e2] border border-[#fca5a5] rounded-xl px-3 py-2 font-semibold">
@@ -849,9 +732,8 @@ function OverviewCard({ data, onCopy }) {
   const sc = data.scene || {};
   const ov = sc.overview || {};
   const cl = data.consistency_lock;
-  const cd = data.copy_direction;
   const bf = data.bridge_frame;
-  const tag = data.tagline;
+  const gw = data.grok_workflow;
 
   return (
     <div className="space-y-4">
@@ -877,7 +759,7 @@ function OverviewCard({ data, onCopy }) {
         </div>
       </div>
 
-      {/* Consistency lock */}
+      {/* Consistency lock (Mode B) */}
       {cl && (
         <div className="rounded-2xl overflow-hidden border border-[#e2e8f0] bg-white">
           <div className="px-4 py-3 border-b border-[#e2e8f0] bg-[#fefce8] flex items-center justify-between">
@@ -906,77 +788,15 @@ function OverviewCard({ data, onCopy }) {
         </div>
       )}
 
-      {/* Copy direction */}
-      {cd && (
-        <div className="rounded-2xl overflow-hidden border border-[#e2e8f0] bg-white">
-          <div className="px-4 py-3 border-b border-[#e2e8f0] bg-[#fdf4ff] flex items-center gap-2">
-            <Mic className="w-4 h-4 text-[#a21caf]" />
-            <span className="text-sm font-bold text-[#0f172a] uppercase tracking-wider">Copy Direction</span>
-            {cd.framework && (
-              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e9d5ff] text-[#a21caf]">
-                {cd.framework}
-              </span>
-            )}
-          </div>
-          <div className="p-4 space-y-2 text-[13px]">
-            {cd.voice_persona && <Stat k="페르소나" v={cd.voice_persona} />}
-            {typeof cd.max_chars_per_panel === 'number' && <Stat k="최대 글자/패널" v={`${cd.max_chars_per_panel}자`} />}
-            {Array.isArray(cd.reference_brands) && cd.reference_brands.length > 0 && (
-              <Stat k="레퍼런스" v={cd.reference_brands.join(' · ')} />
-            )}
-            {Array.isArray(cd.cliche_blocklist) && cd.cliche_blocklist.length > 0 && (
-              <div className="pt-1">
-                <div className="text-[10px] font-black text-[#94a3b8] uppercase tracking-wider mb-1">차단 클리셰</div>
-                <div className="flex flex-wrap gap-1.5">
-                  {cd.cliche_blocklist.map((c) => (
-                    <span key={c} className="text-[11px] px-2 py-0.5 rounded-full bg-[#fee2e2] border border-[#fecaca] text-[#b91c1c] font-bold">
-                      {c}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Tagline */}
-      {tag && (tag.ko || tag.en) && (
-        <div className="rounded-2xl overflow-hidden border border-[#e2e8f0] bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white">
-          <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <TagIcon className="w-4 h-4 text-[#fbbf24]" />
-              <span className="text-sm font-bold uppercase tracking-wider">Tagline</span>
-              {typeof tag.appears_at_panel === 'number' && (
-                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/10 border border-white/20">
-                  P{tag.appears_at_panel}
-                </span>
-              )}
-            </div>
-            <button
-              onClick={() => onCopy(tag.ko || tag.en || '')}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-[11px] font-bold tb-press-soft"
-            >
-              <Copy className="w-3 h-3" />
-              복사
-            </button>
-          </div>
-          <div className="px-4 py-5 space-y-1.5">
-            {tag.ko && <p className="text-2xl font-black leading-snug">{tag.ko}</p>}
-            {tag.en && <p className="text-base font-medium opacity-80 italic">{tag.en}</p>}
-          </div>
-        </div>
-      )}
-
       {/* Bridge frame (Mode B) */}
-      {bf && (bf.summary_ko || bf.image_prompt_en) && (
+      {bf && (bf.summary || bf.image_prompt_en) && (
         <div className="rounded-2xl overflow-hidden border border-[#e2e8f0] bg-white">
           <div className="px-4 py-3 border-b border-[#e2e8f0] bg-[#ecfeff] flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Layers className="w-4 h-4 text-[#0891b2]" />
               <span className="text-sm font-bold text-[#0f172a] uppercase tracking-wider">Bridge Frame</span>
               <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#a5f3fc] text-[#0891b2]">
-                B{bf.from_board}-P{bf.from_panel} → B{bf.to_board}-P{bf.to_panel}
+                Board {bf.from_board}-P{bf.from_panel} → Board {bf.to_board}-P{bf.to_panel}
               </span>
             </div>
             {bf.image_prompt_en && (
@@ -990,7 +810,7 @@ function OverviewCard({ data, onCopy }) {
             )}
           </div>
           <div className="p-4 space-y-2">
-            {bf.summary_ko && <p className="text-sm text-[#334155]">{bf.summary_ko}</p>}
+            {bf.summary && <p className="text-sm text-[#334155]">{bf.summary}</p>}
             {bf.image_prompt_en && (
               <div className="text-[13px] font-mono text-[#0f172a] bg-[#f8fafc] border border-[#e2e8f0] rounded-xl p-2.5">
                 {bf.image_prompt_en}
@@ -999,12 +819,38 @@ function OverviewCard({ data, onCopy }) {
           </div>
         </div>
       )}
+
+      {/* Grok workflow (Mode B) */}
+      {gw && Array.isArray(gw.steps) && gw.steps.length > 0 && (
+        <div className="rounded-2xl overflow-hidden border border-[#e2e8f0] bg-white">
+          <div className="px-4 py-3 border-b border-[#e2e8f0] bg-[#0f172a] text-white flex items-center gap-2">
+            <ScrollText className="w-4 h-4 text-[#fbbf24]" />
+            <span className="text-sm font-bold uppercase tracking-wider">Grok 체이닝 워크플로우</span>
+          </div>
+          <ol className="p-4 space-y-3">
+            {gw.steps.map((s, i) => (
+              <li key={i} className="flex gap-3">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#0f172a] text-white text-[12px] font-black flex items-center justify-center">
+                  {s.step || i + 1}
+                </span>
+                <div className="flex-1 min-w-0">
+                  {s.title && <div className="text-sm font-bold text-[#0f172a]">{s.title}</div>}
+                  {s.description && <p className="text-[12.5px] text-[#475569] leading-relaxed mt-0.5">{s.description}</p>}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
     </div>
   );
 }
 
 function BoardView({ board, boardIndex, data, onCopy, onUpdateBoard, onUpdatePanel }) {
-  const dot = BOARD_DOT[boardIndex] || '#94a3b8';
+  const dot = BOARD_DOT[board.label] || '#94a3b8';
+  const pacing = board.panels.map(p => p.duration_seconds).join('-');
+  const pacingTotal = board.panels.reduce((acc, p) => acc + (p.duration_seconds || 0), 0);
+  const pacingValid = pacingTotal === (board.duration_seconds || 10);
 
   const copyMaster = () => {
     try {
@@ -1026,10 +872,11 @@ function BoardView({ board, boardIndex, data, onCopy, onUpdateBoard, onUpdatePan
           <ScrollText className="w-4 h-4 flex-shrink-0" style={{ color: dot }} />
           <div className="min-w-0">
             <div className="text-sm font-bold text-[#0f172a]">
-              Scene {board.index} 마스터 프롬프트
+              Board {board.label} 마스터 프롬프트
+              {board.title_suffix && <span className="ml-1.5 text-[#64748b] font-medium">· {board.title_suffix}</span>}
             </div>
             <div className="text-[12px] text-[#64748b] leading-snug">
-              헤더 / 씬 정보 / 메인 프레임 / {board.panels.length}패널({board.panels.length === 6 ? '3×2' : board.panels.length === 12 ? '6×2' : ''} grid) / 라벨 / 무드보드까지 한 덩어리로 묶은 이미지 생성용 프롬프트
+              헤더 / 씬 정보 / 메인 프레임 / 6패널(3×2 grid) / 라벨 / 무드보드까지 한 덩어리로 묶은 이미지 생성용 프롬프트
             </div>
           </div>
         </div>
@@ -1042,6 +889,19 @@ function BoardView({ board, boardIndex, data, onCopy, onUpdateBoard, onUpdatePan
         </button>
       </div>
 
+      {/* Pacing strip */}
+      <div
+        className="rounded-2xl border px-4 py-3 flex items-center gap-3 flex-wrap"
+        style={{ background: `${dot}06`, borderColor: `${dot}33` }}
+      >
+        <Clock className="w-4 h-4 flex-shrink-0" style={{ color: dot }} />
+        <span className="text-[11px] font-black uppercase tracking-wider text-[#64748b]">페이싱</span>
+        <span className="text-base font-mono font-bold text-[#0f172a]">{pacing}</span>
+        <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${pacingValid ? 'bg-white border border-[#e2e8f0] text-[#0f172a]' : 'bg-[#fee2e2] border border-[#fca5a5] text-[#b91c1c]'}`}>
+          {pacingTotal}초 / {board.duration_seconds || 10}초{!pacingValid && ' · 합계 불일치'}
+        </span>
+      </div>
+
       {/* Main frame */}
       <div className="rounded-2xl overflow-hidden border border-[#e2e8f0] bg-white shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
         <div className="px-4 py-3 border-b border-[#e2e8f0] flex items-center justify-between gap-3" style={{ background: `${dot}10` }}>
@@ -1050,17 +910,12 @@ function BoardView({ board, boardIndex, data, onCopy, onUpdateBoard, onUpdatePan
               MAIN FRAME
             </span>
             <span className="text-base font-bold text-[#0f172a] truncate">
-              Scene {board.index} {board.title_suffix ? `· ${board.title_suffix}` : ''}
+              Board {board.label} {board.title_suffix ? `· ${board.title_suffix}` : ''}
             </span>
-            {board.duration_label && (
-              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#334155] flex-shrink-0">
-                {board.duration_label}
-              </span>
-            )}
+            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#334155] flex-shrink-0">
+              {board.duration_seconds}초
+            </span>
           </div>
-          <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#64748b]">
-            {board.part_label}
-          </span>
         </div>
 
         <div className="p-4 space-y-3">
@@ -1068,7 +923,7 @@ function BoardView({ board, boardIndex, data, onCopy, onUpdateBoard, onUpdatePan
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-1.5 min-w-0">
                 <Sparkles className="w-3.5 h-3.5 text-[#00996D] flex-shrink-0" />
-                <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">메인 프레임 프롬프트 (50–80 words)</span>
+                <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">메인 프레임 프롬프트 (50–80 words, EN)</span>
               </div>
               <button
                 onClick={() => onCopy(board.main_frame?.prompt_en || '')}
@@ -1116,10 +971,9 @@ function BoardView({ board, boardIndex, data, onCopy, onUpdateBoard, onUpdatePan
       {/* Panels */}
       {board.panels.map((panel, panelIdx) => (
         <PanelCard
-          key={`${board.index}-${panel.number}`}
+          key={`${board.label}-${panel.number}`}
           panel={panel}
           boardDot={dot}
-          audioMode={data.audio_mode}
           onCopy={onCopy}
           onUpdate={(patch) => onUpdatePanel(panelIdx, patch)}
         />
@@ -1128,10 +982,8 @@ function BoardView({ board, boardIndex, data, onCopy, onUpdateBoard, onUpdatePan
   );
 }
 
-function PanelCard({ panel, boardDot, audioMode, onCopy, onUpdate }) {
+function PanelCard({ panel, boardDot, onCopy, onUpdate }) {
   const labels = panel.labels || {};
-  const voice = panel.voice;
-  const vc = voice ? VOICE_COLOR[voice.type] || VOICE_COLOR.none : null;
   const fnLabel = panel.function ? (FUNCTION_LABEL[panel.function] || panel.function) : '';
 
   return (
@@ -1147,6 +999,12 @@ function PanelCard({ panel, boardDot, audioMode, onCopy, onUpdate }) {
           {panel.timecode && (
             <span className="text-[12px] font-mono font-bold text-[#334155]">{panel.timecode}</span>
           )}
+          {panel.duration_seconds > 0 && (
+            <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#334155]">
+              <Clock className="w-3 h-3" />
+              {panel.duration_seconds}초
+            </span>
+          )}
           {fnLabel && (
             <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#334155]">
               {fnLabel}
@@ -1158,19 +1016,6 @@ function PanelCard({ panel, boardDot, audioMode, onCopy, onUpdate }) {
             </span>
           )}
         </div>
-        {voice && voice.type !== 'none' && (
-          <div className="flex items-center gap-1.5">
-            <span
-              className="text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider"
-              style={{ background: vc.bg, color: vc.fg }}
-            >
-              {VOICE_LABEL[voice.type] || voice.type}
-            </span>
-            {voice.speaker && (
-              <span className="text-[11px] font-bold text-[#475569]">{voice.speaker}</span>
-            )}
-          </div>
-        )}
       </div>
 
       <div className="p-4 space-y-3">
@@ -1179,7 +1024,7 @@ function PanelCard({ panel, boardDot, audioMode, onCopy, onUpdate }) {
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5 min-w-0">
               <ImageIcon className="w-3.5 h-3.5 text-[#00996D] flex-shrink-0" />
-              <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">이미지 프롬프트 (15–30 words)</span>
+              <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">이미지 프롬프트 (15–30 words, EN)</span>
             </div>
             <button
               onClick={() => onCopy(panel.image_prompt_en)}
@@ -1215,7 +1060,7 @@ function PanelCard({ panel, boardDot, audioMode, onCopy, onUpdate }) {
           />
           <LabelField
             icon={MessageSquare}
-            label="SOUND / DIALOGUE"
+            label="SOUND / DIALOGUE (music & SFX)"
             value={labels.sound_dialogue}
             onChange={(v) => onUpdate({ labels: { ...labels, sound_dialogue: v } })}
             onCopy={() => onCopy(labels.sound_dialogue || '')}
@@ -1226,90 +1071,6 @@ function PanelCard({ panel, boardDot, audioMode, onCopy, onUpdate }) {
             value={labels.transition}
             onChange={(v) => onUpdate({ labels: { ...labels, transition: v } })}
             onCopy={() => onCopy(labels.transition || '')}
-          />
-        </div>
-
-        {/* Voice */}
-        {voice && audioMode !== 'silent' && (
-          <VoiceField voice={voice} vc={vc} onCopy={onCopy} onUpdate={onUpdate} />
-        )}
-      </div>
-    </div>
-  );
-}
-
-function VoiceField({ voice, vc, onCopy, onUpdate }) {
-  const updateVoice = (patch) => {
-    const next = { ...voice, ...patch };
-    if (typeof patch.line_ko === 'string') {
-      next.char_count_ko = [...patch.line_ko].length;
-    }
-    onUpdate({ voice: next });
-  };
-
-  return (
-    <div
-      className="rounded-xl border p-3 space-y-2"
-      style={{ background: vc.bg, borderColor: `${vc.dot}55` }}
-    >
-      <div className="flex items-center justify-between gap-2 flex-wrap">
-        <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-          <Mic className="w-3.5 h-3.5 flex-shrink-0" style={{ color: vc.fg }} />
-          <span className="text-[10px] font-black uppercase tracking-wider" style={{ color: vc.fg }}>
-            {VOICE_LABEL[voice.type] || voice.type}
-          </span>
-          <input
-            type="text"
-            value={voice.speaker || ''}
-            onChange={(e) => updateVoice({ speaker: e.target.value })}
-            placeholder="화자 (예: NARRATOR_M_30s)"
-            className="text-[11px] font-bold text-[#0f172a] bg-white/70 border border-white rounded-md px-1.5 py-0.5 min-w-[120px] focus:outline-none focus:bg-white focus:border-[#94a3b8]"
-            style={{ width: 'min(180px, 40vw)' }}
-          />
-          <input
-            type="text"
-            value={voice.delivery || ''}
-            onChange={(e) => updateVoice({ delivery: e.target.value })}
-            placeholder="딜리버리 (예: low whisper)"
-            className="text-[11px] italic text-[#475569] bg-white/70 border border-white rounded-md px-1.5 py-0.5 focus:outline-none focus:bg-white focus:border-[#94a3b8]"
-            style={{ width: 'min(200px, 45vw)' }}
-          />
-        </div>
-        <button
-          onClick={() => onCopy(voice.line_ko || voice.line_en || '')}
-          className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[10px] font-bold text-[#64748b] tb-press-soft flex-shrink-0"
-        >
-          <Copy className="w-3 h-3" />
-          카피 복사
-        </button>
-      </div>
-
-      <div className="bg-white rounded-lg p-2.5 border border-[#e2e8f0] space-y-2">
-        <div>
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-[10px] font-black text-[#64748b] uppercase tracking-wider">대사 (KO)</span>
-            <span className="text-[10px] font-bold text-[#94a3b8]">
-              {voice.char_count_ko || [...(voice.line_ko || '')].length}자
-            </span>
-          </div>
-          <textarea
-            value={voice.line_ko || ''}
-            onChange={(e) => updateVoice({ line_ko: e.target.value })}
-            rows={2}
-            placeholder="한국어 대사를 입력하세요"
-            className="w-full min-h-[44px] resize-y text-[15px] font-bold text-[#0f172a] leading-snug bg-white border border-[#e2e8f0] rounded-md p-2 focus:outline-none focus:border-[#00B380] focus:ring-[2px] focus:ring-[#00B380]/20"
-          />
-        </div>
-        <div>
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-[10px] font-black text-[#64748b] uppercase tracking-wider">Line (EN)</span>
-          </div>
-          <textarea
-            value={voice.line_en || ''}
-            onChange={(e) => updateVoice({ line_en: e.target.value })}
-            rows={2}
-            placeholder="English line"
-            className="w-full min-h-[40px] resize-y text-[13px] italic text-[#475569] leading-snug bg-white border border-[#e2e8f0] rounded-md p-2 focus:outline-none focus:border-[#00B380] focus:ring-[2px] focus:ring-[#00B380]/20"
           />
         </div>
       </div>

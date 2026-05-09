@@ -85,7 +85,7 @@ Vercel이 자동 배포함.
 | Step 2-1 | `/lecture/step2-1` | `21` | 인트로 영상 만들기 (Step 2 하위) |
 | Step 3 | `/lecture/step3` | `3` | 스토리 영상 만들기 (기/승/전/결) |
 | Step 6 | `/lecture/step6` | `6` | PRO 1 · 시네마틱 5컷 다이얼로그 (캐릭터 A/B + S01~S05) |
-| Step 7 | `/lecture/step7` | `7` | PRO 2 · 시네마 광고영상 (Cinematic Storyboard v3 · A 12패널 / B 6+6패널) |
+| Step 7 | `/lecture/step7` | `7` | PRO 2 · 멀티영상 만들기 (Cinematic Storyboard v4 · A 12패널 / B 6+6패널, 다국어 단일 출력) |
 | Step 4 | `/lecture/step4` | `4` | PRO 3 · 광고영상 만들기 (Hook/Build/Climax/CTA) |
 | Step 5 | `/lecture/step5` | `5` | PRO 4 · 유튜브 수익화 · 뮤직영상 프롬프트 (마스터 + S01~Snn, part1+part2 병합) |
 

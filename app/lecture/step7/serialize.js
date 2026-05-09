@@ -1,172 +1,142 @@
-// Storyboard JSON → Master Prompt Serializer
-// Ported from /Users/toolb/tb/지침/PROCLASS/시네마광고영상/serialize.ts
-// Output is a single English text block intended for image generators
-// (Nano Banana / Midjourney / DALL·E / Aurora).
+// Storyboard JSON v6 → Master Prompt Serializer
+// Visual-only mode: no narration, dialogue, or tagline. Music & SFX only.
+//
+// Each board = exactly 10 seconds, 6 panels with mixed durations (1–3s each).
+// Mode A = 1 board (10s). Mode B = 2 boards A+B (20s total).
 
-function header(s) {
+function hdr(s) {
   return `[${s}]`;
 }
 
 function panelLine(panel) {
-  return `${panel.number}. ${panel.timecode} — ${panel.image_prompt_en}`;
+  const dur = panel.duration_seconds ? ` (${panel.duration_seconds}s)` : '';
+  return `${panel.number}. ${panel.timecode}${dur} — ${panel.image_prompt_en}`;
 }
 
-function voiceLine(panel) {
-  const v = panel.voice;
-  if (!v || v.type === 'none' || !v.line_en) return null;
-  const tag = v.type === 'tagline' ? 'TAGLINE' : v.type === 'dialogue' ? 'DIALOGUE' : 'VO';
-  const speaker = v.speaker ? ` (${v.speaker})` : '';
-  return `   ${tag}${speaker}: "${v.line_en}"`;
-}
-
-function panelBlock(panel, includeVoice) {
-  const main = panelLine(panel);
-  if (!includeVoice) return main;
-  const voice = voiceLine(panel);
-  return voice ? `${main}\n${voice}` : main;
+function pacingString(panels) {
+  return panels.map(p => p.duration_seconds || '?').join('-');
 }
 
 export function serializeBoardToPrompt(board, data) {
-  const { project, scene, audio_mode, mode, consistency_lock, bridge_frame } = data;
-  const includeVoice = audio_mode !== 'silent';
+  const { project, scene, mode, consistency_lock, bridge_frame } = data;
   const isModeB = mode === 'B';
-
   const panelCount = board.panels.length;
   const gridLayout = panelCount === 12 ? '6 × 2 grid' : '3 × 2 grid';
 
-  const partLabel = board.part_label;
-  const durationLabel = board.duration_label;
+  const boardLabel = board.label || 'A';
   const titleSuffix = board.title_suffix ? ` — ${board.title_suffix}` : '';
   const titleLine = `${project.title}${titleSuffix}`;
+  const boardDuration = board.duration_seconds || 10;
+  const pacing = pacingString(board.panels);
 
-  const sections = [];
+  const out = [];
 
   if (isModeB) {
-    sections.push(`Create a single premium cinematic ${panelCount}-panel director storyboard presentation board, PART ${partLabel}.`);
-    sections.push(`A professional film director's pitch-deck sheet, NOT a comic page.`);
-    sections.push(`This board covers ${durationLabel.replace(' SECONDS', '')} of a continuous ${project.total_duration_seconds}-second cinematic sequence.`);
+    out.push(`Create a single premium cinematic ${panelCount}-panel director storyboard presentation board, BOARD ${boardLabel}.`);
+    out.push(`A professional film director's pitch-deck sheet, NOT a comic page.`);
+    out.push(`This board covers ${boardDuration} seconds (pacing ${pacing}) of a continuous ${project.total_duration_seconds}-second cinematic sequence.`);
   } else {
-    sections.push(`Create a single premium cinematic ${panelCount}-panel director storyboard presentation board.`);
-    sections.push(`A professional film director's pitch-deck sheet, NOT a comic page.`);
+    out.push(`Create a single premium cinematic ${panelCount}-panel director storyboard presentation board (${boardDuration} SECONDS, mixed pacing ${pacing}).`);
+    out.push(`A professional film director's pitch-deck sheet, NOT a comic page.`);
   }
-
-  sections.push('');
+  out.push('');
 
   // [TOP HEADER]
-  sections.push(header('TOP HEADER'));
-  sections.push(`PROJECT TITLE: ${titleLine}    PART: ${partLabel}    DURATION: ${durationLabel}`);
+  out.push(hdr('TOP HEADER'));
+  const partLabel = isModeB ? `BOARD ${boardLabel} OF 2` : `BOARD ${boardLabel} OF 1`;
+  out.push(`PROJECT TITLE: ${titleLine}    PART: ${partLabel}    DURATION: ${boardDuration} SECONDS`);
   const toneStr = Array.isArray(project.tone) ? project.tone.join(' • ') : (project.tone || '');
-  sections.push(`GENRE: ${project.genre}    TONE: ${toneStr}`);
-  sections.push('');
+  out.push(`GENRE: ${project.genre}    TONE: ${toneStr}    PACING: ${pacing}`);
+  out.push('');
 
   // [LEFT ZONE]
-  sections.push(header('LEFT ZONE'));
-  const sceneTitle = `${scene.title}${titleSuffix}`;
-  sections.push(`SCENE TITLE: ${sceneTitle}`);
-  sections.push(`LOGLINE: ${scene.logline}`);
-  sections.push(`SCENE OVERVIEW:`);
+  out.push(hdr('LEFT ZONE'));
+  out.push(`SCENE TITLE: ${scene.title}${titleSuffix}`);
+  out.push(`LOGLINE: ${scene.logline}`);
+  out.push(`SCENE OVERVIEW:`);
   const ov = scene.overview || {};
-  sections.push(`  LOCATION: ${ov.location || ''}`);
-  sections.push(`  TIME: ${ov.time || ''}`);
-  sections.push(`  LIGHTING: ${ov.lighting || ''}`);
-  sections.push(`  MOOD: ${ov.mood || ''}`);
-  sections.push(`  SOUND THEME: ${ov.sound_theme || ''}`);
-  sections.push(`  DIALOGUE: ${ov.dialogue || ''}`);
-  sections.push(`  TRANSITION STYLE: ${ov.transition_style || ''}`);
-  sections.push('');
+  out.push(`  LOCATION: ${ov.location || ''}`);
+  out.push(`  TIME: ${ov.time || ''}`);
+  out.push(`  LIGHTING: ${ov.lighting || ''}`);
+  out.push(`  MOOD: ${ov.mood || ''}`);
+  out.push(`  SOUND THEME: ${ov.sound_theme || ''}`);
+  out.push(`  DIALOGUE: ${ov.dialogue || 'None (Music & SFX only)'}`);
+  out.push(`  TRANSITION STYLE: ${ov.transition_style || ''}`);
+  out.push('');
 
   // [CENTER HERO FRAME]
-  sections.push(header('CENTER HERO FRAME'));
-  sections.push(board.main_frame?.prompt_en || '');
-  sections.push('');
+  out.push(hdr('CENTER HERO FRAME'));
+  out.push(board.main_frame?.prompt_en || '');
+  out.push('');
 
   // [RIGHT ZONE]
-  sections.push(`[RIGHT ZONE: TOTAL DURATION ${project.total_duration_seconds} SECONDS / ${panelCount} PANELS]`);
-  sections.push('');
+  out.push(`[RIGHT ZONE: TOTAL DURATION ${project.total_duration_seconds} SECONDS / ${panelCount} PANELS]`);
+  out.push('');
 
   // [PANELS]
-  sections.push(`[${panelCount} PANELS — ${gridLayout}]`);
+  out.push(`[${panelCount} PANELS — ${gridLayout}]`);
   for (const panel of board.panels) {
-    sections.push(panelBlock(panel, includeVoice));
+    out.push(panelLine(panel));
   }
-  sections.push('');
-  sections.push(`Each panel includes 4 small-cap labels:`);
-  sections.push(`ACTION / VISUAL  •  CAMERA / MOVEMENT  •  SOUND / DIALOGUE  •  TRANSITION`);
-  sections.push('');
-
-  // Voice section
-  if (includeVoice) {
-    const voiceLines = board.panels
-      .map((p) => {
-        const v = p.voice;
-        if (!v || v.type === 'none') return null;
-        const koLine = v.line_ko ? `  ko: "${v.line_ko}"` : '';
-        const enLine = v.line_en ? `  en: "${v.line_en}"` : '';
-        const delivery = v.delivery ? `  delivery: ${v.delivery}` : '';
-        return `Panel ${p.number} [${p.timecode}] ${v.type.toUpperCase()}${
-          v.speaker ? ` — ${v.speaker}` : ''
-        }\n${koLine}\n${enLine}\n${delivery}`;
-      })
-      .filter(Boolean);
-
-    if (voiceLines.length) {
-      sections.push(header('VOICE / NARRATION / DIALOGUE'));
-      sections.push(voiceLines.join('\n\n'));
-      sections.push('');
-    }
-  }
+  out.push('');
+  out.push(`Each panel includes 4 small-cap labels:`);
+  out.push(`ACTION / VISUAL  •  CAMERA / MOVEMENT  •  SOUND / DIALOGUE (music & SFX only)  •  TRANSITION`);
 
   // [BOTTOM]
-  sections.push(header('BOTTOM'));
-  sections.push(`NOTES FOR PRODUCTION:`);
+  out.push('');
+  out.push(hdr('BOTTOM'));
+  out.push(`NOTES FOR PRODUCTION:`);
   for (const note of (board.production_notes || [])) {
-    sections.push(`- ${note}`);
+    out.push(`- ${note}`);
   }
-  sections.push('');
-  sections.push(`VISUAL REFERENCES & MOODBOARD: ${(board.moodboard_keywords || []).join(', ')}.`);
-  sections.push('');
+  out.push('');
+  out.push(`VISUAL REFERENCES & MOODBOARD: ${(board.moodboard_keywords || []).join(', ')}.`);
+  out.push('');
 
   // [DESIGN STYLE]
   const tokens = data.production?.design_tokens || {};
-  sections.push(header('DESIGN STYLE'));
-  sections.push(`Dark luxury director-board, charcoal background (${tokens.color_background_primary || '#0A0A0A'} / ${tokens.color_background_secondary || '#1A1A1A'}),`);
-  sections.push(`gold accents (${tokens.color_accent_gold || '#C9A96E'}), off-white type (${tokens.color_text_primary || '#F5F0E6'}),`);
-  sections.push(`elegant serif headlines, small-cap labels, thin gold dividers,`);
-  sections.push(`magazine-spread quality, no comic style, no random text, no real-world brand logos.`);
-  sections.push('');
+  out.push(hdr('DESIGN STYLE'));
+  out.push(`Dark luxury director-board, charcoal background (${tokens.color_background_primary || '#0A0A0A'} / ${tokens.color_background_secondary || '#1A1A1A'}),`);
+  out.push(`gold accents (${tokens.color_accent_gold || '#C9A96E'}), off-white type (${tokens.color_text_primary || '#F5F0E6'}),`);
+  out.push(`elegant serif headlines, small-cap labels, thin gold dividers,`);
+  out.push(`magazine-spread quality, no comic style, no random text, no real-world brand logos.`);
+  out.push('');
 
   // [VISUAL STYLE]
-  sections.push(header('VISUAL STYLE'));
-  sections.push(`Cinematic realistic, high contrast lighting, shallow depth of field,`);
-  sections.push(`filmic color grading, anamorphic flare, atmospheric highlights,`);
-  sections.push(`${(project.genre || '').toLowerCase()} look, consistent subject/lighting/palette across all ${panelCount} panels.`);
+  out.push(hdr('VISUAL STYLE'));
+  out.push(`Cinematic realistic, high contrast lighting, shallow depth of field,`);
+  out.push(`filmic color grading, anamorphic flare, atmospheric highlights,`);
+  out.push(`${(project.genre || '').toLowerCase()} look, consistent subject/lighting/palette across all ${panelCount} panels.`);
 
-  // Mode B — consistency lock + bridge note
+  // Mode B only — consistency lock + bridge note
   if (isModeB && bridge_frame && consistency_lock) {
-    sections.push('');
-    sections.push(header('CONSISTENCY LOCK (byte-identical across both boards)'));
-    sections.push(`SUBJECT: ${consistency_lock.subject_en}`);
-    sections.push(`SETTING: ${consistency_lock.setting_en}`);
-    sections.push(`LIGHTING: ${consistency_lock.lighting_en}`);
-    sections.push(`BGM POLICY: ${consistency_lock.bgm_policy}`);
-
-    if (board.index === 1) {
-      sections.push(`→ Continues to Part 2 of 2. Bridge frame: ${bridge_frame.summary_ko || ''}`);
+    out.push('');
+    out.push(hdr('CONSISTENCY LOCK (byte-identical across both boards)'));
+    out.push(`SUBJECT: ${consistency_lock.subject_en}`);
+    out.push(`SETTING: ${consistency_lock.setting_en}`);
+    out.push(`LIGHTING: ${consistency_lock.lighting_en}`);
+    out.push(`BGM POLICY: ${consistency_lock.bgm_policy}`);
+    if (boardLabel === 'A') {
+      out.push(`→ Continues to Board B. Bridge: ${bridge_frame.summary || ''}`);
     } else {
-      sections.push(`← Continues from Part 1 of 2. Starts from: ${bridge_frame.summary_ko || ''}`);
+      out.push(`← Continues from Board A. Starts from: ${bridge_frame.summary || ''}`);
     }
   }
 
-  sections.push('');
-  sections.push(`Aspect ratio ${data.production?.aspect_ratio || '16:9'}. Ultra-detailed, magazine-spread quality.`);
+  out.push('');
+  out.push(`Aspect ratio ${data.production?.aspect_ratio || '16:9'}. Ultra-detailed, magazine-spread quality.`);
 
-  return sections.join('\n');
+  // Per-board copy footer — explicit hand-off line for the video generator.
+  out.push('');
+  out.push(`Please make a video referring to the images for each scene. No bgm`);
+
+  return out.join('\n');
 }
 
 export function serializeAllBoards(data) {
   return data.boards.map((board) => ({
-    board_index: board.index,
-    title: `${data.project.title}${board.title_suffix ? ' — ' + board.title_suffix : ''} (${board.part_label})`,
+    board_label: board.label,
+    title: `${data.project.title}${board.title_suffix ? ' — ' + board.title_suffix : ''} (Board ${board.label})`,
     prompt: serializeBoardToPrompt(board, data),
   }));
 }
