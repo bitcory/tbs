@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft, Upload, Copy, Clipboard, ExternalLink, Gem, X,
-  Clapperboard, Image as ImageIcon, Film, Layers, Palette, List, Music, Droplets, Wrench, Languages,
+  Clapperboard, Image as ImageIcon, Film, Layers, Palette, List, Music, Droplets, Wrench, Languages, UserSquare,
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 const FrameExtractor = dynamic(() => import('@/app/components/FrameExtractor'), { ssr: false });
@@ -185,6 +185,17 @@ export default function Step2_1Page() {
   const [hydrated, setHydrated] = useState(false);
   const [toolView, setToolView] = useState(null);
   const [pendingScrollId, setPendingScrollId] = useState(null);
+  const [characterSheetOpen, setCharacterSheetOpen] = useState(false);
+
+  const CHARACTER_SHEET_PROMPT = `Using the attached image as the sole reference for character identity, facial features, skin tone, hair style, clothing design, and overall visual style, generate a professional character turnaround sheet.
+
+The sheet must contain exactly four panels arranged in a single row: front view (full body), side view (full body, facing right), back view (full body), and a portrait close-up (head and shoulders, front-facing).
+
+All four panels must show the same character in a neutral A-pose or relaxed standing pose. The character's face, proportions, clothing details, accessories, and surface textures must remain completely consistent across all four panels. Do not alter the character's design between panels in any way.
+
+Lighting: soft neutral studio three-point lighting, consistent across all four panels, no dramatic shadows, no colored light. Background: clean neutral gray studio backdrop, identical in all panels. Render style: match the exact visual style of the attached image — if photorealistic, render photorealistic; if stylized 3D, render stylized 3D; if illustrated, render illustrated. Maintain the same level of detail, skin texture quality, fabric texture, and color grading as the reference.
+
+No text, no labels, no watermarks, no panel borders, no background elements other than the neutral studio backdrop.`;
   const sceneRefs = useRef({});
 
   // Load cache
@@ -540,6 +551,13 @@ export default function Step2_1Page() {
               <ExternalLink className="w-3.5 h-3.5" />
               인트로영상 젬가이드 열기
             </a>
+            <button
+              onClick={() => setCharacterSheetOpen(true)}
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#7c3aed] hover:opacity-90 text-white text-sm font-bold tb-press"
+            >
+              <UserSquare className="w-3.5 h-3.5" />
+              캐릭터시트
+            </button>
             <a
               href="https://kr.pinterest.com/"
               target="_blank"
@@ -869,6 +887,57 @@ export default function Step2_1Page() {
                 className="px-4 py-1.5 rounded-full tb-pill-primary text-sm font-bold transition"
               >
                 불러오기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Character Sheet Modal */}
+      {characterSheetOpen && (
+        <div
+          className="fixed inset-0 z-[300] flex items-center justify-center bg-[#0f172a]/60 backdrop-blur-md"
+          onClick={() => setCharacterSheetOpen(false)}
+        >
+          <div
+            className="bg-white rounded-2xl border border-[#e2e8f0] shadow-[0_24px_60px_rgba(15,23,42,0.25)] w-[720px] max-w-[95vw] max-h-[85vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#e2e8f0]">
+              <div className="flex items-center gap-2 min-w-0">
+                <UserSquare className="w-4 h-4 text-[#7c3aed] flex-shrink-0" />
+                <span className="text-base font-bold text-[#0f172a] uppercase tracking-wider">캐릭터시트 프롬프트</span>
+              </div>
+              <button
+                onClick={() => setCharacterSheetOpen(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#475569] tb-press-soft"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-5 space-y-3 min-h-0">
+              <p className="text-sm text-[#64748b] leading-relaxed">
+                레퍼런스 이미지를 첨부한 뒤 아래 프롬프트를 사용해 캐릭터 4면 시트를 생성하세요.
+              </p>
+              <textarea
+                value={CHARACTER_SHEET_PROMPT}
+                readOnly
+                className="w-full h-[360px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] focus:outline-none focus:border-[#7c3aed] focus:ring-[3px] focus:ring-[#7c3aed]/20"
+              />
+            </div>
+            <div className="flex justify-end gap-2 px-5 py-3 border-t border-[#e2e8f0]">
+              <button
+                onClick={() => setCharacterSheetOpen(false)}
+                className="px-4 py-1.5 rounded-full tb-pill-ghost text-sm font-bold transition"
+              >
+                닫기
+              </button>
+              <button
+                onClick={() => copyText(CHARACTER_SHEET_PROMPT)}
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#7c3aed] hover:opacity-90 text-white text-sm font-bold tb-press"
+              >
+                <Copy className="w-3.5 h-3.5" />
+                프롬프트 복사
               </button>
             </div>
           </div>
