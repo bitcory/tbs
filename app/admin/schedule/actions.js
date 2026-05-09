@@ -55,6 +55,9 @@ export async function createSession(input) {
   if (!startAt) throw new Error("invalid_date");
   const stepLevel = validateClassSlot(input.classType, input.stepLevel);
 
+  // assistantToReserve only takes effect when no assistant is assigned.
+  const assistantToReserve = !input.assistantInstructorId && !!input.assistantToReserve;
+
   await prisma.classSession.create({
     data: {
       startAt,
@@ -62,6 +65,7 @@ export async function createSession(input) {
       stepLevel,
       mainInstructorId:      input.mainInstructorId      || null,
       assistantInstructorId: input.assistantInstructorId || null,
+      assistantToReserve,
       createdById: me.id,
       note: input.note || null,
     },
@@ -76,6 +80,8 @@ export async function updateSession(sessionId, input) {
   if (!startAt) throw new Error("invalid_date");
   const stepLevel = validateClassSlot(input.classType, input.stepLevel);
 
+  const assistantToReserve = !input.assistantInstructorId && !!input.assistantToReserve;
+
   await prisma.classSession.update({
     where: { id: sessionId },
     data: {
@@ -84,6 +90,7 @@ export async function updateSession(sessionId, input) {
       stepLevel,
       mainInstructorId:      input.mainInstructorId      || null,
       assistantInstructorId: input.assistantInstructorId || null,
+      assistantToReserve,
       note: input.note || null,
     },
   });

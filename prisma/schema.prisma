@@ -132,6 +132,7 @@ model ClassSession {
   stepLevel             Int       @default(1)
   mainInstructorId      String?
   assistantInstructorId String?
+  assistantToReserve    Boolean   @default(false)
   createdById           String?
   note                  String?   @db.Text
   createdAt             DateTime  @default(now())
@@ -168,9 +169,10 @@ model PricingConfig {
   classType      ClassType
   stepLevel      Int       @default(0)
   pricePerPerson Int
-  toolbShare     Float     @default(0.50)
-  mainShare      Float     @default(0.35)
-  assistantShare Float     @default(0.15)
+  toolbShare     Float     @default(0.40)
+  mainShare      Float     @default(0.28)
+  assistantShare Float     @default(0.12)
+  reserveShare   Float     @default(0.20)
   updatedAt      DateTime  @updatedAt
   updatedById    String?
 

@@ -131,7 +131,13 @@ export default function ScheduleClient({ me, sessions, staffUsers, memberUsers, 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       {me.role === "SUPER_ADMIN" && (
-        <PayoutSummary sessions={sessions} />
+        <PayoutSummary
+          sessions={sessions}
+          viewYear={viewYear}
+          viewMonth={viewMonth}
+          setViewYear={setViewYear}
+          setViewMonth={setViewMonth}
+        />
       )}
 
       <CalendarHeader
@@ -456,7 +462,16 @@ function SessionCard({ sess, me, onEdit, onDelete, onOpenEnroll, onSetStatus, on
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10, marginBottom: 14, fontSize: 13 }}>
         <Info label="주강사" value={userLabel(sess.mainInstructor)} />
-        <Info label="보조강사" value={userLabel(sess.assistantInstructor)} />
+        <Info
+          label="보조강사"
+          value={
+            sess.assistantInstructor
+              ? userLabel(sess.assistantInstructor)
+              : sess.assistantToReserve
+                ? "충당금"
+                : "—"
+          }
+        />
         <Info label="신청" value={`${sess.counts.applicants}명`} />
         <Info label="참가" value={`${sess.counts.attendees}명`} highlight />
       </div>
@@ -525,6 +540,7 @@ function RevenueBox({ revenue, scope }) {
     scope.canSeeToolb     && { k: "툴비",     v: revenue.toolb,     accent: "#016837" },
     scope.canSeeMain      && { k: "주강사",   v: revenue.main,      accent: "#1d4ed8" },
     scope.canSeeAssistant && { k: "보조강사", v: revenue.assistant, accent: "#7e22ce" },
+    scope.canSeeReserve   && { k: "충당금",   v: revenue.reserve,   accent: "#b45309" },
   ].filter(Boolean);
 
   if (items.length === 0) return null;
@@ -631,6 +647,7 @@ function SessionModal({ mode, initialDate, session, staffUsers, pricing, onClose
         slotKey: pricingKey(session.classType, session.stepLevel ?? 0),
         mainInstructorId: session.mainInstructorId || "",
         assistantInstructorId: session.assistantInstructorId || "",
+        assistantToReserve: !!session.assistantToReserve,
         note: session.note || "",
       }
     : {
@@ -639,11 +656,27 @@ function SessionModal({ mode, initialDate, session, staffUsers, pricing, onClose
         slotKey: pricingKey("ZERO", 0),
         mainInstructorId: "",
         assistantInstructorId: "",
+        assistantToReserve: false,
         note: "",
       };
 
   const [form, setForm] = useState(initial);
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+
+  // Sentinel for the assistant select — chosen instead of an instructor user id.
+  const RESERVE_SENTINEL = "__reserve__";
+  const assistantValue = form.assistantInstructorId
+    ? form.assistantInstructorId
+    : form.assistantToReserve
+      ? RESERVE_SENTINEL
+      : "";
+  const onAssistantChange = (v) => {
+    if (v === RESERVE_SENTINEL) {
+      setForm((f) => ({ ...f, assistantInstructorId: "", assistantToReserve: true }));
+    } else {
+      setForm((f) => ({ ...f, assistantInstructorId: v, assistantToReserve: false }));
+    }
+  };
 
   function buildPayload() {
     const [classType, stepStr] = form.slotKey.split("_");
@@ -654,6 +687,7 @@ function SessionModal({ mode, initialDate, session, staffUsers, pricing, onClose
       stepLevel: Number(stepStr),
       mainInstructorId: form.mainInstructorId,
       assistantInstructorId: form.assistantInstructorId,
+      assistantToReserve: form.assistantToReserve,
       note: form.note,
     };
   }
@@ -696,7 +730,12 @@ function SessionModal({ mode, initialDate, session, staffUsers, pricing, onClose
             <InstructorSelect value={form.mainInstructorId} onChange={(v) => set("mainInstructorId", v)} staffUsers={staffUsers} />
           </Field>
           <Field label="보조강사">
-            <InstructorSelect value={form.assistantInstructorId} onChange={(v) => set("assistantInstructorId", v)} staffUsers={staffUsers} />
+            <InstructorSelect
+              value={assistantValue}
+              onChange={onAssistantChange}
+              staffUsers={staffUsers}
+              extraOption={{ value: RESERVE_SENTINEL, label: "충당금" }}
+            />
           </Field>
         </Row>
         <Field label="메모">
@@ -718,10 +757,13 @@ function SessionModal({ mode, initialDate, session, staffUsers, pricing, onClose
   );
 }
 
-function InstructorSelect({ value, onChange, staffUsers }) {
+function InstructorSelect({ value, onChange, staffUsers, extraOption }) {
   return (
     <select value={value} onChange={(e) => onChange(e.target.value)} style={S.input}>
       <option value="">— 선택 안 함 —</option>
+      {extraOption && (
+        <option value={extraOption.value}>{extraOption.label}</option>
+      )}
       {staffUsers.map((u) => (
         <option key={u.id} value={u.id}>
           {userLabel(u)} {u.role === "SUPER_ADMIN" ? "(슈퍼)" : "(운영진)"}
@@ -970,12 +1012,27 @@ function EnrollPicker({ session, memberUsers, onClose, onAdd, pending }) {
   );
 }
 
-function PayoutSummary({ sessions }) {
+function PayoutSummary({ sessions, viewYear, viewMonth, setViewYear, setViewMonth }) {
   const [period, setPeriod] = useState("month"); // "month" | "all"
   const now = new Date();
-  const yyyymm = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}`;
+  const yyyymm = `${viewYear}-${pad2(viewMonth + 1)}`;
 
-  const { totalToolb, mains, assistants, totalRevenue } = useMemo(() => {
+  function gotoMonth(delta) {
+    const d = new Date(viewYear, viewMonth + delta, 1);
+    setViewYear(d.getFullYear());
+    setViewMonth(d.getMonth());
+  }
+
+  function gotoCurrentMonth() {
+    const d = new Date();
+    setViewYear(d.getFullYear());
+    setViewMonth(d.getMonth());
+  }
+
+  const isCurrentMonth =
+    viewYear === now.getFullYear() && viewMonth === now.getMonth();
+
+  const { totalToolb, totalReserve, totalRevenue, instructors, mainTotal, assistantTotal } = useMemo(() => {
     const filtered = sessions.filter((s) => {
       if (period === "all") return true;
       const d = new Date(s.startAt);
@@ -983,38 +1040,47 @@ function PayoutSummary({ sessions }) {
     });
 
     let totalToolb = 0;
+    let totalReserve = 0;
     let totalRevenue = 0;
-    const mainsMap = new Map();
-    const assistsMap = new Map();
+    const byInstructor = new Map();
+
+    const get = (user) => {
+      const cur = byInstructor.get(user.id) || {
+        user,
+        mainTotal: 0,
+        mainSessions: 0,
+        assistantTotal: 0,
+        assistantSessions: 0,
+      };
+      byInstructor.set(user.id, cur);
+      return cur;
+    };
 
     for (const s of filtered) {
-      // For super-admin, all revenue fields are populated.
       totalToolb += s.revenue.toolb || 0;
+      totalReserve += s.revenue.reserve || 0;
       totalRevenue += s.revenue.total || 0;
 
       if (s.mainInstructor && (s.revenue.main || 0) > 0) {
-        const id = s.mainInstructor.id;
-        const cur = mainsMap.get(id) || { user: s.mainInstructor, total: 0, sessions: 0 };
-        cur.total += s.revenue.main;
-        cur.sessions += 1;
-        mainsMap.set(id, cur);
+        const cur = get(s.mainInstructor);
+        cur.mainTotal += s.revenue.main;
+        cur.mainSessions += 1;
       }
       if (s.assistantInstructor && (s.revenue.assistant || 0) > 0) {
-        const id = s.assistantInstructor.id;
-        const cur = assistsMap.get(id) || { user: s.assistantInstructor, total: 0, sessions: 0 };
-        cur.total += s.revenue.assistant;
-        cur.sessions += 1;
-        assistsMap.set(id, cur);
+        const cur = get(s.assistantInstructor);
+        cur.assistantTotal += s.revenue.assistant;
+        cur.assistantSessions += 1;
       }
     }
 
-    const sortByTotal = (a, b) => b.total - a.total;
-    return {
-      totalToolb,
-      totalRevenue,
-      mains:      Array.from(mainsMap.values()).sort(sortByTotal),
-      assistants: Array.from(assistsMap.values()).sort(sortByTotal),
-    };
+    const instructors = Array.from(byInstructor.values())
+      .map((r) => ({ ...r, total: r.mainTotal + r.assistantTotal }))
+      .sort((a, b) => b.total - a.total);
+
+    const mainTotal = instructors.reduce((acc, r) => acc + r.mainTotal, 0);
+    const assistantTotal = instructors.reduce((acc, r) => acc + r.assistantTotal, 0);
+
+    return { totalToolb, totalReserve, totalRevenue, instructors, mainTotal, assistantTotal };
   }, [sessions, period, yyyymm]);
 
   return (
@@ -1024,23 +1090,75 @@ function PayoutSummary({ sessions }) {
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
         <h2 style={{ fontSize: 18, fontWeight: 800 }}>💰 정산 요약</h2>
-        <div style={{ display: "flex", gap: 4, padding: 4, background: "#f1f5f9", borderRadius: 999 }}>
-          {[{ k: "month", label: "이번 달" }, { k: "all", label: "전체" }].map((opt) => (
-            <button
-              key={opt.k}
-              onClick={() => setPeriod(opt.k)}
-              className="tb-press-soft"
-              style={{
-                padding: "6px 14px", borderRadius: 999, fontSize: 12, fontWeight: 700,
-                border: "none", cursor: "pointer",
-                background: period === opt.k ? "#fff" : "transparent",
-                color:      period === opt.k ? "#016837" : "#64748b",
-                boxShadow:  period === opt.k ? "0 2px 6px rgba(0,0,0,0.06)" : "none",
-              }}
-            >
-              {opt.label}
-            </button>
-          ))}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          {period === "month" && (
+            <div style={{
+              display: "flex", alignItems: "center", gap: 4,
+              padding: 4, background: "#f1f5f9", borderRadius: 999,
+            }}>
+              <button
+                type="button"
+                onClick={() => gotoMonth(-1)}
+                className="tb-press-soft"
+                aria-label="이전 달"
+                style={{
+                  width: 28, height: 28, borderRadius: 999,
+                  border: "none", cursor: "pointer", background: "#fff",
+                  color: "#475569", fontSize: 14, fontWeight: 800,
+                  boxShadow: "0 1px 3px rgba(15,23,42,0.06)",
+                }}
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                onClick={gotoCurrentMonth}
+                title="이번 달로"
+                className="tb-press-soft"
+                style={{
+                  padding: "6px 12px", borderRadius: 999, border: "none",
+                  cursor: "pointer", fontSize: 13, fontWeight: 800,
+                  background: "transparent",
+                  color: isCurrentMonth ? "#016837" : "#0f172a",
+                  minWidth: 110, textAlign: "center",
+                }}
+              >
+                {viewYear}년 {viewMonth + 1}월{isCurrentMonth ? " · 이번 달" : ""}
+              </button>
+              <button
+                type="button"
+                onClick={() => gotoMonth(+1)}
+                className="tb-press-soft"
+                aria-label="다음 달"
+                style={{
+                  width: 28, height: 28, borderRadius: 999,
+                  border: "none", cursor: "pointer", background: "#fff",
+                  color: "#475569", fontSize: 14, fontWeight: 800,
+                  boxShadow: "0 1px 3px rgba(15,23,42,0.06)",
+                }}
+              >
+                ›
+              </button>
+            </div>
+          )}
+          <div style={{ display: "flex", gap: 4, padding: 4, background: "#f1f5f9", borderRadius: 999 }}>
+            {[{ k: "month", label: "월별" }, { k: "all", label: "전체" }].map((opt) => (
+              <button
+                key={opt.k}
+                onClick={() => setPeriod(opt.k)}
+                className="tb-press-soft"
+                style={{
+                  padding: "6px 14px", borderRadius: 999, fontSize: 12, fontWeight: 700,
+                  border: "none", cursor: "pointer",
+                  background: period === opt.k ? "#fff" : "transparent",
+                  color:      period === opt.k ? "#016837" : "#64748b",
+                  boxShadow:  period === opt.k ? "0 2px 6px rgba(0,0,0,0.06)" : "none",
+                }}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -1049,12 +1167,116 @@ function PayoutSummary({ sessions }) {
         gap: 12, marginBottom: 18,
       }}>
         <SummaryStat label="총매출" value={totalRevenue} accent="#0f172a" />
-        <SummaryStat label="툴비 합계 (50%)" value={totalToolb} accent="#016837" highlight />
+        <SummaryStat label="툴비 합계 (40%)" value={totalToolb} accent="#016837" highlight />
+        <SummaryStat label="충당금 합계 (20%)" value={totalReserve} accent="#b45309" />
       </div>
 
-      <PayoutGroup title="주강사별 (35%)" rows={mains}      accent="#1d4ed8" emptyMsg="해당 기간에 주강사 정산 내역이 없습니다." />
-      <PayoutGroup title="보조강사별 (15%)" rows={assistants} accent="#7e22ce" emptyMsg="해당 기간에 보조강사 정산 내역이 없습니다." />
+      <InstructorPayoutTable
+        rows={instructors}
+        mainTotal={mainTotal}
+        assistantTotal={assistantTotal}
+      />
     </div>
+  );
+}
+
+function InstructorPayoutTable({ rows, mainTotal, assistantTotal }) {
+  const grandTotal = mainTotal + assistantTotal;
+
+  if (rows.length === 0) {
+    return (
+      <div style={{ marginTop: 14, color: "#94a3b8", fontSize: 13, padding: "10px 0" }}>
+        해당 기간에 강사 정산 내역이 없습니다.
+      </div>
+    );
+  }
+
+  const cellHead = {
+    padding: "10px 12px", fontSize: 12, fontWeight: 700, color: "#64748b",
+    textAlign: "left", borderBottom: "1px solid #e2e8f0", whiteSpace: "nowrap",
+  };
+  const cellHeadRight = { ...cellHead, textAlign: "right" };
+  const cell = {
+    padding: "12px", fontSize: 13, color: "#0f172a", borderBottom: "1px solid #f1f5f9",
+    verticalAlign: "top",
+  };
+  const cellRight = { ...cell, textAlign: "right", whiteSpace: "nowrap", fontWeight: 700 };
+
+  return (
+    <div style={{ marginTop: 14, overflowX: "auto" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 560 }}>
+        <thead>
+          <tr style={{ background: "#f8fafc" }}>
+            <th style={cellHead}>강사</th>
+            <th style={cellHeadRight}>주강사 (28%)</th>
+            <th style={cellHeadRight}>보조강사 (12%)</th>
+            <th style={{ ...cellHeadRight, color: "#0f172a" }}>합계</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <InstructorPayoutRow key={r.user.id} row={r} />
+          ))}
+        </tbody>
+        <tfoot>
+          <tr style={{ background: "#f8fafc" }}>
+            <td style={{ ...cell, fontWeight: 800, color: "#0f172a" }}>
+              총합계 <span style={{ color: "#94a3b8", fontWeight: 500, fontSize: 12 }}>· {rows.length}명</span>
+            </td>
+            <td style={{ ...cellRight, color: "#1d4ed8", fontSize: 14 }}>{formatKRW(mainTotal)}</td>
+            <td style={{ ...cellRight, color: "#7e22ce", fontSize: 14 }}>{formatKRW(assistantTotal)}</td>
+            <td style={{ ...cellRight, color: "#0f172a", fontSize: 15, fontWeight: 900 }}>{formatKRW(grandTotal)}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  );
+}
+
+function InstructorPayoutRow({ row }) {
+  const { user, mainTotal, mainSessions, assistantTotal, assistantSessions, total } = row;
+  const hasBank = user.bankName || user.bankAccount;
+  const cell = {
+    padding: "12px", fontSize: 13, color: "#0f172a", borderBottom: "1px solid #f1f5f9",
+    verticalAlign: "top",
+  };
+  const cellRight = { ...cell, textAlign: "right", whiteSpace: "nowrap", fontWeight: 700 };
+
+  return (
+    <tr>
+      <td style={cell}>
+        <div style={{ fontWeight: 700, color: "#0f172a" }}>{userLabel(user)}</div>
+        <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
+          {hasBank ? (
+            <>
+              {user.bankName || "은행 미입력"} {user.bankAccount || "계좌 미입력"}
+              {user.accountHolder ? ` · 예금주 ${user.accountHolder}` : ""}
+            </>
+          ) : (
+            <span style={{ color: "#dc2626" }}>⚠️ 계좌정보 미등록</span>
+          )}
+        </div>
+      </td>
+      <td style={{ ...cellRight, color: mainTotal > 0 ? "#1d4ed8" : "#cbd5e1" }}>
+        {mainTotal > 0 ? (
+          <>
+            {formatKRW(mainTotal)}
+            <div style={{ fontSize: 11, fontWeight: 500, color: "#94a3b8", marginTop: 2 }}>{mainSessions}회</div>
+          </>
+        ) : "—"}
+      </td>
+      <td style={{ ...cellRight, color: assistantTotal > 0 ? "#7e22ce" : "#cbd5e1" }}>
+        {assistantTotal > 0 ? (
+          <>
+            {formatKRW(assistantTotal)}
+            <div style={{ fontSize: 11, fontWeight: 500, color: "#94a3b8", marginTop: 2 }}>{assistantSessions}회</div>
+          </>
+        ) : "—"}
+      </td>
+      <td style={{ ...cellRight, color: "#0f172a", fontSize: 14, fontWeight: 900 }}>
+        {formatKRW(total)}
+      </td>
+    </tr>
   );
 }
 
@@ -1068,52 +1290,6 @@ function SummaryStat({ label, value, accent, highlight }) {
       <div style={{ fontSize: 11, color: "#64748b", fontWeight: 700, marginBottom: 4 }}>{label}</div>
       <div style={{ fontSize: 18, fontWeight: 900, color: accent }}>{formatKRW(value)}</div>
     </div>
-  );
-}
-
-function PayoutGroup({ title, rows, accent, emptyMsg }) {
-  return (
-    <div style={{ marginTop: 14 }}>
-      <h3 style={{ fontSize: 13, fontWeight: 700, color: accent, marginBottom: 8 }}>{title}</h3>
-      {rows.length === 0 ? (
-        <div style={{ color: "#94a3b8", fontSize: 13, padding: "10px 0" }}>{emptyMsg}</div>
-      ) : (
-        <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column", gap: 6 }}>
-          {rows.map((r) => <PayoutRow key={r.user.id} row={r} accent={accent} />)}
-        </ul>
-      )}
-    </div>
-  );
-}
-
-function PayoutRow({ row, accent }) {
-  const { user, total, sessions } = row;
-  const hasBank = user.bankName || user.bankAccount;
-  return (
-    <li style={{
-      display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
-      padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 10, background: "#fafafa",
-      flexWrap: "wrap",
-    }}>
-      <div style={{ minWidth: 0, flex: 1 }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: "#0f172a" }}>
-          {userLabel(user)} <span style={{ color: "#94a3b8", fontWeight: 500, fontSize: 12 }}>· {sessions}회</span>
-        </div>
-        <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
-          {hasBank ? (
-            <>
-              {user.bankName || "은행 미입력"} {user.bankAccount || "계좌 미입력"}
-              {user.accountHolder ? ` · 예금주 ${user.accountHolder}` : ""}
-            </>
-          ) : (
-            <span style={{ color: "#dc2626" }}>⚠️ 계좌정보 미등록 — 본인이 마이페이지에서 입력 필요</span>
-          )}
-        </div>
-      </div>
-      <div style={{ fontSize: 16, fontWeight: 900, color: accent, whiteSpace: "nowrap" }}>
-        {formatKRW(total)}
-      </div>
-    </li>
   );
 }
 

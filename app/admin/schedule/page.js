@@ -58,7 +58,7 @@ export default async function SchedulePage() {
     const att   = attendeeCount(sess.enrollments);
     const apply = applicantCount(sess.enrollments);
     const slot  = lookupPricing(pricingMap, sess.classType, sess.stepLevel);
-    const rev   = calculateRevenue(att, slot);
+    const rev   = calculateRevenue(att, slot, { assistantToReserve: sess.assistantToReserve });
     const scope = viewerRevenueScope(me, sess);
     const masked = maskRevenue(rev, scope);
     return {
@@ -70,6 +70,7 @@ export default async function SchedulePage() {
       assistantInstructor: sess.assistantInstructor,
       mainInstructorId: sess.mainInstructorId,
       assistantInstructorId: sess.assistantInstructorId,
+      assistantToReserve: sess.assistantToReserve,
       createdById: sess.createdById,
       note: sess.note,
       enrollments: sess.enrollments.map((e) => ({

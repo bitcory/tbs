@@ -18,10 +18,11 @@ export async function updatePricing(rows) {
     const t = Number(r.toolbShare);
     const m = Number(r.mainShare);
     const a = Number(r.assistantShare);
+    const v = Number(r.reserveShare ?? 0);
 
     if (!Number.isFinite(price) || price < 0) throw new Error("invalid_price");
-    if (![t, m, a].every((n) => Number.isFinite(n) && n >= 0 && n <= 1)) throw new Error("invalid_share");
-    if (Math.abs(t + m + a - 1) > 0.001) throw new Error(`shares_must_sum_to_1:${r.classType}_${lvl}`);
+    if (![t, m, a, v].every((n) => Number.isFinite(n) && n >= 0 && n <= 1)) throw new Error("invalid_share");
+    if (Math.abs(t + m + a + v - 1) > 0.001) throw new Error(`shares_must_sum_to_1:${r.classType}_${lvl}`);
   }
 
   await prisma.$transaction(rows.map((r) =>
@@ -32,6 +33,7 @@ export async function updatePricing(rows) {
         toolbShare:     Number(r.toolbShare),
         mainShare:      Number(r.mainShare),
         assistantShare: Number(r.assistantShare),
+        reserveShare:   Number(r.reserveShare ?? 0),
         updatedById:    me.id,
       },
       create: {
@@ -41,6 +43,7 @@ export async function updatePricing(rows) {
         toolbShare:     Number(r.toolbShare),
         mainShare:      Number(r.mainShare),
         assistantShare: Number(r.assistantShare),
+        reserveShare:   Number(r.reserveShare ?? 0),
         updatedById:    me.id,
       },
     })

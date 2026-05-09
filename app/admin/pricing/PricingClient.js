@@ -31,9 +31,13 @@ export default function PricingClient({ initial }) {
     update(idx, { [key]: n / 100 });
   }
 
+  function shareSum(r) {
+    return r.toolbShare + r.mainShare + r.assistantShare + (r.reserveShare ?? 0);
+  }
+
   function save() {
     setMsg(null);
-    const bad = rows.find((r) => Math.abs(r.toolbShare + r.mainShare + r.assistantShare - 1) > 0.001);
+    const bad = rows.find((r) => Math.abs(shareSum(r) - 1) > 0.001);
     if (bad) {
       setActiveTab(bad.classType);
       setMsg({ type: "err", text: `${formatClassLabel(bad.classType, bad.stepLevel)} 요율 합이 100%가 아닙니다.` });
@@ -51,9 +55,7 @@ export default function PricingClient({ initial }) {
 
   const tabSums = TABS.reduce((acc, t) => {
     const tabRows = rows.filter((r) => r.classType === t.key);
-    acc[t.key] = tabRows.every(
-      (r) => Math.abs(r.toolbShare + r.mainShare + r.assistantShare - 1) < 0.001
-    );
+    acc[t.key] = tabRows.every((r) => Math.abs(shareSum(r) - 1) < 0.001);
     return acc;
   }, {});
 
@@ -119,7 +121,7 @@ export default function PricingClient({ initial }) {
         {rows.map((r, idx) => {
           if (r.classType !== activeTab) return null;
           const c = CLASS_TYPE_COLOR[r.classType];
-          const sum = r.toolbShare + r.mainShare + r.assistantShare;
+          const sum = shareSum(r);
           const sumOk = Math.abs(sum - 1) < 0.001;
           return (
             <div key={`${r.classType}_${r.stepLevel}`} style={{
@@ -148,7 +150,7 @@ export default function PricingClient({ initial }) {
                 </Field>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
                 <Field label="툴비 (%)">
                   <input
                     type="number" min={0} max={100} step={1}
@@ -170,6 +172,14 @@ export default function PricingClient({ initial }) {
                     type="number" min={0} max={100} step={1}
                     value={asPct(r.assistantShare)}
                     onChange={(e) => setPct(idx, "assistantShare", e.target.value)}
+                    style={S.input}
+                  />
+                </Field>
+                <Field label="충당금 (%)">
+                  <input
+                    type="number" min={0} max={100} step={1}
+                    value={asPct(r.reserveShare ?? 0)}
+                    onChange={(e) => setPct(idx, "reserveShare", e.target.value)}
                     style={S.input}
                   />
                 </Field>

@@ -17,9 +17,10 @@ export default async function PricingPage() {
       classType,
       stepLevel,
       pricePerPerson: r?.pricePerPerson ?? 0,
-      toolbShare:     r?.toolbShare     ?? 0.5,
-      mainShare:      r?.mainShare      ?? 0.35,
-      assistantShare: r?.assistantShare ?? 0.15,
+      toolbShare:     r?.toolbShare     ?? 0.40,
+      mainShare:      r?.mainShare      ?? 0.28,
+      assistantShare: r?.assistantShare ?? 0.12,
+      reserveShare:   r?.reserveShare   ?? 0.20,
     };
   });
 
