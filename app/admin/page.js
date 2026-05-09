@@ -32,9 +32,10 @@ const SINGLE_STEPS = [
 
 const PRO_STEPS = [
   { step: 6, label: "PRO 1" },
-  { step: 4, label: "PRO 2" },
-  { step: 5, label: "PRO 3" },
-  { step: 3, label: "PRO 4" },
+  { step: 7, label: "PRO 2" },
+  { step: 4, label: "PRO 3" },
+  { step: 5, label: "PRO 4" },
+  { step: 3, label: "PRO 5" },
 ];
 
 const PAGE_SIZE = 30;

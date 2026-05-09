@@ -1143,6 +1143,19 @@
             <p class="step-card-title">시네마틱 5컷 다이얼로그</p>
           </button>
 
+          <button type="button" class="step-card" data-step="step7">
+            <div class="step-card-check">
+              <svg viewBox="0 0 14 14" fill="none">
+                <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <div class="step-card-visual visual-step7">
+              <img src="/images/cards/pro2.png" alt="PRO 2단계 시네마 광고영상" />
+            </div>
+            <p class="step-card-label">PRO 2단계</p>
+            <p class="step-card-title">시네마 광고영상</p>
+          </button>
+
           <button type="button" class="step-card" data-step="step4">
             <div class="step-card-check">
               <svg viewBox="0 0 14 14" fill="none">
@@ -1150,9 +1163,9 @@
               </svg>
             </div>
             <div class="step-card-visual visual-step4">
-              <img src="/images/cards/pro2.png" alt="PRO 2단계 광고영상 제작" />
+              <img src="/images/cards/pro2.png" alt="PRO 3단계 광고영상 제작" />
             </div>
-            <p class="step-card-label">PRO 2단계</p>
+            <p class="step-card-label">PRO 3단계</p>
             <p class="step-card-title">광고영상 제작</p>
           </button>
 
@@ -1163,9 +1176,9 @@
               </svg>
             </div>
             <div class="step-card-visual visual-step5">
-              <img src="/images/cards/pro3.png" alt="PRO 3단계 유튜브 수익화" />
+              <img src="/images/cards/pro3.png" alt="PRO 4단계 유튜브 수익화" />
             </div>
-            <p class="step-card-label">PRO 3단계</p>
+            <p class="step-card-label">PRO 4단계</p>
             <p class="step-card-title">유튜브 수익화과정</p>
           </button>
 
@@ -1176,9 +1189,9 @@
               </svg>
             </div>
             <div class="step-card-visual visual-step3">
-              <img src="/images/cards/pro4.png" alt="PRO 4단계 프리프로덕션" />
+              <img src="/images/cards/pro4.png" alt="PRO 5단계 프리프로덕션" />
             </div>
-            <p class="step-card-label">PRO 4단계</p>
+            <p class="step-card-label">PRO 5단계</p>
             <p class="step-card-title">프리프로덕션</p>
           </button>
 
@@ -1284,9 +1297,10 @@
         label: 'UP 3단계', title: '인트로영상 만들기', url: '/lecture/step2-1', ready: true,
       },
       step6: { label: 'PRO 1단계', title: '시네마틱 5컷 다이얼로그', url: '/lecture/step6', ready: true },
-      step4: { label: 'PRO 2단계', title: '광고영상 제작',          url: '/lecture/step4', ready: true },
-      step5: { label: 'PRO 3단계', title: '유튜브 수익화과정',      url: '/lecture/step5', ready: true },
-      step3: { label: 'PRO 4단계', title: '프리프로덕션',           url: '/lecture/step3', ready: true },
+      step7: { label: 'PRO 2단계', title: '시네마 광고영상',          url: '/lecture/step7', ready: true },
+      step4: { label: 'PRO 3단계', title: '광고영상 제작',          url: '/lecture/step4', ready: true },
+      step5: { label: 'PRO 4단계', title: '유튜브 수익화과정',      url: '/lecture/step5', ready: true },
+      step3: { label: 'PRO 5단계', title: '프리프로덕션',           url: '/lecture/step3', ready: true },
 
       'zero-gmail':    { label: 'Step 01', title: '구글계정 가입하기',   url: '/zero/gmail',    ready: true },
       'zero-flow':     { label: 'Step 02', title: 'FLOW 가입하기',        url: '/zero/flow',     ready: true },
@@ -1358,7 +1372,7 @@
     function classOfStep(step) {
       if (!step) return null;
       if (step.startsWith('zero-')) return 'zero';
-      if (step === 'step4' || step === 'step5' || step === 'step6') return 'pro';
+      if (step === 'step4' || step === 'step5' || step === 'step6' || step === 'step7') return 'pro';
       if (step === 'step1' || step === 'step2' || step === 'step3' || step === 'step2-1') return 'up';
       return null;
     }

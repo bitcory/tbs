@@ -42,6 +42,20 @@ function cleanJson(raw) {
   }
 }
 
+function stripSpeakerPrefix(dialogue) {
+  if (!dialogue) return '';
+  // "A: ", "B: ", "민준: " 같이 짧은 화자 prefix만 제거 (첫 줄 기준)
+  return dialogue.replace(/^[^\n:]{1,8}:\s*/, '');
+}
+
+function syncDialogueIntoPrompt(videoPrompt, dialogueText) {
+  if (!videoPrompt) return videoPrompt;
+  // 일반(") · 스마트(", ") 따옴표 모두 지원, 첫 번째 쌍만 교체
+  const re = /(["“"])([^"”"]*)(["”"])/;
+  if (!re.test(videoPrompt)) return videoPrompt;
+  return videoPrompt.replace(re, (_m, open, _content, close) => `${open}${dialogueText}${close}`);
+}
+
 function flattenDialogue(d, characters) {
   if (!d) return '';
   if (typeof d === 'string') return d;
@@ -265,7 +279,16 @@ export default function Step6Page() {
   const updateShot = (shotId, patch) => {
     setData((prev) => prev && {
       ...prev,
-      shots: prev.shots.map((s) => (s.shot_id === shotId ? { ...s, ...patch } : s)),
+      shots: prev.shots.map((s) => {
+        if (s.shot_id !== shotId) return s;
+        const next = { ...s, ...patch };
+        // 대사가 변경되면 video_prompt 안의 첫 번째 따옴표 내용을 자동 동기화
+        if ('dialogue' in patch && next.video_prompt) {
+          const lineForPrompt = stripSpeakerPrefix(next.dialogue);
+          next.video_prompt = syncDialogueIntoPrompt(next.video_prompt, lineForPrompt);
+        }
+        return next;
+      }),
     });
   };
 
@@ -1116,11 +1139,14 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
           </div>
           <div>
             <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-1.5 min-w-0">
+              <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
                 <Film className="w-3.5 h-3.5 text-[#f43f5e] flex-shrink-0" />
                 <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">영상 프롬프트</span>
                 <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#fee2e2] text-[#b91c1c] font-bold">
                   사용자 입력
+                </span>
+                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#faf5ff] text-[#6d28d9] font-bold border border-[#e9d5ff]">
+                  대사 ↔ "..." 자동 동기화
                 </span>
               </div>
               <button
