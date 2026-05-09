@@ -532,7 +532,7 @@ export default function Step2_1Page() {
               젬 가이드
             </div>
             <a
-              href="https://gemini.google.com/gem/1_7ZqJxYVyTB82w8Q9WNuUCIvR52ZBAsS?usp=sharing"
+              href="https://chatgpt.com/g/g-69f0fafa1520819180fabe815d8d5d1f-up-class-inteuro-yeongsangmandeulgi-3-3"
               target="_blank"
               rel="noreferrer"
               className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full tb-pill-primary text-sm font-bold transition"
