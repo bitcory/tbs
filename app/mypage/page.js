@@ -118,7 +118,7 @@ export default async function MyPage() {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 10 }}>
               {[
                 { label: "툴비캡쳐",        desc: "화면 캡쳐",   url: "https://drive.google.com/file/d/1P0Ybn1D4W8eu8SpzHqyrjd_94DAj8Gil/view?usp=sharing", c: "59,130,246",  Icon: Camera },
-                { label: "툴비검색기",      desc: "파일 검색",    url: "https://drive.google.com/file/d/1xnnjKVMwk7b9SvEub2nCIWIsaO2I3Anc/view?usp=sharing", c: "245,158,11", Icon: Search },
+                { label: "툴비검색기",      desc: "파일 검색",    url: "https://drive.google.com/file/d/1v6fQcMyaao9OZjfHhK3ZR-vSAJ4lqdB0/view?usp=sharing", c: "245,158,11", Icon: Search },
                 { label: "무료 캡컷",      desc: "영상 편집",     url: "https://aitoolb.com/61",           c: "236,72,153", Icon: Film },
               ].map((u) => {
                 const Icon = u.Icon;
