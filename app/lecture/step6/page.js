@@ -56,6 +56,13 @@ function syncDialogueIntoPrompt(videoPrompt, dialogueText) {
   return videoPrompt.replace(re, (_m, open, _content, close) => `${open}${dialogueText}${close}`);
 }
 
+function appendNoBgm(videoPrompt) {
+  if (!videoPrompt) return videoPrompt;
+  const trimmed = videoPrompt.replace(/\s+$/, '');
+  if (/no\s*bgm\.?$/i.test(trimmed)) return trimmed;
+  return `${trimmed} no bgm`;
+}
+
 function flattenDialogue(d, characters) {
   if (!d) return '';
   if (typeof d === 'string') return d;
@@ -321,7 +328,7 @@ export default function Step6Page() {
   };
 
   const allImagePrompts = data ? data.shots.map((s) => s.image_prompt).filter(Boolean).join('\n\n') : '';
-  const allVideoPrompts = data ? data.shots.map((s) => s.video_prompt).filter(Boolean).join('\n\n') : '';
+  const allVideoPrompts = data ? data.shots.map((s) => s.video_prompt).filter(Boolean).map(appendNoBgm).join('\n\n') : '';
   const allDialogues = data ? data.shots.map((s) => s.dialogue).filter(Boolean).join('\n\n') : '';
 
   const sc = data?.scene_context || {};
@@ -1150,7 +1157,7 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
                 </span>
               </div>
               <button
-                onClick={() => onCopy(shot.video_prompt)}
+                onClick={() => onCopy(appendNoBgm(shot.video_prompt))}
                 className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] tb-press-soft flex-shrink-0"
               >
                 <Copy className="w-3 h-3" />
