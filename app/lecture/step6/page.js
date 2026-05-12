@@ -605,13 +605,13 @@ export default function Step6Page() {
               젬 가이드
             </div>
             <a
-              href="https://gemini.google.com/gem/14w4k5_zTEEBu_-mgXFBM0MWyCJPYQBKb?usp=sharing"
+              href="https://chatgpt.com/g/g-6a02ce44665881919ced116b08fac385-pro-class-sinematig-5keos-daieolrogeu-1dangye"
               target="_blank"
               rel="noreferrer"
               className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full tb-pill-primary text-sm font-bold transition"
             >
               <ExternalLink className="w-3.5 h-3.5" />
-              시네마틱 5컷 젬 열기
+              시네마틱 5컷 지침열기
             </a>
             <a
               href="https://kr.pinterest.com/"
