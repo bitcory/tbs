@@ -50,8 +50,8 @@ function stripSpeakerPrefix(dialogue) {
 
 function syncDialogueIntoPrompt(videoPrompt, dialogueText) {
   if (!videoPrompt) return videoPrompt;
-  // 일반(") · 스마트(", ") 따옴표 모두 지원, 첫 번째 쌍만 교체
-  const re = /(["“"])([^"”"]*)(["”"])/;
+  // 큰따옴표(", ", ") · 작은따옴표(', ', ') 모두 지원, 첫 번째 쌍만 교체
+  const re = /(["“”'‘’])([^"“”'‘’]*)(["“”'‘’])/;
   if (!re.test(videoPrompt)) return videoPrompt;
   return videoPrompt.replace(re, (_m, open, _content, close) => `${open}${dialogueText}${close}`);
 }
