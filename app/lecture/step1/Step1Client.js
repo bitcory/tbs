@@ -142,13 +142,27 @@ Subtitles, title, text is strictly prohibited.`,
       sub: 'UP 1-2',
       prompts: [
         {
-          title: '브레이크댄스',
-          prompt: `A 10-second video of a dancer performing breakdance.
-0-2s: The dancer starts with a confident pose, slight head nod to the beat.
-2-5s: Fast footwork and top rock moves, smooth and rhythmic.
-5-8s: Transition into power moves, including a clean windmill spin.
-8-10s: Ends with a freeze pose, holding balance with strong lighting.
-Camera: dynamic tracking shot, slight slow motion on power moves. no bgm`,
+          title: '댄스인트로',
+          prompt: `The character is a native Korean speaker in [her 20s]. All dialogue must be spoken in Korean ONLY. English is strictly prohibited.
+Voice requirements:
+Native Korean pronunciation
+Natural Korean intonation and rhythm
+No foreign accent
+Sounds like a professional Korean voice actor
+Dialogue (Korean only):
+Korean girl "안녕하세요. 저는 [민스]라고 합니다."
+"오늘은 제가 춤을 춰볼건데 잘 봐주세요"
+Performance:
+Natural pauses
+Realistic emotions
+Not robotic
+Not exaggerated
+No subtitles
+Subtitles, title, text is strictly prohibited.
+After speaking, The character begins with quick rhythmic footwork, alternating sharp heel and toe stomps on the floor, then sharply spins around to face away and swings their hips playfully side to side, next explosively jumps up and rotates 180 degrees mid-air, finally landing to face forward with one arm thrusting diagonally upward toward the sky and holding the victory pose.
+Preserve the exact appearance, clothing, and footwear from the source image.
+Locked frontal medium shot rises subtly with the jump, then freezes completely still on the final pose.
+Sharp percussive footstep sounds alternating between heel and toe, fabric swishing, a whoosh on the jump, one solid landing sound. No music. No cheers. No clap.`,
         },
         {
           title: '탭댄스',
