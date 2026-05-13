@@ -63,55 +63,238 @@ function appendNoBgm(videoPrompt) {
   return `${trimmed} no bgm`;
 }
 
+function formatDialogueLine(l, characters) {
+  if (!l) return '';
+  if (typeof l === 'string') return l;
+  // speaker: 'A'|'B' (v2.2). character: legacy Korean-name field. Fallback to id keys.
+  const speakerKey = l.speaker || l.character || '';
+  const charName = characters?.[speakerKey]?.name;
+  const display = charName || speakerKey;
+  // v2.2: ko/en. legacy GPT outputs sometimes use kr.
+  const text = l.ko || l.kr || l.subtitle || l.en || '';
+  return display ? `${display}: ${text}` : text;
+}
+
 function flattenDialogue(d, characters) {
   if (!d) return '';
   if (typeof d === 'string') return d;
   if (typeof d !== 'object') return '';
-  // v2 object form: { speaker, ko, en, delivery, subtitle }
+  // v2.2 schema: { lines: [{speaker, ko, en, delivery, subtitle}, ...] }
+  if (Array.isArray(d.lines)) {
+    return d.lines.map((l) => formatDialogueLine(l, characters)).filter(Boolean).join('\n');
+  }
+  // legacy GPT output that put an array under subtitle
+  if (Array.isArray(d.subtitle)) {
+    return d.subtitle.map((l) => formatDialogueLine(l, characters)).filter(Boolean).join('\n');
+  }
+  // legacy single subtitle string
   if (d.subtitle && typeof d.subtitle === 'string') return d.subtitle;
-  const name = d.speaker && characters?.[d.speaker]?.name
-    ? characters[d.speaker].name
-    : (d.speaker || '');
-  const line = d.ko || d.en || '';
-  return name ? `${name}: ${line}` : line;
+  // legacy single-object form
+  return formatDialogueLine(d, characters);
 }
 
-function parseProject(raw) {
-  const json = cleanJson(raw);
-  if (!json.characters?.A || !json.characters?.B) {
-    throw new Error('characters.A 와 characters.B 가 모두 필요합니다.');
+function normalizeDialogueMeta(d) {
+  if (!d || typeof d !== 'object') return null;
+  if (Array.isArray(d.lines)) {
+    if (d.lines.length === 0) return { lines: [] };
+    const first = d.lines[0] || {};
+    return {
+      speaker: first.speaker || first.character || '',
+      delivery: first.delivery || '',
+      lines: d.lines,
+    };
   }
-  if (!Array.isArray(json.shots) || json.shots.length === 0) {
-    throw new Error('shots 배열이 필요합니다.');
+  if (Array.isArray(d.subtitle)) {
+    const first = d.subtitle[0] || {};
+    return {
+      speaker: first.speaker || first.character || '',
+      delivery: first.delivery || '',
+      lines: d.subtitle,
+    };
   }
-  const characters = json.characters;
-  const shots = json.shots.map((s, i) => ({
+  if (d.speaker || d.delivery || d.subtitle || d.ko || d.kr) return d;
+  return null;
+}
+
+function arrOrStr(v) {
+  if (Array.isArray(v)) return v.join(', ');
+  if (typeof v === 'string') return v;
+  return null;
+}
+
+function normalizeAudio(a) {
+  if (!a || typeof a !== 'object') return null;
+  // v2.2: ambient/foley/sfx/music_cue/bgm_policy. legacy: ambient_layers/foley_layers/dialogue_mix.
+  return {
+    ambient:    arrOrStr(a.ambient    ?? a.ambient_layers),
+    foley:      arrOrStr(a.foley      ?? a.foley_layers),
+    sfx:        a.sfx ?? null,
+    music_cue:  a.music_cue ?? null,
+    bgm_policy: a.bgm_policy || a.music_policy || null,
+  };
+}
+
+function normalizeShots(rawShots, characters) {
+  return rawShots.map((s, i) => ({
     shot_id: s.shot_id || `S${String(i + 1).padStart(2, '0')}`,
     shot_type: s.shot_type || '',
     shot_label: s.shot_label || '',
-    duration_sec: typeof s.duration_sec === 'number' ? s.duration_sec : null,
-    purpose: s.purpose || '',
+    duration_sec: typeof s.duration_sec === 'number'
+      ? s.duration_sec
+      : typeof s.duration_seconds === 'number' ? s.duration_seconds : null,
+    // v2.2: shot_purpose. legacy: purpose / scene_purpose.
+    purpose: s.shot_purpose || s.purpose || s.scene_purpose || '',
     characters_in_frame: Array.isArray(s.characters_in_frame) ? s.characters_in_frame : ['A', 'B'],
     camera: s.camera || {},
     blocking: s.blocking || {},
-    emotion: s.emotion || {},
-    audio: s.audio || null,
-    dialogue_meta: (s.dialogue && typeof s.dialogue === 'object') ? s.dialogue : null,
+    // legacy: actor_micro_expression. v2.2: emotion.
+    emotion: s.emotion || s.actor_micro_expression || {},
+    // v2.2: audio object. legacy: sound_design.
+    audio: normalizeAudio(s.audio || s.sound_design || null),
+    dialogue_meta: normalizeDialogueMeta(s.dialogue),
     // Accept both new (image_prompt) and legacy (i2i_prompt) field names.
     image_prompt: s.image_prompt || s.i2i_prompt || '',
     video_prompt: typeof s.video_prompt === 'string' ? s.video_prompt : '',
     dialogue: flattenDialogue(s.dialogue, characters),
     imageUpload: '',
   }));
+}
+
+function normalizeCharacters(chars) {
   return {
+    A: { ...(chars?.A || {}), imageUpload: '' },
+    B: { ...(chars?.B || {}), imageUpload: '' },
+  };
+}
+
+function emptyCharacters() {
+  return {
+    A: { name: '캐릭터 A', sheet_prompt: '', imageUpload: '' },
+    B: { name: '캐릭터 B', sheet_prompt: '', imageUpload: '' },
+  };
+}
+
+// 입력된 JSON 이 Stage 1(캐릭터 시트) / Stage 2(5컷) / 통합본 중 어느 단계인지 판별.
+function detectStage(json) {
+  if (json.stage === 'character_sheet') return 'stage1';
+  if (json.stage === 'shots') return 'stage2';
+  const hasChars = !!(json.characters?.A && json.characters?.B);
+  const hasShots = Array.isArray(json.shots) && json.shots.length > 0;
+  if (hasChars && hasShots) return 'combined';
+  if (hasChars) return 'stage1';
+  if (hasShots) return 'stage2';
+  return null;
+}
+
+function parseProject(raw) {
+  const json = cleanJson(raw);
+  const stage = detectStage(json);
+  if (!stage) {
+    throw new Error('characters 또는 shots 가 필요합니다. Stage 1(캐릭터 시트) 또는 Stage 2(5컷) JSON 을 붙여넣어 주세요.');
+  }
+
+  if (stage === 'stage1') {
+    if (!json.characters?.A || !json.characters?.B) {
+      throw new Error('Stage 1 JSON 은 characters.A 와 characters.B 가 모두 필요합니다.');
+    }
+    return {
+      _kind: 'stage1',
+      characters: normalizeCharacters(json.characters),
+      synopsis: json.synopsis || '',
+      scene_hint: json.scene_hint || {},
+    };
+  }
+
+  if (stage === 'stage2') {
+    if (!Array.isArray(json.shots) || json.shots.length === 0) {
+      throw new Error('Stage 2 JSON 은 shots 배열이 필요합니다.');
+    }
+    return {
+      _kind: 'stage2',
+      project: json.project || {},
+      scene_context: json.scene_context || {},
+      scene_analysis: json.scene_analysis || {},
+      shots: normalizeShots(json.shots, json.characters || null),
+    };
+  }
+
+  // combined
+  return {
+    _kind: 'combined',
     project: json.project || {},
     scene_context: json.scene_context || {},
-    characters: {
-      A: { ...characters.A, imageUpload: '' },
-      B: { ...characters.B, imageUpload: '' },
-    },
-    shots,
+    scene_analysis: json.scene_analysis || {},
+    characters: normalizeCharacters(json.characters),
+    shots: normalizeShots(json.shots, json.characters),
   };
+}
+
+// 새 JSON 을 기존 data 와 병합. Stage 1/2 를 따로 붙여넣어도 누적되도록.
+function mergeProject(prev, parsed) {
+  if (parsed._kind === 'stage1') {
+    if (!prev) {
+      return {
+        project: {},
+        scene_context: {},
+        scene_analysis: {},
+        characters: parsed.characters,
+        shots: [],
+        synopsis: parsed.synopsis,
+        scene_hint: parsed.scene_hint,
+      };
+    }
+    // 기존 shots 유지하고 캐릭터만 교체. 업로드한 이미지는 보존.
+    return {
+      ...prev,
+      characters: {
+        A: { ...parsed.characters.A, imageUpload: prev.characters?.A?.imageUpload || '' },
+        B: { ...parsed.characters.B, imageUpload: prev.characters?.B?.imageUpload || '' },
+      },
+      synopsis: parsed.synopsis,
+      scene_hint: parsed.scene_hint,
+    };
+  }
+
+  if (parsed._kind === 'stage2') {
+    const baseChars = prev?.characters?.A && prev?.characters?.B
+      ? prev.characters
+      : emptyCharacters();
+    const prevShotMap = new Map((prev?.shots || []).map((s) => [s.shot_id, s]));
+    const mergedShots = parsed.shots.map((s) => {
+      const old = prevShotMap.get(s.shot_id);
+      return old?.imageUpload ? { ...s, imageUpload: old.imageUpload } : s;
+    });
+    return {
+      ...(prev || {}),
+      project: parsed.project,
+      scene_context: parsed.scene_context,
+      scene_analysis: parsed.scene_analysis,
+      characters: baseChars,
+      shots: mergedShots,
+    };
+  }
+
+  // combined: 전부 교체하되 기존 업로드 이미지는 가능하면 유지
+  if (!prev) return stripKind(parsed);
+  const prevShotMap = new Map((prev.shots || []).map((s) => [s.shot_id, s]));
+  return {
+    project: parsed.project,
+    scene_context: parsed.scene_context,
+    scene_analysis: parsed.scene_analysis,
+    characters: {
+      A: { ...parsed.characters.A, imageUpload: prev.characters?.A?.imageUpload || '' },
+      B: { ...parsed.characters.B, imageUpload: prev.characters?.B?.imageUpload || '' },
+    },
+    shots: parsed.shots.map((s) => {
+      const old = prevShotMap.get(s.shot_id);
+      return old?.imageUpload ? { ...s, imageUpload: old.imageUpload } : s;
+    }),
+  };
+}
+
+function stripKind(p) {
+  const { _kind, ...rest } = p;
+  return rest;
 }
 
 function UploadSlot({ image, onFile }) {
@@ -227,8 +410,19 @@ export default function Step6Page() {
       const raw = localStorage.getItem(CACHE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (parsed?.characters?.A && parsed?.characters?.B && Array.isArray(parsed?.shots)) {
-          setData(parsed);
+        // 캐릭터 또는 샷 중 하나라도 있으면 복원 (Stage 1 만 받은 상태도 보존).
+        const hasChars = !!(parsed?.characters?.A && parsed?.characters?.B);
+        const hasShots = Array.isArray(parsed?.shots) && parsed.shots.length > 0;
+        if (hasChars || hasShots) {
+          setData({
+            project: parsed.project || {},
+            scene_context: parsed.scene_context || {},
+            scene_analysis: parsed.scene_analysis || {},
+            characters: hasChars ? parsed.characters : emptyCharacters(),
+            shots: Array.isArray(parsed.shots) ? parsed.shots : [],
+            synopsis: parsed.synopsis,
+            scene_hint: parsed.scene_hint,
+          });
         }
       }
     } catch (e) { }
@@ -259,11 +453,21 @@ export default function Step6Page() {
     setUploadError('');
     try {
       const parsed = parseProject(jsonInput);
-      setData(parsed);
-      setActiveTab('A');
+      setData((prev) => mergeProject(prev, parsed));
+      // Stage 1 → 캐릭터 탭, Stage 2 → 첫 샷 탭, 통합 → 캐릭터 탭
+      if (parsed._kind === 'stage2') {
+        const firstShot = parsed.shots?.[0]?.shot_id || 'S01';
+        setActiveTab(firstShot);
+      } else {
+        setActiveTab('A');
+      }
       setUploadOpen(false);
       setJsonInput('');
-      showToast('프로젝트 로드 완료!');
+      const msg =
+        parsed._kind === 'stage1'   ? '캐릭터 시트(Stage 1) 병합 완료!' :
+        parsed._kind === 'stage2'   ? '5컷 시퀀스(Stage 2) 병합 완료!' :
+        '프로젝트 로드 완료!';
+      showToast(msg);
     } catch (e) {
       setUploadError(e.message || 'JSON 파싱 오류');
     }
@@ -839,17 +1043,20 @@ export default function Step6Page() {
             </div>
             <div className="flex-1 overflow-y-auto p-5 space-y-3 min-h-0">
               <p className="text-sm text-[#64748b] leading-relaxed">
-                Gemini 젬에서 받은 JSON을 붙여넣으세요. 필요한 필드:
-                <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">project</code>,
-                <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">scene_context</code>,
-                <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">characters.A / B</code>,
-                <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">shots[]</code>
+                Stage 1 (캐릭터 시트) 와 Stage 2 (5컷) 를 따로 붙여넣어도 자동으로 병합됩니다.
+                <br />
+                <span className="inline-flex items-center gap-1 mt-1">
+                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">stage: "character_sheet"</code>
+                  <span className="text-[#94a3b8]">또는</span>
+                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">stage: "shots"</code>
+                  <span className="text-[#94a3b8]">자동 인식</span>
+                </span>
               </p>
               <textarea
                 value={jsonInput}
                 onChange={(e) => setJsonInput(e.target.value)}
                 className="w-full h-[260px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
-                placeholder='{"project": {...}, "scene_context": {...}, "characters": {"A": {...}, "B": {...}}, "shots": [{"shot_id": "S01", ...}, ...]}'
+                placeholder={'Stage 1: { "stage": "character_sheet", "characters": { "A": {...}, "B": {...} } }\nStage 2: { "stage": "shots", "shots": [{"shot_id": "S01", ...}, ...] }'}
               />
               {uploadError && (
                 <div className="text-sm text-[#b91c1c] bg-[#fee2e2] border border-[#fca5a5] rounded-xl px-3 py-2 font-semibold">
@@ -909,7 +1116,9 @@ function CharacterCard({ who, character, onCopy, onUpdatePrompt, onImageFile, on
         </div>
         {c.demographics && (
           <div className="hidden md:flex items-center gap-1 flex-shrink-0">
-            {c.demographics.age_range && <Tag>{c.demographics.age_range}</Tag>}
+            {(c.demographics.age_range || c.demographics.age) && (
+              <Tag>{c.demographics.age_range || `${c.demographics.age}세`}</Tag>
+            )}
             {c.demographics.gender && <Tag>{c.demographics.gender}</Tag>}
             {c.demographics.ethnicity && <Tag>{c.demographics.ethnicity}</Tag>}
           </div>
@@ -985,17 +1194,21 @@ function CharacterCard({ who, character, onCopy, onUpdatePrompt, onImageFile, on
 function CharSpecGrid({ character }) {
   const p = character.physical || {};
   const w = character.wardrobe || {};
+  const distinguishing = p.distinguishing_features || p.distinguishing;
+  const accessoriesText = Array.isArray(w.accessories)
+    ? w.accessories.join(', ')
+    : (typeof w.accessories === 'string' ? w.accessories : '');
   const items = [
     p.hair && ['머리', p.hair],
     p.eyes && ['눈', p.eyes],
     p.face_shape && ['얼굴형', p.face_shape],
     p.skin && ['피부', p.skin],
     p.height_build && ['체격', p.height_build],
-    p.distinguishing && ['특징', p.distinguishing],
+    distinguishing && ['특징', distinguishing],
     w.outerwear && w.outerwear !== '없음' && ['아우터', w.outerwear],
     w.top && ['상의', w.top],
     w.bottom && ['하의', w.bottom],
-    w.accessories && ['액세서리', w.accessories],
+    accessoriesText && ['액세서리', accessoriesText],
   ].filter(Boolean);
 
   if (items.length === 0) return null;
@@ -1084,14 +1297,31 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
         </div>
       )}
 
-      {/* Dialogue meta strip — speaker / delivery (preserved from JSON) */}
-      {dm && (dm.speaker || dm.delivery) && (
+      {/* Dialogue meta strip — speaker / delivery (preserved from JSON).
+          v2.2 lines[] 일 경우 모든 발화의 화자/딜리버리를 노출. */}
+      {dm && (Array.isArray(dm.lines) ? dm.lines.length > 0 : (dm.speaker || dm.delivery)) && (
         <div className="px-4 py-2.5 border-b border-[#e2e8f0] bg-[#fefce8] flex flex-wrap gap-x-4 gap-y-1.5 text-[12.5px]">
           <span className="text-[10px] font-black text-[#a16207] uppercase tracking-wider self-center">DIALOGUE</span>
-          {dm.speaker && (
-            <Stat k="화자" v={`${dm.speaker}${characters?.[dm.speaker]?.name ? ` · ${characters[dm.speaker].name}` : ''}`} />
+          {Array.isArray(dm.lines) ? (
+            dm.lines.map((l, idx) => {
+              const sp = l.speaker || l.character || '';
+              const charName = characters?.[sp]?.name;
+              const labelSp = `${sp}${charName ? ` · ${charName}` : ''}`;
+              return (
+                <span key={idx} className="inline-flex items-center gap-2">
+                  {sp && <Stat k={`화자${dm.lines.length > 1 ? ` ${idx + 1}` : ''}`} v={labelSp} />}
+                  {l.delivery && <Stat k="딜리버리" v={l.delivery} />}
+                </span>
+              );
+            })
+          ) : (
+            <>
+              {dm.speaker && (
+                <Stat k="화자" v={`${dm.speaker}${characters?.[dm.speaker]?.name ? ` · ${characters[dm.speaker].name}` : ''}`} />
+              )}
+              {dm.delivery && <Stat k="딜리버리" v={dm.delivery} />}
+            </>
           )}
-          {dm.delivery && <Stat k="딜리버리" v={dm.delivery} />}
         </div>
       )}
 
