@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireSuperAdmin } from "@/lib/access";
 
-const CLASS_TYPES = ["ZERO", "UP", "PRO"];
+const CLASS_TYPES = ["ZERO", "UP", "PRO", "MASTER"];
 
 export async function updatePricing(rows) {
   const me = await requireSuperAdmin();
