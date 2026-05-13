@@ -15,6 +15,7 @@ import {
   setEnrollmentStatus,
   removeEnrollment,
   sendMaterialsForEnrollment,
+  sendMaterialsToInstructor,
 } from "./actions";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
@@ -220,6 +221,19 @@ export default function ScheduleClient({ me, sessions, staffUsers, memberUsers, 
             }
           });
         }}
+        onSendMaterialsToInstructor={(sessId, role, label) => {
+          if (!confirm(`${label} 이메일로 강의자료를 발송할까요?`)) return;
+          startTransition(async () => {
+            try {
+              const r = await sendMaterialsToInstructor(sessId, role);
+              if (r?.ok) alert("✅ " + r.message);
+              else       alert("⚠ " + (r?.message || "발송에 실패했습니다."));
+            } catch (e) {
+              console.error(e);
+              alert("⚠ 발송에 실패했습니다.");
+            }
+          });
+        }}
         pending={pending}
       />
 
@@ -395,7 +409,7 @@ function CalendarGrid({ grid, sessionsByDay, selectedKey, onSelect }) {
   );
 }
 
-function DayDetail({ dateKey, sessions, me, onEdit, onAdd, onDelete, onOpenEnroll, onSetStatus, onRemoveEnroll, onSendMaterials, pending }) {
+function DayDetail({ dateKey, sessions, me, onEdit, onAdd, onDelete, onOpenEnroll, onSetStatus, onRemoveEnroll, onSendMaterials, onSendMaterialsToInstructor, pending }) {
   return (
     <div style={{
       background: "#fff", borderRadius: 14, padding: 20,
@@ -420,6 +434,7 @@ function DayDetail({ dateKey, sessions, me, onEdit, onAdd, onDelete, onOpenEnrol
               onSetStatus={onSetStatus}
               onRemoveEnroll={onRemoveEnroll}
               onSendMaterials={onSendMaterials}
+              onSendMaterialsToInstructor={onSendMaterialsToInstructor}
               pending={pending}
             />
           ))}
@@ -434,10 +449,12 @@ const subAddBtn = {
   color: "#0f172a", background: "#fff", border: "1px solid #e2e8f0", cursor: "pointer",
 };
 
-function SessionCard({ sess, me, onEdit, onDelete, onOpenEnroll, onSetStatus, onRemoveEnroll, onSendMaterials, pending }) {
+function SessionCard({ sess, me, onEdit, onDelete, onOpenEnroll, onSetStatus, onRemoveEnroll, onSendMaterials, onSendMaterialsToInstructor, pending }) {
   const c = CLASS_TYPE_COLOR[sess.classType];
   const showEdit = canEditSession(me, sess);
   const showDelete = canDeleteSession(me, sess);
+  const matStep = sessionMaterialsStep(sess.classType, sess.stepLevel);
+  const materialsReady = !!matStep && hasStepMaterials(matStep);
   return (
     <div style={{
       border: "1px solid #e2e8f0", borderRadius: 12, padding: 16, background: "#fff",
@@ -461,16 +478,32 @@ function SessionCard({ sess, me, onEdit, onDelete, onOpenEnroll, onSetStatus, on
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10, marginBottom: 14, fontSize: 13 }}>
-        <Info label="주강사" value={userLabel(sess.mainInstructor)} />
-        <Info
-          label="보조강사"
-          value={
-            sess.assistantInstructor
-              ? userLabel(sess.assistantInstructor)
-              : sess.assistantToReserve
-                ? "충당금"
-                : "—"
+        <InstructorInfo
+          label="주강사"
+          instructor={sess.mainInstructor}
+          materialsReady={materialsReady}
+          onSend={() =>
+            onSendMaterialsToInstructor(
+              sess.id,
+              "main",
+              userLabel(sess.mainInstructor) + " 주강사"
+            )
           }
+          pending={pending}
+        />
+        <InstructorInfo
+          label="보조강사"
+          instructor={sess.assistantInstructor}
+          fallback={sess.assistantToReserve ? "충당금" : "—"}
+          materialsReady={materialsReady}
+          onSend={() =>
+            onSendMaterialsToInstructor(
+              sess.id,
+              "assistant",
+              userLabel(sess.assistantInstructor) + " 보조강사"
+            )
+          }
+          pending={pending}
         />
         <Info label="신청" value={`${sess.counts.applicants}명`} />
         <Info label="참가" value={`${sess.counts.attendees}명`} highlight />
@@ -530,6 +563,51 @@ function Info({ label, value, highlight }) {
     <div>
       <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>{label}</div>
       <div style={{ fontSize: 14, fontWeight: highlight ? 800 : 600, color: highlight ? "#016837" : "#0f172a" }}>{value}</div>
+    </div>
+  );
+}
+
+function InstructorInfo({ label, instructor, fallback = "—", materialsReady, onSend, pending }) {
+  const hasInstructor = !!instructor;
+  const canSend = hasInstructor && materialsReady && !!instructor.email;
+  const sendTitle = !hasInstructor
+    ? "강사가 지정되지 않았습니다"
+    : !instructor.email
+    ? "강사의 이메일이 등록되어 있지 않습니다"
+    : !materialsReady
+    ? "이 단계의 자료는 아직 준비중입니다"
+    : "강사 이메일로 강의자료 발송";
+
+  return (
+    <div>
+      <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+        {label}
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginTop: 2 }}>
+        <span style={{ fontSize: 14, fontWeight: 600, color: "#0f172a" }}>
+          {hasInstructor ? userLabel(instructor) : fallback}
+        </span>
+        {hasInstructor && (
+          <button
+            type="button"
+            onClick={onSend}
+            disabled={pending || !canSend}
+            className="tb-press-soft"
+            title={sendTitle}
+            style={{
+              ...miniBtn,
+              padding: "3px 9px",
+              fontSize: 11,
+              color: canSend ? "#1d4ed8" : "#94a3b8",
+              background: canSend ? "#eff6ff" : "#fff",
+              borderColor: canSend ? "#bfdbfe" : "#e2e8f0",
+              fontWeight: canSend ? 700 : 500,
+            }}
+          >
+            {!materialsReady ? "📩 준비중" : "📩 자료발송"}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

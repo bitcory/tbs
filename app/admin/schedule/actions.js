@@ -131,6 +131,67 @@ export async function removeEnrollment(enrollmentId) {
   revalidatePath("/admin/schedule");
 }
 
+export async function sendMaterialsToInstructor(sessionId, role) {
+  // role: "main" | "assistant" — 회차 카드에서 주/보조강사 옆 "자료발송" 버튼이 호출.
+  // 운영진(STAFF/SUPER_ADMIN) 또는 본인 회차의 주강사만 발송 가능.
+  const me = await requireUser();
+  if (role !== "main" && role !== "assistant") {
+    return { ok: false, message: "잘못된 요청입니다." };
+  }
+  const sess = await prisma.classSession.findUnique({
+    where: { id: sessionId },
+    select: {
+      classType: true,
+      stepLevel: true,
+      mainInstructorId: true,
+      assistantInstructorId: true,
+      mainInstructor:      { select: { email: true, nickname: true, name: true } },
+      assistantInstructor: { select: { email: true, nickname: true, name: true } },
+    },
+  });
+  if (!sess) return { ok: false, message: "회차 정보를 찾을 수 없습니다." };
+
+  const isAdmin = me.role === "SUPER_ADMIN" || me.role === "STAFF";
+  const isMain = sess.mainInstructorId === me.id;
+  if (!isAdmin && !isMain) {
+    return { ok: false, message: "발송 권한이 없습니다." };
+  }
+
+  const target = role === "main" ? sess.mainInstructor : sess.assistantInstructor;
+  if (!target) {
+    return {
+      ok: false,
+      message: role === "main" ? "주강사가 지정되지 않았습니다." : "보조강사가 지정되지 않았습니다.",
+    };
+  }
+  if (!target.email) {
+    return { ok: false, message: "강사의 이메일이 등록되어 있지 않습니다." };
+  }
+
+  const step = sessionMaterialsStep(sess.classType, sess.stepLevel);
+  if (!step || !hasStepMaterials(step)) {
+    return { ok: false, message: "이 단계의 자료는 아직 준비중입니다." };
+  }
+
+  try {
+    await sendMaterialsEmail({
+      to: target.email,
+      nickname: target.nickname || target.name || "강사님",
+      step,
+    });
+    return {
+      ok: true,
+      message: `${target.email}로 강의자료를 발송했습니다.`,
+    };
+  } catch (e) {
+    console.error("[sendMaterialsToInstructor] send failed:", e);
+    return {
+      ok: false,
+      message: "메일 발송에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+    };
+  }
+}
+
 export async function sendMaterialsForEnrollment(enrollmentId) {
   const me = await requireUser();
   const enr = await prisma.enrollment.findUnique({
