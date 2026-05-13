@@ -21,7 +21,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://tbs.aitoolb.com';
 const SITE_NAME = 'TB STUDY';
 const SITE_TITLE = 'TB STUDY - AI 영상 제작 학습실';
 const SITE_DESCRIPTION =
-  'AI 영상 제작 5단계 커리큘럼 학습실. 마스터 이미지, 1분 영상, 인트로, 광고, 유튜브 수익화까지 단계별 강의를 만나보세요.';
+  'AI 영상 제작 단계별 커리큘럼 학습실. 마스터 이미지, 1분 영상, 인트로, 멀티영상, 광고 제작, 유튜브 창작까지 ZERO·UP·PRO·MASTER 클래스로 만나보세요.';
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
@@ -39,9 +39,11 @@ export const metadata = {
     'AI 영상 강의',
     'AI 이미지 생성',
     '1분 영상 만들기',
-    '유튜브 수익화',
+    '유튜브 창작과정',
     '인트로 영상 제작',
     '광고 영상 제작',
+    '멀티영상 제작',
+    '프리프로덕션',
   ],
   authors: [{ name: 'TOOLB LAB', url: SITE_URL }],
   creator: 'TOOLB LAB',

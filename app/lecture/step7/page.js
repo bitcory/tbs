@@ -331,7 +331,7 @@ export default function Step7Page() {
       <section className="tb-hero">
         <div className="tb-hero-glow" />
         <div className="tb-hero-row">
-          <span className="tb-hero-eyebrow">TB STUDY · PRO 2</span>
+          <span className="tb-hero-eyebrow">TB STUDY · PRO 3</span>
           <h1 className="tb-hero-title">멀티영상 만들기</h1>
         </div>
       </section>

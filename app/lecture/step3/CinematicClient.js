@@ -142,13 +142,13 @@ export default function CinematicClient() {
       <section className="tb-hero">
         <div className="tb-hero-glow" />
         <div className="tb-hero-row">
-          <span className="tb-hero-eyebrow">TB STUDY · PRO 4단계</span>
+          <span className="tb-hero-eyebrow">TB STUDY · MASTER 2단계</span>
           <h1 className="tb-hero-title">프리프로덕션</h1>
         </div>
       </section>
 
       <div className="tb-glass-bar">
-        <Link href="/?c=pro&s=step3" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full tb-pill-ghost text-xs sm:text-sm font-bold">
+        <Link href="/?c=master&s=step3" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full tb-pill-ghost text-xs sm:text-sm font-bold">
           <ArrowLeft className="w-3.5 h-3.5" /> 홈
         </Link>
         <span className="text-[11px] font-bold tracking-[0.18em] text-[#00996D] uppercase hidden sm:inline">TOOLB LAB</span>

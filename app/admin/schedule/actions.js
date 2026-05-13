@@ -6,14 +6,15 @@ import { requireAdmin, requireUser } from "@/lib/access";
 import { sendMaterialsEmail } from "@/lib/email";
 import { sessionMaterialsStep, hasStepMaterials } from "@/lib/stepMaterials";
 
-const CLASS_TYPES = ["ZERO", "UP", "PRO"];
+const CLASS_TYPES = ["ZERO", "UP", "PRO", "MASTER"];
 const STATUSES = ["APPLIED", "ATTENDED", "CANCELLED"];
 
 const VALID_SLOTS = new Set([
   "ZERO_0",
   "UP_1", "UP_11", "UP_12", "UP_13", "UP_14",
   "UP_2", "UP_3",
-  "PRO_1", "PRO_2", "PRO_3", "PRO_4",
+  "PRO_1", "PRO_2", "PRO_3",
+  "MASTER_1", "MASTER_2",
 ]);
 
 function parseStartAt(dateStr, timeStr) {

@@ -33,9 +33,12 @@ const SINGLE_STEPS = [
 const PRO_STEPS = [
   { step: 6, label: "PRO 1" },
   { step: 7, label: "PRO 2" },
-  { step: 4, label: "PRO 3" },
-  { step: 5, label: "PRO 4" },
-  { step: 3, label: "PRO 5" },
+  { step: 5, label: "PRO 3" },
+];
+
+const MASTER_STEPS = [
+  { step: 4, label: "MASTER 1" },
+  { step: 3, label: "MASTER 2" },
 ];
 
 const PAGE_SIZE = 30;
@@ -230,6 +233,7 @@ export default async function AdminPage({ searchParams }) {
                   <th colSpan={1} style={groupTh("#64748b")}>ZERO CLASS</th>
                   <th colSpan={1 + SINGLE_STEPS.length} style={groupTh("#00996D")}>UP CLASS</th>
                   <th colSpan={PRO_STEPS.length} style={groupTh("#1E293B")}>PRO CLASS</th>
+                  <th colSpan={MASTER_STEPS.length} style={groupTh("#7C3AED")}>MASTER CLASS</th>
                   <th colSpan={isSuper ? 2 : 1} style={groupTh("#64748b")}>메타</th>
                 </tr>
                 <tr style={{ background: "#f8fafc", color: "#64748b" }}>
@@ -244,6 +248,9 @@ export default async function AdminPage({ searchParams }) {
                     <th key={s.step} style={th}>{s.label}</th>
                   ))}
                   {PRO_STEPS.map((s) => (
+                    <th key={s.step} style={th}>{s.label}</th>
+                  ))}
+                  {MASTER_STEPS.map((s) => (
                     <th key={s.step} style={th}>{s.label}</th>
                   ))}
                   <th style={th}>가입일</th>
@@ -433,6 +440,44 @@ export default async function AdminPage({ searchParams }) {
                               <span
                                 style={{
                                   ...S.badge(hasAccess ? S.badgeGreen : S.badgeGray),
+                                  opacity: 0.6,
+                                }}
+                              >
+                                {hasAccess ? "자동" : "-"}
+                              </span>
+                            )}
+                          </td>
+                        );
+                      })}
+
+                      {/* MASTER CLASS */}
+                      {MASTER_STEPS.map(({ step }) => {
+                        const hasAccess = u.role !== "USER" || u.stepAccess.includes(step);
+                        return (
+                          <td key={step} style={td}>
+                            {canEditSteps ? (
+                              <form
+                                action={async () => {
+                                  "use server";
+                                  await toggleStepAccess(u.id, step, !hasAccess);
+                                }}
+                              >
+                                <button
+                                  className="tb-press-soft"
+                                  style={{
+                                    ...S.badge(hasAccess ? S.badgePurple : S.badgeGray),
+                                    border: "none",
+                                    cursor: "pointer",
+                                    fontFamily: "inherit",
+                                  }}
+                                >
+                                  {hasAccess ? "✓ 허용" : "✕ 차단"}
+                                </button>
+                              </form>
+                            ) : (
+                              <span
+                                style={{
+                                  ...S.badge(hasAccess ? S.badgePurple : S.badgeGray),
                                   opacity: 0.6,
                                 }}
                               >

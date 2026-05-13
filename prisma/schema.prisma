@@ -17,6 +17,7 @@ enum ClassType {
   ZERO
   UP
   PRO
+  MASTER
 }
 
 enum EnrollmentStatus {

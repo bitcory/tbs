@@ -515,8 +515,8 @@ export default function Step5Page() {
       <section className="tb-hero">
         <div className="tb-hero-glow" />
         <div className="tb-hero-row">
-          <span className="tb-hero-eyebrow">TB STUDY · PRO 3</span>
-          <h1 className="tb-hero-title">유튜브 수익화 · 뮤직영상 만들기</h1>
+          <span className="tb-hero-eyebrow">TB STUDY · PRO 2</span>
+          <h1 className="tb-hero-title">유튜브 창작과정 · 뮤직영상 만들기</h1>
         </div>
       </section>
 

@@ -83,15 +83,35 @@ Vercel이 자동 배포함.
 | Step 1-4 | `/lecture/step1?v=interview` | `14` | 영상기초다지기 · 동물 인터뷰 프롬프트 |
 | Step 2 | `/lecture/step2` | `2` | 뮤직 영상 만들기 |
 | Step 2-1 | `/lecture/step2-1` | `21` | 인트로 영상 만들기 (Step 2 하위) |
-| Step 3 | `/lecture/step3` | `3` | 스토리 영상 만들기 (기/승/전/결) |
 | Step 6 | `/lecture/step6` | `6` | PRO 1 · 시네마틱 5컷 다이얼로그 (캐릭터 A/B + S01~S05) |
-| Step 7 | `/lecture/step7` | `7` | PRO 2 · 멀티영상 만들기 (Cinematic Storyboard v4 · A 12패널 / B 6+6패널, 다국어 단일 출력) |
-| Step 4 | `/lecture/step4` | `4` | PRO 3 · 광고영상 만들기 (Hook/Build/Climax/CTA) |
-| Step 5 | `/lecture/step5` | `5` | PRO 4 · 유튜브 수익화 · 뮤직영상 프롬프트 (마스터 + S01~Snn, part1+part2 병합) |
+| Step 5 | `/lecture/step5` | `5` | PRO 2 · 유튜브 창작과정 (구 유튜브 수익화과정 · 뮤직영상 프롬프트 마스터 + S01~Snn, part1+part2 병합) |
+| Step 7 | `/lecture/step7` | `7` | PRO 3 · 멀티영상 만들기 (Cinematic Storyboard v4 · A 12패널 / B 6+6패널, 다국어 단일 출력) |
+| Step 4 | `/lecture/step4` | `4` | MASTER 1 · 광고영상 만들기 (Hook/Build/Climax/CTA) |
+| Step 3 | `/lecture/step3` | `3` | MASTER 2 · 프리프로덕션 (구 스토리 영상 · 기/승/전/결) |
 
 > **Step 1 구조**: `/lecture/step1/page.js` 는 서버 컴포넌트 게이트로, `?v=` 쿼리를 읽어 `requireStepAccess([11|12|13|14, 1])` 로 variant별 접근을 강제한 뒤 `Step1Client` 에 `variant` prop 으로 전달한다. 레거시 `1` 을 보유한 사용자는 네 variant 모두 접근 가능(하위 호환).
 >
 > **ZERO CLASS 인코딩**: 3자리 (10N). 하위 스텝이 생겨도 동일 prefix 유지.
+
+### 회차/단가 슬롯 ↔ stepAccess 매핑
+
+회차등록·단가관리·일정카드 등은 `ClassSession`/`PricingConfig` 의 `(classType, stepLevel)` 슬롯 키를 쓴다. stepAccess 코드와는 별개로 슬롯이 매핑돼 있으니 헷갈리지 말 것.
+
+| 슬롯 (classType_stepLevel) | stepAccess 코드 | 강의 |
+|---|---|---|
+| `ZERO_0` | `100` | ZERO CLASS 전체 |
+| `UP_1` (sub: `UP_11~14`) | `1` (sub: `11~14`) | UP 1 · 영상기초다지기 |
+| `UP_2` | `2` | UP 2 · 뮤직영상 |
+| `UP_3` | `21` | UP 3 · 인트로영상 |
+| `PRO_1` | `6` | PRO 1 · 시네마틱 5컷 |
+| `PRO_2` | `5` | PRO 2 · 유튜브 창작과정 |
+| `PRO_3` | `7` | PRO 3 · 멀티영상 |
+| `MASTER_1` | `4` | MASTER 1 · 광고영상 |
+| `MASTER_2` | `3` | MASTER 2 · 프리프로덕션 |
+
+- 라벨은 `lib/pricing.js#formatClassLabel` 가 단일 진실 원천 (회차 셀렉트/단가카드/일정카드 모두 거침).
+- 슬롯↔stepAccess 변환은 `lib/stepMaterials.js#SESSION_TO_MATERIAL_STEP` 사용.
+- 새 슬롯을 추가할 때는 `PRICING_SLOTS` / `SESSION_STEP_OPTIONS` / `SESSION_COURSE_TITLE` (pricing.js) 와 `SESSION_TO_MATERIAL_STEP` (stepMaterials.js) 를 함께 갱신.
 
 ### 접근 제어 규칙 (새 페이지에도 동일 적용)
 
@@ -109,7 +129,7 @@ Vercel이 자동 배포함.
    - **UP CLASS 하위 단계는 두 자리 인코딩** (예: Step 1-2 → `12`, Step 2-1 → `21`, Step 3-2 → `32`)
    - **ZERO CLASS 는 단일 코드 `100`** (5개 루트가 공유 — 허용 시 전체 접근)
    - 새 서브스텝을 만들 때 같은 규칙을 따른다.
-3. `app/admin/page.js` 의 `ZERO_STEP` / `STEP1_OPTIONS` / `SINGLE_STEPS` / `PRO_STEPS`
+3. `app/admin/page.js` 의 `ZERO_STEP` / `STEP1_OPTIONS` / `SINGLE_STEPS` / `PRO_STEPS` / `MASTER_STEPS`
    값·배열을 수정하면 자동으로 드롭다운·토글 컬럼이 노출된다.
    (`STAFF` / `SUPER_ADMIN` 은 `requireStepAccess` 에서 자동 통과.)
 4. 권한 없는 사용자는 `/no-access?step=<값>` 으로 리디렉션된다.

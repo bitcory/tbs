@@ -319,6 +319,15 @@
       background: linear-gradient(135deg, #00B380, #68E571);
     }
 
+    /* MASTER class — purple / gold premium tones */
+    .visual-master1 {
+      background: linear-gradient(135deg, #7C3AED 0%, #A855F7 55%, #F59E0B 100%);
+    }
+
+    .visual-master2 {
+      background: linear-gradient(135deg, #1E1B4B 0%, #4C1D95 50%, #C084FC 100%);
+    }
+
     /* ZERO card visuals — clean opaque background, no noise overlay,
        so transparent PNG logos render crisply. */
     .visual-zero {
@@ -1018,6 +1027,41 @@
         inset -1px -1px 0.5px 1px rgba(255, 255, 255, 0.25);
     }
 
+    .class-tab[data-class="master"].active {
+      background: linear-gradient(135deg, rgba(124,58,237,0.96) 0%, rgba(168,85,247,0.92) 55%, rgba(245,158,11,0.94) 100%);
+      box-shadow:
+        0 16px 36px rgba(124, 58, 237, 0.38),
+        inset 1.5px 1.5px 0.5px 0 rgba(255, 255, 255, 0.55),
+        inset -1px -1px 0.5px 1px rgba(255, 255, 255, 0.25);
+    }
+
+    .class-tab[data-class="master"]:hover:not(.active) {
+      color: #7C3AED;
+    }
+
+    /* MASTER active card glow — gold/purple instead of green */
+    #view-master .step-card.active {
+      border-color: #A855F7;
+      box-shadow: 0 30px 70px rgba(124, 58, 237, 0.38), 0 0 0 3px rgba(245, 158, 11, 0.25);
+    }
+
+    #view-master .step-card-label {
+      color: #7C3AED;
+    }
+
+    #view-master .step-card.active .step-card-check {
+      background: linear-gradient(135deg, #A855F7, #F59E0B);
+      border-color: #7C3AED;
+    }
+
+    #view-master .video-panel-eyebrow {
+      background: linear-gradient(112.34deg, #A855F7 -38.67%, #7C3AED 60%, #F59E0B 130%);
+    }
+
+    #view-master .video-section-title::before {
+      background: linear-gradient(180deg, #A855F7, #F59E0B);
+    }
+
     .class-view { display: none; }
     .class-view.active { display: block; }
 
@@ -1046,6 +1090,7 @@
       <button type="button" class="class-tab" data-class="zero" onclick="selectClass('zero')">ZERO CLASS</button>
       <button type="button" class="class-tab active" data-class="up" onclick="selectClass('up')">UP CLASS</button>
       <button type="button" class="class-tab" data-class="pro" onclick="selectClass('pro')">PRO CLASS</button>
+      <button type="button" class="class-tab" data-class="master" onclick="selectClass('master')">MASTER CLASS</button>
     </nav>
 
     <!-- ───────── ZERO CLASS VIEW ───────── -->
@@ -1143,32 +1188,6 @@
             <p class="step-card-title">시네마틱 5컷 다이얼로그</p>
           </button>
 
-          <button type="button" class="step-card" data-step="step7">
-            <div class="step-card-check">
-              <svg viewBox="0 0 14 14" fill="none">
-                <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </div>
-            <div class="step-card-visual visual-step7">
-              <img src="/images/cards/pro5.png" alt="PRO 2단계 멀티영상 만들기" />
-            </div>
-            <p class="step-card-label">PRO 2단계</p>
-            <p class="step-card-title">멀티영상 만들기</p>
-          </button>
-
-          <button type="button" class="step-card" data-step="step4">
-            <div class="step-card-check">
-              <svg viewBox="0 0 14 14" fill="none">
-                <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </div>
-            <div class="step-card-visual visual-step4">
-              <img src="/images/cards/pro2.png" alt="PRO 3단계 광고영상 제작" />
-            </div>
-            <p class="step-card-label">PRO 3단계</p>
-            <p class="step-card-title">광고영상 제작</p>
-          </button>
-
           <button type="button" class="step-card" data-step="step5">
             <div class="step-card-check">
               <svg viewBox="0 0 14 14" fill="none">
@@ -1176,10 +1195,47 @@
               </svg>
             </div>
             <div class="step-card-visual visual-step5">
-              <img src="/images/cards/pro3.png" alt="PRO 4단계 유튜브 수익화" />
+              <img src="/images/cards/pro3.png" alt="PRO 2단계 유튜브 창작과정" />
             </div>
-            <p class="step-card-label">PRO 4단계</p>
-            <p class="step-card-title">유튜브 수익화과정</p>
+            <p class="step-card-label">PRO 2단계</p>
+            <p class="step-card-title">유튜브 창작과정</p>
+          </button>
+
+          <button type="button" class="step-card" data-step="step7">
+            <div class="step-card-check">
+              <svg viewBox="0 0 14 14" fill="none">
+                <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <div class="step-card-visual visual-step7">
+              <img src="/images/cards/pro5.png" alt="PRO 3단계 멀티영상 만들기" />
+            </div>
+            <p class="step-card-label">PRO 3단계</p>
+            <p class="step-card-title">멀티영상 만들기</p>
+          </button>
+
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ───────── MASTER CLASS VIEW ───────── -->
+    <div class="class-view" id="view-master">
+
+      <section class="cards-section">
+        <div class="cards-track" id="cardsTrackMaster">
+
+          <button type="button" class="step-card" data-step="step4">
+            <div class="step-card-check">
+              <svg viewBox="0 0 14 14" fill="none">
+                <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <div class="step-card-visual visual-master1">
+              <img src="/images/cards/pro2.png" alt="MASTER 1단계 광고영상 제작" />
+            </div>
+            <p class="step-card-label">MASTER 1단계</p>
+            <p class="step-card-title">광고영상 제작</p>
           </button>
 
           <button type="button" class="step-card" data-step="step3">
@@ -1188,10 +1244,10 @@
                 <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </div>
-            <div class="step-card-visual visual-step3">
-              <img src="/images/cards/pro4.png" alt="PRO 5단계 프리프로덕션" />
+            <div class="step-card-visual visual-master2">
+              <img src="/images/cards/pro4.png" alt="MASTER 2단계 프리프로덕션" />
             </div>
-            <p class="step-card-label">PRO 5단계</p>
+            <p class="step-card-label">MASTER 2단계</p>
             <p class="step-card-title">프리프로덕션</p>
           </button>
 
@@ -1296,11 +1352,11 @@
       'step2-1': {
         label: 'UP 3단계', title: '인트로영상 만들기', url: '/lecture/step2-1', ready: true,
       },
-      step6: { label: 'PRO 1단계', title: '시네마틱 5컷 다이얼로그', url: '/lecture/step6', ready: true },
-      step7: { label: 'PRO 2단계', title: '멀티영상 만들기',          url: '/lecture/step7', ready: true },
-      step4: { label: 'PRO 3단계', title: '광고영상 제작',          url: '/lecture/step4', ready: true },
-      step5: { label: 'PRO 4단계', title: '유튜브 수익화과정',      url: '/lecture/step5', ready: true },
-      step3: { label: 'PRO 5단계', title: '프리프로덕션',           url: '/lecture/step3', ready: true },
+      step6: { label: 'PRO 1단계',    title: '시네마틱 5컷 다이얼로그', url: '/lecture/step6', ready: true },
+      step5: { label: 'PRO 2단계',    title: '유튜브 창작과정',          url: '/lecture/step5', ready: true },
+      step7: { label: 'PRO 3단계',    title: '멀티영상 만들기',          url: '/lecture/step7', ready: true },
+      step4: { label: 'MASTER 1단계', title: '광고영상 제작',            url: '/lecture/step4', ready: true },
+      step3: { label: 'MASTER 2단계', title: '프리프로덕션',             url: '/lecture/step3', ready: true },
 
       'zero-gmail':    { label: 'Step 01', title: '구글계정 가입하기',   url: '/zero/gmail',    ready: true },
       'zero-flow':     { label: 'Step 02', title: 'FLOW 가입하기',        url: '/zero/flow',     ready: true },
@@ -1367,13 +1423,14 @@
     let currentStep = 'step1';
 
     /* ──────────────── CLASS TABS ──────────────── */
-    const CLASS_DEFAULT_STEP = { zero: 'zero-gmail', up: 'step1', pro: 'step4' };
+    const CLASS_DEFAULT_STEP = { zero: 'zero-gmail', up: 'step1', pro: 'step6', master: 'step4' };
 
     function classOfStep(step) {
       if (!step) return null;
       if (step.startsWith('zero-')) return 'zero';
-      if (step === 'step4' || step === 'step5' || step === 'step6' || step === 'step7') return 'pro';
-      if (step === 'step1' || step === 'step2' || step === 'step3' || step === 'step2-1') return 'up';
+      if (step === 'step3' || step === 'step4') return 'master';
+      if (step === 'step5' || step === 'step6' || step === 'step7') return 'pro';
+      if (step === 'step1' || step === 'step2' || step === 'step2-1') return 'up';
       return null;
     }
 
@@ -1772,7 +1829,7 @@
       const params = new URLSearchParams(window.location.search);
       const cParam = params.get('c');
       const sParam = params.get('s');
-      const validClasses = ['zero', 'up', 'pro'];
+      const validClasses = ['zero', 'up', 'pro', 'master'];
       const targetStep = sParam && STEPS[sParam] ? sParam : null;
       const targetClass = validClasses.includes(cParam)
         ? cParam

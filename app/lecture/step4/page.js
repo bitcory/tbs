@@ -1026,14 +1026,14 @@ export default function Step4Page() {
       <section className="tb-hero">
         <div className="tb-hero-glow" />
         <div className="tb-hero-row">
-          <span className="tb-hero-eyebrow">TB STUDY · PRO 2</span>
+          <span className="tb-hero-eyebrow">TB STUDY · MASTER 1</span>
           <h1 className="tb-hero-title">광고영상 만들기</h1>
         </div>
       </section>
 
       {/* Glass bar */}
       <div className="tb-glass-bar">
-        <Link href="/?c=pro&s=step4" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full tb-pill-ghost text-xs sm:text-sm font-bold transition">
+        <Link href="/?c=master&s=step4" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full tb-pill-ghost text-xs sm:text-sm font-bold transition">
           <ArrowLeft className="w-3.5 h-3.5" />
           홈
         </Link>

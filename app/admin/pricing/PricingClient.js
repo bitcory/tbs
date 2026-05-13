@@ -6,9 +6,10 @@ import { CLASS_TYPE_COLOR, formatClassLabel } from "@/lib/pricing";
 import { updatePricing } from "./actions";
 
 const TABS = [
-  { key: "ZERO", label: "ZERO CLASS" },
-  { key: "UP",   label: "UP CLASS" },
-  { key: "PRO",  label: "PRO CLASS" },
+  { key: "ZERO",   label: "ZERO CLASS" },
+  { key: "UP",     label: "UP CLASS" },
+  { key: "PRO",    label: "PRO CLASS" },
+  { key: "MASTER", label: "MASTER CLASS" },
 ];
 
 export default function PricingClient({ initial }) {
