@@ -165,23 +165,42 @@ Locked frontal medium shot rises subtly with the jump, then freezes completely s
 Sharp percussive footstep sounds alternating between heel and toe, fabric swishing, a whoosh on the jump, one solid landing sound. No music. No cheers. No clap.`,
         },
         {
-          title: '탭댄스',
-          prompt: `A 10-second video of a dancer performing tap dance.
-0-3s: Starts with light rhythmic tapping, feet close-up.
-3-6s: Fast synchronized footwork with clear sound emphasis.
-6-8s: Spins while maintaining tap rhythm.
-8-10s: Ends with a sharp final stomp and pose.
-Camera: low angle focusing on feet, smooth zoom out at the end. no bgm`,
+          title: '댄싱타임',
+          prompt: `The character is a native Korean speaker in her 20s. All dialogue must be spoken in Korean ONLY. English is strictly prohibited.
+Voice requirements:
+Native Korean pronunciation
+Natural Korean intonation and rhythm
+No foreign accent
+Sounds like a professional Korean voice actor
+Dialogue (Korean only):
+Korean girl "제 춤 어때요? 괜찮나요?".
+"그럼 이 춤은 어떤지 봐주세요~"
+Performance:
+Natural pauses
+Realistic emotions
+Not robotic
+Not exaggerated
+No subtitles
+Subtitles, title, text is strictly prohibited.
+After speaking, Energetic 6-second funky disco dance animation featuring dramatic Saturday Night Fever moves, spins, hip shakes, and a confident victory stance. No music. No cheers. No clap.`,
         },
         {
-          title: '웨이/팝핀',
-          prompt: `A 10-second video of a dancer performing wave and popping dance.
-0-2s: Starts with subtle finger wave.
-2-5s: Full arm wave flowing into shoulders and chest.
-5-7s: Body wave moving smoothly down to legs.
-7-9s: Quick popping hits synchronized with beats.
-9-10s: Freeze with a stylish pose.
-Camera: slow motion emphasis on wave transitions. no bgm`,
+          title: '댄싱끝',
+          prompt: `The character is a native Korean speaker in her 20s. All dialogue must be spoken in Korean ONLY. English is strictly prohibited.
+Voice requirements:
+Native Korean pronunciation
+Natural Korean intonation and rhythm
+No foreign accent
+Sounds like a professional Korean voice actor
+Dialogue (Korean only):
+Korean girl "오늘 저와 함께 춤도 배우고 AI 영상도 배워보니까 어떠신가요?"
+Performance:
+Natural pauses
+Realistic emotions
+Not robotic
+Not exaggerated
+No subtitles
+Subtitles, title, text is strictly prohibited.`,
         },
       ],
     },
