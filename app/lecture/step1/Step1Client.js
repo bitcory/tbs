@@ -150,7 +150,7 @@ Natural Korean intonation and rhythm
 No foreign accent
 Sounds like a professional Korean voice actor
 Dialogue (Korean only):
-Korean girl "안녕하세요. 저는 [민스]라고 합니다."
+Korean girl "안녕하세요. 저는 [**]라고 합니다."
 "오늘은 제가 춤을 춰볼건데 잘 봐주세요"
 Performance:
 Natural pauses
