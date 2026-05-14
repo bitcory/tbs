@@ -66,55 +66,86 @@ function resolveSpeaker(key, characters) {
   return { id: key, name: key };
 }
 
-function stripSpeakerPrefix(dialogue) {
-  if (!dialogue) return '';
-  // "A: ", "B: ", "민준: " 같이 짧은 화자 prefix만 제거 (첫 줄 기준)
-  return dialogue.replace(/^[^\n:]{1,8}:\s*/, '');
-}
-
-function syncDialogueIntoPrompt(videoPrompt, dialogueText) {
-  if (!videoPrompt) return videoPrompt;
-  // 큰따옴표(", ", ") · 작은따옴표(', ', ') 모두 지원, 첫 번째 쌍만 교체
-  const re = /(["“”'‘’])([^"“”'‘’]*)(["“”'‘’])/;
-  if (!re.test(videoPrompt)) return videoPrompt;
-  return videoPrompt.replace(re, (_m, open, _content, close) => `${open}${dialogueText}${close}`);
-}
-
-// 대사 한 줄의 한국어 텍스트 추출 (v3: ko, cinematic_sequence variant: line).
+// 대사 한 줄의 한국어 텍스트 추출.
+// v3: ko / v4 cinematic_sequence: text / 기타: line·kr·subtitle·en.
 function dialogueLineText(l) {
   if (!l || typeof l !== 'object') return '';
-  return l.ko || l.line || l.kr || l.subtitle || l.en || '';
+  return l.ko || l.text || l.line || l.kr || l.subtitle || l.en || '';
 }
 
-// 영상 프롬프트에 박을 화자 표기 — 로마자 이름 우선.
-function speakerRomanized(key, characters) {
-  if (!key) return '';
-  const c = characters?.[key];
-  if (c) return c.name_romanized || c.name || key;
-  return key; // cinematic_sequence variant 는 character 가 이미 로마자 이름
+// 대사 화자 표시 이름 — flattenDialogue 와 video_prompt 주입에서 동일하게 사용.
+// speaker('A'/'B'), character_id('A'/'B'), character(이름) 모두 수용.
+function dialogueSpeakerLabel(l, characters) {
+  if (!l || typeof l !== 'object') return '';
+  const key = l.speaker || l.character_id || l.character || '';
+  const resolved = resolveSpeaker(key, characters);
+  if (resolved.name && resolved.name !== key) return resolved.name;
+  // 캐릭터 미로딩 시 character_name 폴백
+  return l.character_name || resolved.name || key;
 }
 
-// video_prompt 에 대사가 빠져 있으면 v3 형식(Name: "한국어")으로 끼워넣는다.
-// "No background music." 직전에 삽입. cinematic_sequence variant 대응.
+// video_prompt 끝의 BGM 정책 문장과, 그 앞에 붙은 대사 구간을 분리.
+function splitVideoPrompt(videoPrompt) {
+  let body = String(videoPrompt || '');
+  let tail = '';
+  const tailMatch = body.match(/\s*(No background music\.?|no bgm\.?)\s*$/i);
+  if (tailMatch) {
+    tail = tailMatch[1];
+    body = body.slice(0, tailMatch.index);
+  }
+  // 끝에 붙은  화자: "대사"  세그먼트를 하나씩 제거 (라벨은 문장부호를 넘지 않음)
+  const segRe = /\s*[^"“”\n.!?]*?[:：]\s*["“”][^"“”]*["“”]\s*$/;
+  let guard = 0;
+  while (segRe.test(body) && guard < 10) {
+    body = body.replace(segRe, '');
+    guard += 1;
+  }
+  return { base: body.replace(/\s+$/, ''), tail };
+}
+
+// 대사 텍스트창 내용("화자: 대사" 줄들)을  화자: "대사"  세그먼트 문자열로 변환.
+function buildDialogueSegments(dialogueText) {
+  return String(dialogueText || '')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const m = line.match(/^([^:：]{1,24})[:：]\s*(.+)$/);
+      return m ? `${m[1].trim()}: "${m[2].trim()}"` : `"${line}"`;
+    })
+    .join(' ');
+}
+
+// 대사 텍스트창 → video_prompt 의 대사 구간을 통째로 재구성 (편집 시 동기화).
+function syncDialogueIntoPrompt(videoPrompt, dialogueText) {
+  if (!videoPrompt) return videoPrompt;
+  const { base, tail } = splitVideoPrompt(videoPrompt);
+  const seg = buildDialogueSegments(dialogueText);
+  let result = base;
+  if (seg) result = result ? `${result} ${seg}` : seg;
+  if (tail) result = result ? `${result} ${tail}` : tail;
+  return result;
+}
+
+// video_prompt 에 대사가 빠져 있으면 v3/v4 형식(화자: "대사")으로 끼워넣는다.
+// cinematic_sequence variant 대응. 이미 들어있으면 건드리지 않음.
 function ensureDialogueInVideoPrompt(videoPrompt, dialogueObj, characters) {
   if (!videoPrompt) return videoPrompt;
   const lines = dialogueObj && Array.isArray(dialogueObj.lines) ? dialogueObj.lines : [];
   if (lines.length === 0) return videoPrompt;
   const firstText = dialogueLineText(lines[0]);
-  // 이미 대사가 박혀 있으면 건드리지 않음 (v3 stage:"shots" 는 기본 포함됨)
   if (firstText && videoPrompt.includes(firstText)) return videoPrompt;
   const segs = lines.map((l) => {
     const text = dialogueLineText(l);
     if (!text) return '';
-    const sp = speakerRomanized(l.speaker || l.character || '', characters);
+    const sp = dialogueSpeakerLabel(l, characters);
     return sp ? `${sp}: "${text}"` : `"${text}"`;
   }).filter(Boolean);
   if (segs.length === 0) return videoPrompt;
-  const dlgStr = segs.join(' ');
-  const tailRe = /\s*(No background music\.?|no bgm\.?)\s*$/i;
-  const m = videoPrompt.match(tailRe);
-  if (m) return videoPrompt.replace(tailRe, ` ${dlgStr} ${m[1]}`);
-  return `${videoPrompt.replace(/\s+$/, '')} ${dlgStr}`;
+  const { base, tail } = splitVideoPrompt(videoPrompt);
+  let result = base ? `${base} ${segs.join(' ')}` : segs.join(' ');
+  if (tail) result = `${result} ${tail}`;
+  return result;
 }
 
 function appendNoBgm(videoPrompt) {
@@ -128,11 +159,8 @@ function appendNoBgm(videoPrompt) {
 function formatDialogueLine(l, characters) {
   if (!l) return '';
   if (typeof l === 'string') return l;
-  // speaker: 'A'|'B' (v2.2/v3). character: Korean-name 또는 로마자 이름 (cinematic_sequence variant).
-  const speakerKey = l.speaker || l.character || '';
-  const { name: display } = resolveSpeaker(speakerKey, characters);
-  // v3: ko/en. cinematic_sequence variant: line. legacy: kr/subtitle.
-  const text = l.ko || l.kr || l.line || l.subtitle || l.en || '';
+  const display = dialogueSpeakerLabel(l, characters);
+  const text = dialogueLineText(l);
   return display ? `${display}: ${text}` : text;
 }
 
@@ -160,7 +188,7 @@ function normalizeDialogueMeta(d) {
     if (d.lines.length === 0) return { lines: [] };
     const first = d.lines[0] || {};
     return {
-      speaker: first.speaker || first.character || '',
+      speaker: first.speaker || first.character_id || first.character || '',
       delivery: first.delivery || '',
       lines: d.lines,
     };
@@ -168,7 +196,7 @@ function normalizeDialogueMeta(d) {
   if (Array.isArray(d.subtitle)) {
     const first = d.subtitle[0] || {};
     return {
-      speaker: first.speaker || first.character || '',
+      speaker: first.speaker || first.character_id || first.character || '',
       delivery: first.delivery || '',
       lines: d.subtitle,
     };
@@ -185,12 +213,12 @@ function arrOrStr(v) {
 
 function normalizeAudio(a) {
   if (!a || typeof a !== 'object') return null;
-  // v3: ambient/foley/sfx/music_cue/bgm_policy.
-  // cinematic_sequence variant: ambient_sounds[]/foley[]. legacy: ambient_layers/foley_layers.
+  // v3/v4: ambient/foley/sfx/music_cue/bgm_policy.
+  // cinematic_sequence variant: ambient_sounds[]/sound_fx[]. legacy: ambient_layers/foley_layers.
   return {
     ambient:    arrOrStr(a.ambient    ?? a.ambient_sounds ?? a.ambient_layers),
     foley:      arrOrStr(a.foley      ?? a.foley_layers),
-    sfx:        a.sfx ?? null,
+    sfx:        arrOrStr(a.sfx        ?? a.sound_fx),
     music_cue:  a.music_cue ?? null,
     bgm_policy: a.bgm_policy || a.music_policy || null,
   };
@@ -213,8 +241,8 @@ function normalizeShots(rawShots, characters) {
     duration_sec: typeof s.duration_sec === 'number'
       ? s.duration_sec
       : typeof s.duration_seconds === 'number' ? s.duration_seconds : null,
-    // v3: shot_purpose. legacy: purpose / scene_purpose.
-    purpose: s.shot_purpose || s.purpose || s.scene_purpose || '',
+    // v3/v4: shot_purpose. cinematic_sequence variant: visual_description. legacy: purpose/scene_purpose.
+    purpose: s.shot_purpose || s.purpose || s.scene_purpose || s.visual_description || '',
     characters_in_frame: Array.isArray(s.characters_in_frame) ? s.characters_in_frame : ['A', 'B'],
     camera: normalizeCamera(s),
     blocking: s.blocking || {},
@@ -583,10 +611,9 @@ export default function Step6Page() {
       shots: prev.shots.map((s) => {
         if (s.shot_id !== shotId) return s;
         const next = { ...s, ...patch };
-        // 대사가 변경되면 video_prompt 안의 첫 번째 따옴표 내용을 자동 동기화
+        // 대사 텍스트창이 바뀌면 video_prompt 의 대사 구간을 통째로 재구성
         if ('dialogue' in patch && next.video_prompt) {
-          const lineForPrompt = stripSpeakerPrefix(next.dialogue);
-          next.video_prompt = syncDialogueIntoPrompt(next.video_prompt, lineForPrompt);
+          next.video_prompt = syncDialogueIntoPrompt(next.video_prompt, next.dialogue);
         }
         return next;
       }),
@@ -629,6 +656,8 @@ export default function Step6Page() {
   const allDialogues = data ? data.shots.map((s) => s.dialogue).filter(Boolean).join('\n\n') : '';
 
   const sc = data?.scene_context || {};
+  // 제목: project.title (v3/v4 shots) → scene_context.title (cinematic_sequence variant)
+  const projectTitle = data?.project?.title || sc.title || '';
 
   return (
     <div className="min-h-screen md:h-screen md:flex md:flex-col md:overflow-hidden bg-[#f8fafc] text-[#0f172a]">
@@ -803,10 +832,10 @@ export default function Step6Page() {
             </div>
             {data ? (
               <div className="space-y-1.5">
-                {data.project?.title && (
+                {projectTitle && (
                   <div className="flex items-start gap-2">
                     <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">제목</span>
-                    <span className="text-sm text-[#0f172a] font-bold flex-1 break-all">{data.project.title}</span>
+                    <span className="text-sm text-[#0f172a] font-bold flex-1 break-all">{projectTitle}</span>
                   </div>
                 )}
                 <div className="flex items-start gap-2">
@@ -1012,7 +1041,7 @@ export default function Step6Page() {
               <div className="flex-shrink-0 px-4 py-3 border-b border-[#e2e8f0] bg-[#ecfdf5]/40 rounded-t-2xl flex items-center justify-between gap-3 flex-wrap">
                 <div className="flex items-center gap-2 min-w-0">
                   <Clapperboard className="w-4 h-4 text-[#00996D] flex-shrink-0" />
-                  <h2 className="text-base font-black text-[#0f172a] uppercase truncate">{data.project?.title || '시네마틱 5컷'}</h2>
+                  <h2 className="text-base font-black text-[#0f172a] uppercase truncate">{projectTitle || '시네마틱 5컷'}</h2>
                   <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#64748b] flex-shrink-0">
                     {data.shots.length}컷
                   </span>
@@ -1424,9 +1453,8 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
           <span className="text-[10px] font-black text-[#a16207] uppercase tracking-wider self-center">DIALOGUE</span>
           {Array.isArray(dm.lines) ? (
             dm.lines.map((l, idx) => {
-              const sp = l.speaker || l.character || '';
-              const { id, name } = resolveSpeaker(sp, characters);
-              const labelSp = id && name && id !== name ? `${id} · ${name}` : (name || sp);
+              const sp = l.speaker || l.character_id || l.character || '';
+              const labelSp = dialogueSpeakerLabel(l, characters);
               return (
                 <span key={idx} className="inline-flex items-center gap-2">
                   {sp && <Stat k={`화자${dm.lines.length > 1 ? ` ${idx + 1}` : ''}`} v={labelSp} />}
