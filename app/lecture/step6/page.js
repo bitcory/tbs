@@ -42,6 +42,30 @@ function cleanJson(raw) {
   }
 }
 
+// v3.0 sheet_prompt 는 9-섹션 객체. 편집/복사용으로는 compiled_prompt 문자열을 쓴다.
+// 레거시(문자열) sheet_prompt 도 그대로 통과.
+function sheetPromptString(sp) {
+  if (typeof sp === 'string') return sp;
+  if (sp && typeof sp === 'object') return sp.compiled_prompt || '';
+  return '';
+}
+
+// 대사 화자 키('A'/'B' 또는 'Taesik' 같은 로마자 이름)를 캐릭터로 해소.
+function resolveSpeaker(key, characters) {
+  if (!key) return { id: '', name: '' };
+  if (characters?.[key]) return { id: key, name: characters[key].name || key };
+  const lower = String(key).toLowerCase();
+  for (const id of ['A', 'B']) {
+    const c = characters?.[id];
+    if (!c) continue;
+    if (c.name === key || c.name_romanized === key
+        || String(c.name_romanized || '').toLowerCase() === lower) {
+      return { id, name: c.name || key };
+    }
+  }
+  return { id: key, name: key };
+}
+
 function stripSpeakerPrefix(dialogue) {
   if (!dialogue) return '';
   // "A: ", "B: ", "민준: " 같이 짧은 화자 prefix만 제거 (첫 줄 기준)
@@ -56,22 +80,59 @@ function syncDialogueIntoPrompt(videoPrompt, dialogueText) {
   return videoPrompt.replace(re, (_m, open, _content, close) => `${open}${dialogueText}${close}`);
 }
 
+// 대사 한 줄의 한국어 텍스트 추출 (v3: ko, cinematic_sequence variant: line).
+function dialogueLineText(l) {
+  if (!l || typeof l !== 'object') return '';
+  return l.ko || l.line || l.kr || l.subtitle || l.en || '';
+}
+
+// 영상 프롬프트에 박을 화자 표기 — 로마자 이름 우선.
+function speakerRomanized(key, characters) {
+  if (!key) return '';
+  const c = characters?.[key];
+  if (c) return c.name_romanized || c.name || key;
+  return key; // cinematic_sequence variant 는 character 가 이미 로마자 이름
+}
+
+// video_prompt 에 대사가 빠져 있으면 v3 형식(Name: "한국어")으로 끼워넣는다.
+// "No background music." 직전에 삽입. cinematic_sequence variant 대응.
+function ensureDialogueInVideoPrompt(videoPrompt, dialogueObj, characters) {
+  if (!videoPrompt) return videoPrompt;
+  const lines = dialogueObj && Array.isArray(dialogueObj.lines) ? dialogueObj.lines : [];
+  if (lines.length === 0) return videoPrompt;
+  const firstText = dialogueLineText(lines[0]);
+  // 이미 대사가 박혀 있으면 건드리지 않음 (v3 stage:"shots" 는 기본 포함됨)
+  if (firstText && videoPrompt.includes(firstText)) return videoPrompt;
+  const segs = lines.map((l) => {
+    const text = dialogueLineText(l);
+    if (!text) return '';
+    const sp = speakerRomanized(l.speaker || l.character || '', characters);
+    return sp ? `${sp}: "${text}"` : `"${text}"`;
+  }).filter(Boolean);
+  if (segs.length === 0) return videoPrompt;
+  const dlgStr = segs.join(' ');
+  const tailRe = /\s*(No background music\.?|no bgm\.?)\s*$/i;
+  const m = videoPrompt.match(tailRe);
+  if (m) return videoPrompt.replace(tailRe, ` ${dlgStr} ${m[1]}`);
+  return `${videoPrompt.replace(/\s+$/, '')} ${dlgStr}`;
+}
+
 function appendNoBgm(videoPrompt) {
   if (!videoPrompt) return videoPrompt;
   const trimmed = videoPrompt.replace(/\s+$/, '');
-  if (/no\s*bgm\.?$/i.test(trimmed)) return trimmed;
-  return `${trimmed} no bgm`;
+  // v3.0 영상 프롬프트는 이미 "No background music." 으로 끝남. 레거시 "no bgm" 도 인정.
+  if (/no\s*(bgm|background\s+music)\.?$/i.test(trimmed)) return trimmed;
+  return `${trimmed} No background music.`;
 }
 
 function formatDialogueLine(l, characters) {
   if (!l) return '';
   if (typeof l === 'string') return l;
-  // speaker: 'A'|'B' (v2.2). character: legacy Korean-name field. Fallback to id keys.
+  // speaker: 'A'|'B' (v2.2/v3). character: Korean-name 또는 로마자 이름 (cinematic_sequence variant).
   const speakerKey = l.speaker || l.character || '';
-  const charName = characters?.[speakerKey]?.name;
-  const display = charName || speakerKey;
-  // v2.2: ko/en. legacy GPT outputs sometimes use kr.
-  const text = l.ko || l.kr || l.subtitle || l.en || '';
+  const { name: display } = resolveSpeaker(speakerKey, characters);
+  // v3: ko/en. cinematic_sequence variant: line. legacy: kr/subtitle.
+  const text = l.ko || l.kr || l.line || l.subtitle || l.en || '';
   return display ? `${display}: ${text}` : text;
 }
 
@@ -124,14 +185,24 @@ function arrOrStr(v) {
 
 function normalizeAudio(a) {
   if (!a || typeof a !== 'object') return null;
-  // v2.2: ambient/foley/sfx/music_cue/bgm_policy. legacy: ambient_layers/foley_layers/dialogue_mix.
+  // v3: ambient/foley/sfx/music_cue/bgm_policy.
+  // cinematic_sequence variant: ambient_sounds[]/foley[]. legacy: ambient_layers/foley_layers.
   return {
-    ambient:    arrOrStr(a.ambient    ?? a.ambient_layers),
+    ambient:    arrOrStr(a.ambient    ?? a.ambient_sounds ?? a.ambient_layers),
     foley:      arrOrStr(a.foley      ?? a.foley_layers),
     sfx:        a.sfx ?? null,
     music_cue:  a.music_cue ?? null,
     bgm_policy: a.bgm_policy || a.music_policy || null,
   };
+}
+
+// v3 shots 는 camera 객체. cinematic_sequence variant 는 flat camera_move + composition.
+function normalizeCamera(s) {
+  if (s.camera && typeof s.camera === 'object') return s.camera;
+  const cam = {};
+  if (s.camera_move) cam.movement = s.camera_move;
+  if (s.composition) cam.composition = s.composition;
+  return cam;
 }
 
 function normalizeShots(rawShots, characters) {
@@ -142,10 +213,10 @@ function normalizeShots(rawShots, characters) {
     duration_sec: typeof s.duration_sec === 'number'
       ? s.duration_sec
       : typeof s.duration_seconds === 'number' ? s.duration_seconds : null,
-    // v2.2: shot_purpose. legacy: purpose / scene_purpose.
+    // v3: shot_purpose. legacy: purpose / scene_purpose.
     purpose: s.shot_purpose || s.purpose || s.scene_purpose || '',
     characters_in_frame: Array.isArray(s.characters_in_frame) ? s.characters_in_frame : ['A', 'B'],
-    camera: s.camera || {},
+    camera: normalizeCamera(s),
     blocking: s.blocking || {},
     // legacy: actor_micro_expression. v2.2: emotion.
     emotion: s.emotion || s.actor_micro_expression || {},
@@ -154,16 +225,34 @@ function normalizeShots(rawShots, characters) {
     dialogue_meta: normalizeDialogueMeta(s.dialogue),
     // Accept both new (image_prompt) and legacy (i2i_prompt) field names.
     image_prompt: s.image_prompt || s.i2i_prompt || '',
-    video_prompt: typeof s.video_prompt === 'string' ? s.video_prompt : '',
+    // cinematic_sequence variant 는 video_prompt 에 대사가 없어 v3 형식으로 끼워넣는다.
+    video_prompt: ensureDialogueInVideoPrompt(
+      typeof s.video_prompt === 'string' ? s.video_prompt : '',
+      s.dialogue,
+      characters,
+    ),
     dialogue: flattenDialogue(s.dialogue, characters),
     imageUpload: '',
   }));
 }
 
+function normalizeOneCharacter(c) {
+  const raw = c || {};
+  const sp = raw.sheet_prompt;
+  return {
+    ...raw,
+    // 편집/복사용 문자열 (v3 객체면 compiled_prompt, 레거시면 원문)
+    sheet_prompt: sheetPromptString(sp),
+    // v3 9-섹션 구조 원본 (있을 때만) — 구조화 표시용
+    sheet_struct: (sp && typeof sp === 'object') ? sp : null,
+    imageUpload: '',
+  };
+}
+
 function normalizeCharacters(chars) {
   return {
-    A: { ...(chars?.A || {}), imageUpload: '' },
-    B: { ...(chars?.B || {}), imageUpload: '' },
+    A: normalizeOneCharacter(chars?.A),
+    B: normalizeOneCharacter(chars?.B),
   };
 }
 
@@ -177,7 +266,8 @@ function emptyCharacters() {
 // 입력된 JSON 이 Stage 1(캐릭터 시트) / Stage 2(5컷) / 통합본 중 어느 단계인지 판별.
 function detectStage(json) {
   if (json.stage === 'character_sheet') return 'stage1';
-  if (json.stage === 'shots') return 'stage2';
+  // v3: 'shots'. cinematic_sequence variant: 'cinematic_sequence'.
+  if (json.stage === 'shots' || json.stage === 'cinematic_sequence') return 'stage2';
   const hasChars = !!(json.characters?.A && json.characters?.B);
   const hasShots = Array.isArray(json.shots) && json.shots.length > 0;
   if (hasChars && hasShots) return 'combined';
@@ -531,6 +621,9 @@ export default function Step6Page() {
     reader.readAsDataURL(file);
   };
 
+  const allCharacterPrompts = data
+    ? ['A', 'B'].map((who) => data.characters?.[who]?.sheet_prompt).filter(Boolean).join('\n\n')
+    : '';
   const allImagePrompts = data ? data.shots.map((s) => s.image_prompt).filter(Boolean).join('\n\n') : '';
   const allVideoPrompts = data ? data.shots.map((s) => s.video_prompt).filter(Boolean).map(appendNoBgm).join('\n\n') : '';
   const allDialogues = data ? data.shots.map((s) => s.dialogue).filter(Boolean).join('\n\n') : '';
@@ -759,9 +852,15 @@ export default function Step6Page() {
                     <span className="text-sm text-[#0f172a] font-bold flex-1">{data.project.image_model}</span>
                   </div>
                 )}
-                {sc.mood && (
+                {(data.synopsis || sc.synopsis) && (
                   <div className="flex items-start gap-2 pt-1">
-                    <span className="text-xs text-[#64748b] font-medium italic leading-relaxed">"{sc.mood}"</span>
+                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">시놉시스</span>
+                    <span className="text-[12px] text-[#334155] leading-relaxed flex-1">{data.synopsis || sc.synopsis}</span>
+                  </div>
+                )}
+                {(sc.mood || sc.atmosphere || sc.tone) && (
+                  <div className="flex items-start gap-2 pt-1">
+                    <span className="text-xs text-[#64748b] font-medium italic leading-relaxed">"{sc.mood || sc.atmosphere || sc.tone}"</span>
                   </div>
                 )}
               </div>
@@ -925,6 +1024,13 @@ export default function Step6Page() {
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
                   <button
+                    onClick={() => copyText(allCharacterPrompts)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[#334155] text-sm font-bold tb-press-soft"
+                  >
+                    <User className="w-3.5 h-3.5" />
+                    캐릭터 전체
+                  </button>
+                  <button
                     onClick={() => copyText(allImagePrompts)}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full tb-pill-primary text-sm font-bold transition"
                   >
@@ -1043,12 +1149,14 @@ export default function Step6Page() {
             </div>
             <div className="flex-1 overflow-y-auto p-5 space-y-3 min-h-0">
               <p className="text-sm text-[#64748b] leading-relaxed">
-                Stage 1 (캐릭터 시트) 와 Stage 2 (5컷) 를 따로 붙여넣어도 자동으로 병합됩니다.
+                v3.0 Stage 1 (캐릭터 시트) 와 Stage 2 (5컷) 를 따로 붙여넣어도 자동으로 병합됩니다.
                 <br />
-                <span className="inline-flex items-center gap-1 mt-1">
+                <span className="inline-flex items-center gap-1 mt-1 flex-wrap">
                   <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">stage: "character_sheet"</code>
-                  <span className="text-[#94a3b8]">또는</span>
+                  <span className="text-[#94a3b8]">·</span>
                   <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">stage: "shots"</code>
+                  <span className="text-[#94a3b8]">·</span>
+                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">stage: "cinematic_sequence"</code>
                   <span className="text-[#94a3b8]">자동 인식</span>
                 </span>
               </p>
@@ -1056,7 +1164,7 @@ export default function Step6Page() {
                 value={jsonInput}
                 onChange={(e) => setJsonInput(e.target.value)}
                 className="w-full h-[260px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
-                placeholder={'Stage 1: { "stage": "character_sheet", "characters": { "A": {...}, "B": {...} } }\nStage 2: { "stage": "shots", "shots": [{"shot_id": "S01", ...}, ...] }'}
+                placeholder={'Stage 1: { "stage": "character_sheet", "version": "3.0", "characters": { "A": {...}, "B": {...} } }\nStage 2: { "stage": "shots", "version": "3.0", "shots": [{"shot_id": "S01", ...}, ...] }'}
               />
               {uploadError && (
                 <div className="text-sm text-[#b91c1c] bg-[#fee2e2] border border-[#fca5a5] rounded-xl px-3 py-2 font-semibold">
@@ -1154,6 +1262,11 @@ function CharacterCard({ who, character, onCopy, onUpdatePrompt, onImageFile, on
               {c.vibe}
             </p>
           )}
+          {c.sheet_struct?.character_identity?.summary && (
+            <p className="bg-[#ecfdf5] border border-[#a7f3d0] px-3 py-2 rounded-md text-[12.5px] text-[#065f46] leading-snug">
+              {c.sheet_struct.character_identity.summary}
+            </p>
+          )}
           {c.voice_profile && (
             <div className="flex flex-wrap gap-x-3 gap-y-1 px-3 py-2 rounded-xl bg-[#fefce8] border border-[#fde68a] text-[12px]">
               <span className="text-[10px] font-black text-[#a16207] uppercase tracking-wider self-center">VOICE</span>
@@ -1165,9 +1278,14 @@ function CharacterCard({ who, character, onCopy, onUpdatePrompt, onImageFile, on
           <CharSpecGrid character={c} />
           <div>
             <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-1.5 min-w-0">
+              <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
                 <ImageIcon className="w-3.5 h-3.5 text-[#00996D] flex-shrink-0" />
                 <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">캐릭터 시트 프롬프트</span>
+                {c.sheet_struct && (
+                  <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#ecfdf5] text-[#00996D] font-bold">
+                    v3 · 9섹션 compiled
+                  </span>
+                )}
               </div>
               <button
                 onClick={() => onCopy(c.sheet_prompt || '')}
@@ -1277,6 +1395,8 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
         {cam.aperture && <Stat k="조리개" v={cam.aperture} />}
         {cam.angle && <Stat k="앵글" v={cam.angle} />}
         {cam.movement && <Stat k="무빙" v={cam.movement} />}
+        {cam.composition && <Stat k="구도" v={cam.composition} />}
+        {cam.depth_of_field && <Stat k="심도" v={cam.depth_of_field} />}
         {(blocking.A || blocking.B) && <Stat k="블로킹" v={[blocking.A && `A: ${blocking.A}`, blocking.B && `B: ${blocking.B}`].filter(Boolean).join(' / ')} />}
         {(emotion.A || emotion.B) && <Stat k="감정" v={[emotion.A && `A: ${emotion.A}`, emotion.B && `B: ${emotion.B}`].filter(Boolean).join(' / ')} />}
       </div>
@@ -1305,8 +1425,8 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
           {Array.isArray(dm.lines) ? (
             dm.lines.map((l, idx) => {
               const sp = l.speaker || l.character || '';
-              const charName = characters?.[sp]?.name;
-              const labelSp = `${sp}${charName ? ` · ${charName}` : ''}`;
+              const { id, name } = resolveSpeaker(sp, characters);
+              const labelSp = id && name && id !== name ? `${id} · ${name}` : (name || sp);
               return (
                 <span key={idx} className="inline-flex items-center gap-2">
                   {sp && <Stat k={`화자${dm.lines.length > 1 ? ` ${idx + 1}` : ''}`} v={labelSp} />}
@@ -1316,9 +1436,10 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
             })
           ) : (
             <>
-              {dm.speaker && (
-                <Stat k="화자" v={`${dm.speaker}${characters?.[dm.speaker]?.name ? ` · ${characters[dm.speaker].name}` : ''}`} />
-              )}
+              {dm.speaker && (() => {
+                const { id, name } = resolveSpeaker(dm.speaker, characters);
+                return <Stat k="화자" v={id && name && id !== name ? `${id} · ${name}` : (name || dm.speaker)} />;
+              })()}
               {dm.delivery && <Stat k="딜리버리" v={dm.delivery} />}
             </>
           )}
