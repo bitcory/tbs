@@ -566,6 +566,12 @@
       max-height: 80vh;
     }
 
+    .video-grid.single-col .video-slot:has(iframe) {
+      aspect-ratio: 16/9;
+      width: 100%;
+      max-width: 100%;
+    }
+
     .video-slot video,
     .video-slot iframe {
       width: 100%;
@@ -1411,6 +1417,17 @@
           layout: 'single',
           items: [
             { type: 'video', src: 'https://www.dropbox.com/scl/fi/eq6sqon5ew823djthwfsu/E3FD3A0C-CAAB-4AA1-A4A4-52CE3BDEC876_video.MP4?rlkey=y4yzfvrgzzc4y6d84zwgggb75&st=1me9wr60&raw=1', poster: '/images/thumbs/step5-1.jpg' },
+            { type: 'youtube', src: 'https://youtube.com/watch?v=67V8yjpUalo', title: '유튜브 창작과정 미리보기' },
+          ],
+        },
+      ],
+      step7: [
+        {
+          title: '멀티영상 미리보기',
+          items: [
+            { type: 'youtube', src: 'https://www.youtube.com/watch?v=eNPjHBk4rEo', title: '멀티영상 샘플 1' },
+            { type: 'youtube', src: 'https://youtube.com/watch?v=l5_1EEX750w', title: '멀티영상 샘플 2' },
+            { type: 'youtube', src: 'https://youtube.com/watch?v=XUPgogriS-8', title: '멀티영상 샘플 3' },
           ],
         },
       ],
@@ -1524,6 +1541,11 @@
           <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" />
           <path d="M10 8.5L15.5 12L10 15.5V8.5Z" fill="currentColor" />
         </svg>`;
+      const extractYoutubeId = (src) => {
+        if (!src) return '';
+        const m = src.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+        return m ? m[1] : src;
+      };
       const renderItem = (item) => {
         if (item.type === 'image') {
           return `<img src="${item.src}" alt="${item.alt || ''}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;" draggable="false" />`;
@@ -1531,6 +1553,10 @@
         if (item.type === 'video') {
           const poster = item.poster ? ` poster="${item.poster}"` : '';
           return `<video src="${item.src}"${poster} controls preload="metadata" playsinline></video>`;
+        }
+        if (item.type === 'youtube') {
+          const id = extractYoutubeId(item.src);
+          return `<iframe src="https://www.youtube.com/embed/${id}" title="${item.title || ''}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;
         }
         return `<div class="video-slot-placeholder">${placeholderSvg}<span>${item.label || ''}</span></div>`;
       };
