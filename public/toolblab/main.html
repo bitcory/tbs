@@ -1311,12 +1311,14 @@
       </div>
     </section>
 
-    <!-- ───────── CTA ───────── -->
+    </div><!-- /#view-up -->
+
+    <!-- ───────── CTA (공통: 모든 class-view에서 표시) ───────── -->
     <div class="cta-row">
       <button type="button" class="cta-watch" onclick="scrollToVideos()">아래에서 미리보기 영상 확인</button>
     </div>
 
-    <!-- ───────── VIDEO PANEL ───────── -->
+    <!-- ───────── VIDEO PANEL (공통: 모든 class-view에서 표시) ───────── -->
     <section class="video-panel" id="videoPanel">
       <div class="video-panel-header">
         <span class="video-panel-eyebrow" id="videoPanelEyebrow">UP 1단계</span>
@@ -1325,8 +1327,6 @@
 
       <div id="videoSectionsContainer"></div>
     </section>
-
-    </div><!-- /#view-up -->
 
   </main>
 
@@ -1414,9 +1414,9 @@
       step5: [
         {
           title: '영상 모아보기',
-          layout: 'single',
           items: [
-            { type: 'video', src: 'https://www.dropbox.com/scl/fi/eq6sqon5ew823djthwfsu/E3FD3A0C-CAAB-4AA1-A4A4-52CE3BDEC876_video.MP4?rlkey=y4yzfvrgzzc4y6d84zwgggb75&st=1me9wr60&raw=1', poster: '/images/thumbs/step5-1.jpg' },
+            // 세로 영상(Dropbox) 숨김처리 — 필요 시 복원
+            // { type: 'video', src: 'https://www.dropbox.com/scl/fi/eq6sqon5ew823djthwfsu/E3FD3A0C-CAAB-4AA1-A4A4-52CE3BDEC876_video.MP4?rlkey=y4yzfvrgzzc4y6d84zwgggb75&st=1me9wr60&raw=1', poster: '/images/thumbs/step5-1.jpg' },
             { type: 'youtube', src: 'https://youtube.com/watch?v=67V8yjpUalo', title: '유튜브 창작과정 미리보기' },
           ],
         },
