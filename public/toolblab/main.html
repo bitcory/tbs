@@ -1760,9 +1760,11 @@
       let dragStartX = 0;
       let dragStartScrollLeft = 0;
       let dragCaptured = false;
+      let suppressNextClick = false;
       const DRAG_THRESHOLD = 6;
 
-      // Click handlers scoped to this track (so dragMoved state is per-track)
+      // Click handlers — pin on first click, enter on repeat click of the active card.
+      // Kept (in addition to pointerup) for keyboard activation (Enter/Space on focused button).
       track.querySelectorAll('.step-card').forEach(card => {
         card.addEventListener('click', (e) => {
           if (dragMoved > DRAG_THRESHOLD) {
@@ -1770,12 +1772,19 @@
             e.stopPropagation();
             return;
           }
+          if (suppressNextClick) {
+            suppressNextClick = false;
+            return;
+          }
           const step = card.dataset.step;
           if (!step) return;
+          // 이미 활성화된 카드를 다시 클릭하면 해당 페이지로 진입.
+          if (step === currentStep) {
+            startCurrentStep();
+            return;
+          }
+          // 미리보기가 없는 단순 링크 카드(ZERO 클래스 등) 는 첫 클릭에 즉시 이동.
           const data = STEPS[step];
-          // 미리보기 영상/이미지가 있는 단계는 바로 이동하지 않고 카드만 선택해
-          // 아래 패널에서 미리보기를 먼저 보여준다. STEP_MEDIA 가 없는 카드
-          // (ZERO 클래스 등) 는 기존처럼 즉시 이동한다.
           const hasMediaPreview = Array.isArray(STEP_MEDIA[step]) && STEP_MEDIA[step].length > 0;
           if (
             data && data.ready && data.url &&
@@ -1785,7 +1794,8 @@
             navigateTop(data.url);
             return;
           }
-          selectStep(step, { userInitiated: true });
+          // 미리보기 있는 카드(UP/PRO/MASTER): 첫 클릭은 pin, 다음 클릭에 진입.
+          selectStep(step);
         });
       });
 
@@ -1825,7 +1835,15 @@
         } else {
           const el = document.elementFromPoint(e.clientX, e.clientY);
           const card = el && el.closest && el.closest('.step-card');
-          if (card && card.dataset.step) selectStep(card.dataset.step);
+          if (card && card.dataset.step) {
+            // Suppress the upcoming synthetic click event so this isn't processed twice.
+            suppressNextClick = true;
+            if (card.dataset.step === currentStep) {
+              startCurrentStep();
+            } else {
+              selectStep(card.dataset.step);
+            }
+          }
         }
         dragCaptured = false;
       };
