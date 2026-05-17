@@ -12,13 +12,42 @@ export default function StepGroupDropdown({
 }) {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
+  const [menuPos, setMenuPos] = useState(null);
   const rootRef = useRef(null);
+  const btnRef = useRef(null);
 
   const stepSet = new Set(currentSteps);
   const granted = options.filter((o) => stepSet.has(o.step)).length;
   const total = options.length;
   const allOn = granted === total;
   const noneOn = granted === 0;
+
+  // 버튼 기준 viewport 좌표로 메뉴를 고정 배치한다 (테이블 overflow 로 잘리는 것 방지).
+  // 아래 공간이 부족하면 위로 펼친다.
+  useEffect(() => {
+    if (!open) return;
+    const place = () => {
+      const btn = btnRef.current;
+      if (!btn) return;
+      const r = btn.getBoundingClientRect();
+      const menuHeight = Math.min(48 + options.length * 36, 320); // 대략값
+      const gap = 6;
+      const spaceBelow = window.innerHeight - r.bottom;
+      const flipUp = spaceBelow < menuHeight + gap && r.top > menuHeight + gap;
+      setMenuPos({
+        left: r.left,
+        top: flipUp ? r.top - gap - menuHeight : r.bottom + gap,
+        maxHeight: Math.max(120, (flipUp ? r.top : window.innerHeight - r.bottom) - gap - 8),
+      });
+    };
+    place();
+    window.addEventListener("scroll", place, true);
+    window.addEventListener("resize", place);
+    return () => {
+      window.removeEventListener("scroll", place, true);
+      window.removeEventListener("resize", place);
+    };
+  }, [open, options.length]);
 
   useEffect(() => {
     if (!open) return;
@@ -52,6 +81,7 @@ export default function StepGroupDropdown({
   return (
     <div ref={rootRef} style={{ position: "relative", display: "inline-block" }}>
       <button
+        ref={btnRef}
         type="button"
         disabled={!canEdit || pending}
         onClick={() => canEdit && setOpen((v) => !v)}
@@ -86,14 +116,16 @@ export default function StepGroupDropdown({
         )}
       </button>
 
-      {open && (
+      {open && menuPos && (
         <div
           style={{
-            position: "absolute",
-            top: "calc(100% + 6px)",
-            left: 0,
-            zIndex: 50,
+            position: "fixed",
+            top: menuPos.top,
+            left: menuPos.left,
+            zIndex: 1000,
             minWidth: 220,
+            maxHeight: menuPos.maxHeight,
+            overflowY: "auto",
             background: "#fff",
             border: "1px solid #e2e8f0",
             borderRadius: 12,

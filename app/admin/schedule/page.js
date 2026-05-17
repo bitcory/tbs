@@ -103,11 +103,12 @@ export default async function SchedulePage() {
       </section>
 
       <div style={{ ...S.pageWrap, maxWidth: 1100, padding: "28px 16px 80px", marginTop: -48, position: "relative", color: "#0f172a" }}>
-        <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginBottom: 16 }}>
+        <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginBottom: 16, flexWrap: "wrap" }}>
           {me.role === "SUPER_ADMIN" && (
             <Link href="/admin/pricing" className="glass-hoverable" style={S.ghostBtn}>단가/요율</Link>
           )}
           <Link href="/admin" className="glass-hoverable" style={S.ghostBtn}>← 관리자</Link>
+          <Link href="/" className="glass-hoverable" style={S.ghostBtn}>← 홈으로</Link>
         </div>
 
         <ScheduleClient

@@ -1773,9 +1773,15 @@
           const step = card.dataset.step;
           if (!step) return;
           const data = STEPS[step];
-          // Direct navigation when the step has a ready URL and no sub-items
-          // (ZERO class cards, PRO step4, etc.)
-          if (data && data.ready && data.url && !(Array.isArray(data.items) && data.items.length)) {
+          // 미리보기 영상/이미지가 있는 단계는 바로 이동하지 않고 카드만 선택해
+          // 아래 패널에서 미리보기를 먼저 보여준다. STEP_MEDIA 가 없는 카드
+          // (ZERO 클래스 등) 는 기존처럼 즉시 이동한다.
+          const hasMediaPreview = Array.isArray(STEP_MEDIA[step]) && STEP_MEDIA[step].length > 0;
+          if (
+            data && data.ready && data.url &&
+            !(Array.isArray(data.items) && data.items.length) &&
+            !hasMediaPreview
+          ) {
             navigateTop(data.url);
             return;
           }
