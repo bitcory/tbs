@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { toggleStepAccess } from "./actions";
 
 export default function StepGroupDropdown({
@@ -12,9 +13,14 @@ export default function StepGroupDropdown({
 }) {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
+  const [mounted, setMounted] = useState(false);
   const [menuPos, setMenuPos] = useState(null);
-  const rootRef = useRef(null);
   const btnRef = useRef(null);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const stepSet = new Set(currentSteps);
   const granted = options.filter((o) => stepSet.has(o.step)).length;
@@ -22,7 +28,7 @@ export default function StepGroupDropdown({
   const allOn = granted === total;
   const noneOn = granted === 0;
 
-  // 버튼 기준 viewport 좌표로 메뉴를 고정 배치한다 (테이블 overflow 로 잘리는 것 방지).
+  // 버튼 기준 viewport 좌표로 메뉴를 고정 배치 (테이블 overflow 로 잘리는 것 방지).
   // 아래 공간이 부족하면 위로 펼친다.
   useEffect(() => {
     if (!open) return;
@@ -30,7 +36,7 @@ export default function StepGroupDropdown({
       const btn = btnRef.current;
       if (!btn) return;
       const r = btn.getBoundingClientRect();
-      const menuHeight = Math.min(48 + options.length * 36, 320); // 대략값
+      const menuHeight = Math.min(48 + options.length * 36, 320);
       const gap = 6;
       const spaceBelow = window.innerHeight - r.bottom;
       const flipUp = spaceBelow < menuHeight + gap && r.top > menuHeight + gap;
@@ -52,7 +58,9 @@ export default function StepGroupDropdown({
   useEffect(() => {
     if (!open) return;
     const handler = (e) => {
-      if (rootRef.current && !rootRef.current.contains(e.target)) setOpen(false);
+      if (btnRef.current?.contains(e.target)) return;
+      if (menuRef.current?.contains(e.target)) return;
+      setOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -79,7 +87,7 @@ export default function StepGroupDropdown({
   };
 
   return (
-    <div ref={rootRef} style={{ position: "relative", display: "inline-block" }}>
+    <div style={{ position: "relative", display: "inline-block" }}>
       <button
         ref={btnRef}
         type="button"
@@ -116,13 +124,14 @@ export default function StepGroupDropdown({
         )}
       </button>
 
-      {open && menuPos && (
+      {mounted && open && menuPos && createPortal(
         <div
+          ref={menuRef}
           style={{
             position: "fixed",
             top: menuPos.top,
             left: menuPos.left,
-            zIndex: 1000,
+            zIndex: 9999,
             minWidth: 220,
             maxHeight: menuPos.maxHeight,
             overflowY: "auto",
@@ -172,7 +181,8 @@ export default function StepGroupDropdown({
               </label>
             );
           })}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
