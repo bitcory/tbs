@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Upload, Copy, Clipboard, ExternalLink, Gem, X, Layers, List, Info, Film, Droplets, Wrench, Mic, Languages } from 'lucide-react';
+import { ArrowLeft, Upload, Copy, Clipboard, ExternalLink, Gem, X, Layers, List, Info, Film, Droplets, Wrench, Mic, Languages, FileText } from 'lucide-react';
 import dynamic from 'next/dynamic';
 const FrameExtractor = dynamic(() => import('@/app/components/FrameExtractor'), { ssr: false });
 const WatermarkRemover = dynamic(() => import('@/app/components/WatermarkRemover'), { ssr: false });
@@ -521,7 +521,7 @@ Subtitles, title, text is strictly prohibited.`,
                 href="https://translate.google.co.kr/?sl=ko&tl=en&op=translate"
                 target="_blank"
                 rel="noreferrer"
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#334155] bg-[#f1f5f9] hover:bg-[#e2e8f0] tb-press-soft"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#1e40af] bg-[#eff6ff] hover:bg-[#dbeafe] tb-press-soft"
               >
                 <Languages className="w-4 h-4" />
                 구글번역기
@@ -530,7 +530,7 @@ Subtitles, title, text is strictly prohibited.`,
                 onClick={() => setToolView(toolView === 'frame-extractor' ? null : 'frame-extractor')}
                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition ${toolView === 'frame-extractor'
                   ? 'tb-pill-primary'
-                  : 'text-[#334155] bg-[#f1f5f9] hover:bg-[#e2e8f0] tb-press-soft'
+                  : 'text-[#92400e] bg-[#fef3c7] hover:bg-[#fde68a] tb-press-soft'
                   }`}
               >
                 <Film className="w-4 h-4" />
@@ -540,12 +540,21 @@ Subtitles, title, text is strictly prohibited.`,
                 onClick={() => setToolView(toolView === 'watermark-remover' ? null : 'watermark-remover')}
                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition ${toolView === 'watermark-remover'
                   ? 'tb-pill-primary'
-                  : 'text-[#334155] bg-[#f1f5f9] hover:bg-[#e2e8f0] tb-press-soft'
+                  : 'text-[#155e75] bg-[#cffafe] hover:bg-[#a5f3fc] tb-press-soft'
                   }`}
               >
                 <Droplets className="w-4 h-4" />
                 워터마크제거
               </button>
+              <a
+                href="https://tbnc.aitoolb.com/"
+                target="_blank"
+                rel="noreferrer"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#6b21a8] bg-[#f3e8ff] hover:bg-[#e9d5ff] tb-press-soft"
+              >
+                <FileText className="w-4 h-4" />
+                파일명변경
+              </a>
             </div>
           </div>
 

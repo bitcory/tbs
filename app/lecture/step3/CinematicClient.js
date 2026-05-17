@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
   ArrowLeft, Upload, Copy, ExternalLink, Gem, X, Trash2,
   Clapperboard, Image as ImageIcon, Film, MessageSquare, Music, Scissors, Droplets, Wrench, Languages,
-  User, Check,
+  User, Check, FileText,
 } from 'lucide-react';
 import { parseCinematicJson } from './parser';
 
@@ -225,8 +225,12 @@ export default function CinematicClient() {
             </div>
             <div className="space-y-1">
               <a href="https://translate.google.co.kr/?sl=ko&tl=en&op=translate" target="_blank" rel="noreferrer"
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#334155] bg-[#f1f5f9] hover:bg-[#e2e8f0] tb-press-soft">
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#1e40af] bg-[#eff6ff] hover:bg-[#dbeafe] tb-press-soft">
                 <Languages className="w-4 h-4" /> 구글번역기
+              </a>
+              <a href="https://tbnc.aitoolb.com/" target="_blank" rel="noreferrer"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#6b21a8] bg-[#f3e8ff] hover:bg-[#e9d5ff] tb-press-soft">
+                <FileText className="w-4 h-4" /> 파일명변경
               </a>
             </div>
           </div>
