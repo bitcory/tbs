@@ -319,6 +319,11 @@
       background: linear-gradient(135deg, #00B380, #68E571);
     }
 
+    /* PRO 4 · AI 그림책 — picturebook viewer 의 night-mode 톤과 결 맞춤 */
+    .visual-step8 {
+      background: linear-gradient(135deg, #161a2e 0%, #1f2542 55%, #39406a 100%);
+    }
+
     /* MASTER class — purple / gold premium tones */
     .visual-master1 {
       background: linear-gradient(135deg, #7C3AED 0%, #A855F7 55%, #F59E0B 100%);
@@ -1220,6 +1225,19 @@
             <p class="step-card-title">멀티영상 만들기</p>
           </button>
 
+          <button type="button" class="step-card" data-step="step8">
+            <div class="step-card-check">
+              <svg viewBox="0 0 14 14" fill="none">
+                <path d="M3 7.5L6 10.5L11 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <div class="step-card-visual visual-step8">
+              <img src="/images/cards/pro6.png" alt="PRO 4단계 AI 그림책 만들기" />
+            </div>
+            <p class="step-card-label">PRO 4단계</p>
+            <p class="step-card-title">AI 그림책 만들기</p>
+          </button>
+
         </div>
       </section>
 
@@ -1361,6 +1379,7 @@
       step6: { label: 'PRO 1단계',    title: '시네마틱 5컷 다이얼로그', url: '/lecture/step6', ready: true },
       step5: { label: 'PRO 2단계',    title: '유튜브 창작과정',          url: '/lecture/step5', ready: true },
       step7: { label: 'PRO 3단계',    title: '멀티영상 만들기',          url: '/lecture/step7', ready: true },
+      step8: { label: 'PRO 4단계',    title: 'AI 그림책 만들기',          url: '/lecture/step8', ready: true },
       step4: { label: 'MASTER 1단계', title: '광고영상 제작',            url: '/lecture/step4', ready: true },
       step3: { label: 'MASTER 2단계', title: '프리프로덕션',             url: '/lecture/step3', ready: true },
 
@@ -1448,7 +1467,7 @@
       if (!step) return null;
       if (step.startsWith('zero-')) return 'zero';
       if (step === 'step3' || step === 'step4') return 'master';
-      if (step === 'step5' || step === 'step6' || step === 'step7') return 'pro';
+      if (step === 'step5' || step === 'step6' || step === 'step7' || step === 'step8') return 'pro';
       if (step === 'step1' || step === 'step2' || step === 'step2-1') return 'up';
       return null;
     }

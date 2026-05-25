@@ -34,6 +34,7 @@ const PRO_STEPS = [
   { step: 6, label: "PRO 1" },
   { step: 5, label: "PRO 2" },
   { step: 7, label: "PRO 3" },
+  { step: 8, label: "PRO 4" },
 ];
 
 const MASTER_STEPS = [

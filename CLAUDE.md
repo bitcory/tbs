@@ -86,6 +86,7 @@ Vercel이 자동 배포함.
 | Step 6 | `/lecture/step6` | `6` | PRO 1 · 시네마틱 5컷 다이얼로그 (캐릭터 A/B + S01~S05) |
 | Step 5 | `/lecture/step5` | `5` | PRO 2 · 유튜브 창작과정 (구 유튜브 수익화과정 · 뮤직영상 프롬프트 마스터 + S01~Snn, part1+part2 병합) |
 | Step 7 | `/lecture/step7` | `7` | PRO 3 · 멀티영상 만들기 (Cinematic Storyboard v4 · A 12패널 / B 6+6패널, 다국어 단일 출력) |
+| Step 8 | `/lecture/step8` | `8` | PRO 4 · AI 그림책 만들기 (picturebook 서재 뷰어 — 책장/캐릭터/컷/표지 + JSON 라이브러리 불러오기) |
 | Step 4 | `/lecture/step4` | `4` | MASTER 1 · 광고영상 만들기 (Hook/Build/Climax/CTA) |
 | Step 3 | `/lecture/step3` | `3` | MASTER 2 · 프리프로덕션 (구 스토리 영상 · 기/승/전/결) |
 
@@ -106,6 +107,7 @@ Vercel이 자동 배포함.
 | `PRO_1` | `6` | PRO 1 · 시네마틱 5컷 |
 | `PRO_2` | `5` | PRO 2 · 유튜브 창작과정 |
 | `PRO_3` | `7` | PRO 3 · 멀티영상 |
+| `PRO_4` | `8` | PRO 4 · AI 그림책 |
 | `MASTER_1` | `4` | MASTER 1 · 광고영상 |
 | `MASTER_2` | `3` | MASTER 2 · 프리프로덕션 |
 

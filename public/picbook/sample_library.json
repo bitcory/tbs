@@ -1,0 +1,409 @@
+{
+  "library_meta": {
+    "name": "우리 그림책 서재",
+    "count": 2
+  },
+  "books": [
+    {
+      "meta": {
+        "title": "콩쥐야, 우리가 도와줄게",
+        "source": "콩쥐팥쥐 각색",
+        "age": "4-5",
+        "mood": "warm",
+        "message": "따뜻한 마음은 우리를 혼자가 아니게 한다",
+        "workflow": "Nano Banana character sheet -> per-cut i2i",
+        "cut_count": 15,
+        "book_id": "kongjwi_patjwi"
+      },
+      "style_block": {
+        "common": "Soft watercolor and colored-pencil children's picture book illustration, warm sunlit palette (pale yellow, apricot tones), gentle paper texture, soft outlines, flat friendly shading, rounded cute 2.5-head proportions.",
+        "character_add": "character reference sheet on clean off-white background",
+        "scene_add": "generous negative space, picture-book composition",
+        "cover_add": "picture-book cover composition"
+      },
+      "characters": [
+        {
+          "id": "kongjwi",
+          "name_ko": "콩쥐",
+          "role": "주인공",
+          "id_point": "다홍 치마 + 노랑 저고리 (scarlet skirt)",
+          "prompt_en": "Character reference sheet of a kind little Korean girl, age 5-6, 2.5-head chibi proportions, round face with rosy cheeks, short black bob hair, gentle curved smiling eyes, wearing pale-yellow hanbok jeogori and vivid scarlet-red chima, white beoseon socks. Show 3 views: front full body, 3/4 side, back, plus 3 expression close-ups: happy smile, worried face, gentle caring look. Identical outfit and colors across all views."
+        },
+        {
+          "id": "patjwi",
+          "name_ko": "팥쥐",
+          "role": "화해 상대",
+          "id_point": "보라+청록 한복 + 갈래머리 (purple-and-teal)",
+          "prompt_en": "Character reference sheet of a Korean girl, age 5-6, same proportions as the kind girl (looks like a sister), slightly chubby face, hair in two braided pigtails, wearing deep-purple jeogori and teal-green chima. Show 3 views: front, 3/4 side, back, plus 3 expression close-ups: pouty sulky face, surprised face, teary regretful face. Identical outfit and colors across all views."
+        },
+        {
+          "id": "ox",
+          "name_ko": "검은 소",
+          "role": "도와주는 친구",
+          "id_point": "큰 눈망울 + 순한 표정 (charcoal-grey ox)",
+          "prompt_en": "Character reference sheet of a friendly gentle ox, rounded big soft body, dark charcoal-grey fur, big kind glossy eyes, short stubby blunt horns, calm warm not-scary expression, about 1.5x a small child's height. Show 3 views: front, 3/4 side, back, plus a face close-up."
+        },
+        {
+          "id": "toad",
+          "name_ko": "두꺼비",
+          "role": "도와주는 친구",
+          "id_point": "동글동글한 연두색 몸 + 똘망한 눈 (light-green toad)",
+          "prompt_en": "Character reference sheet of a cute chubby toad, palm-sized, round dumpling body, soft light-green skin with gentle bumps on back, big bright round eyes, slightly smiling mouth. Show 3 views: front, 3/4 side, top, plus a face close-up."
+        },
+        {
+          "id": "sparrows",
+          "name_ko": "참새들",
+          "role": "도와주는 친구",
+          "id_point": "갈색 통통 몸 + 무리 (brown sparrows flock)",
+          "prompt_en": "Character reference sheet of cute little brown sparrows, a flock of 4-6, round plump bodies, short beaks, tiny black bean-like eyes, soft brown feathers, always a cheerful group. Show flying pose, perched pose, single-bird close-up."
+        }
+      ],
+      "cuts": [
+        {
+          "no": 1,
+          "ref": [
+            "kongjwi"
+          ],
+          "emotion": "평화",
+          "prompt_en": "A peaceful thatched-roof Korean cottage yard in warm morning sunlight, fence and small flowers, the scarlet-skirt girl standing small in the center smiling brightly, plenty of open space, eye drawn to her cheerful face."
+        },
+        {
+          "no": 2,
+          "ref": [
+            "kongjwi"
+          ],
+          "emotion": "막막함",
+          "prompt_en": "A vast wide farm field filling most of the frame under open sky, the small scarlet-skirt girl alone at the lower corner looking tiny, large empty sky as negative space, contrast conveying helplessness."
+        },
+        {
+          "no": 3,
+          "ref": [
+            "kongjwi"
+          ],
+          "emotion": "걱정",
+          "prompt_en": "Close-up of the girl's face and hands gripping a hoe, slightly tense worried expression, rosy cheeks, blurred soft background, focus on her face, eyeline from eyes to hoe."
+        },
+        {
+          "no": 4,
+          "ref": [
+            "kongjwi",
+            "ox"
+          ],
+          "emotion": "도움받음",
+          "prompt_en": "A farm field, a gentle charcoal-grey ox entering from the left with big kind eyes looking toward the girl, the scarlet-skirt girl on the right, plowed furrows showing movement, warm colors beginning to glow, eyelines meeting."
+        },
+        {
+          "no": 5,
+          "ref": [
+            "kongjwi"
+          ],
+          "emotion": "막막함",
+          "prompt_en": "A huge water jar in the center, the scarlet-skirt girl beside it looking up, a small visible crack at the jar's bottom hinting at the next moment, calm composition."
+        },
+        {
+          "no": 6,
+          "ref": [
+            "kongjwi"
+          ],
+          "emotion": "풀죽음",
+          "prompt_en": "Water leaking from the jar's bottom onto the ground, the scarlet-skirt girl with slumped shoulders and lowered head, spreading water stain in the lower frame, slightly muted colors conveying discouragement."
+        },
+        {
+          "no": 7,
+          "ref": [
+            "kongjwi",
+            "toad"
+          ],
+          "emotion": "도움받음",
+          "prompt_en": "A light-green toad at the base of the jar, the scarlet-skirt girl crouching to meet the toad at eye level, close warm distance showing help arriving, gentle mood."
+        },
+        {
+          "no": 8,
+          "ref": [
+            "kongjwi"
+          ],
+          "emotion": "따뜻함",
+          "prompt_en": "The jar now full of water, the girl's smiling face reflected on the rippling surface, bright warm colors, joyful mood, eyeline from her happy face to her reflection."
+        },
+        {
+          "no": 9,
+          "ref": [
+            "kongjwi"
+          ],
+          "emotion": "설렘",
+          "prompt_en": "A festive village gathering with lanterns and tents far in the background, the scarlet-skirt girl sitting in front of her chores gazing toward the distant festival, sense of distance, her gaze off-frame toward the lights."
+        },
+        {
+          "no": 10,
+          "ref": [
+            "kongjwi",
+            "sparrows"
+          ],
+          "emotion": "도움받음",
+          "prompt_en": "A flock of brown sparrows pouring down from the sky toward the girl, curved motion lines suggesting fluttering flight, the scarlet-skirt girl looking up with a surprised happy expression, lively movement."
+        },
+        {
+          "no": 11,
+          "ref": [
+            "kongjwi",
+            "sparrows"
+          ],
+          "emotion": "함께",
+          "prompt_en": "The scarlet-skirt girl and a flock of brown sparrows gathered around a pile of grain, sorting it together, busy small cheerful details, the girl smiling, warm active atmosphere."
+        },
+        {
+          "no": 12,
+          "ref": [
+            "kongjwi",
+            "patjwi"
+          ],
+          "emotion": "머뭇거림",
+          "prompt_en": "Inside a festive gathering, the scarlet-skirt girl on the left, the purple-and-teal hanbok girl with braided pigtails on the right lowering her head, empty space between them showing distance, surrounding people blurred."
+        },
+        {
+          "no": 13,
+          "ref": [
+            "patjwi"
+          ],
+          "emotion": "후회",
+          "prompt_en": "Close-up of the purple-and-teal girl with braided pigtails, watery teary eyes, trembling lips, regretful face, background omitted to focus on her expression, the other girl barely visible at the frame edge listening."
+        },
+        {
+          "no": 14,
+          "ref": [
+            "kongjwi",
+            "patjwi"
+          ],
+          "emotion": "용서",
+          "prompt_en": "The scarlet-skirt girl and the purple-and-teal girl clasping hands in the center, the previously empty space now connected by their joined hands, warm light wrapping around them, their hanboks side by side."
+        },
+        {
+          "no": 15,
+          "ref": [
+            "kongjwi",
+            "patjwi",
+            "ox",
+            "toad",
+            "sparrows"
+          ],
+          "emotion": "함께",
+          "prompt_en": "The scarlet-skirt girl, the purple-and-teal girl, the grey ox, the green toad and the brown sparrows all holding hands in a circle, dancing round, circular composition, whole scene in warm golden sunlit tones, center slightly open to show the shared circle, the brightest fullest final scene."
+        }
+      ],
+      "covers": [
+        {
+          "type": "front",
+          "ref": [
+            "kongjwi",
+            "ox",
+            "toad",
+            "sparrows"
+          ],
+          "title_area": "상단 1/3 하늘 여백 (콩쥐 머리와 안 겹치게)",
+          "prompt_en": "Front book cover. The scarlet-skirt, pale-yellow-hanbok girl at the center slightly lower, smiling brightly with rosy cheeks. The grey ox standing supportively behind, the green toad near her feet, a flock of brown sparrows fluttering above her head. All friends gathered with caring happy faces. Warm sunlit background. Leave clear open sky space in the upper third for the title. Inviting cozy scene a child wants to step into."
+        },
+        {
+          "type": "back",
+          "ref": [
+            "kongjwi",
+            "patjwi",
+            "ox",
+            "toad",
+            "sparrows"
+          ],
+          "title_area": "한 줄 메시지 자리 확보",
+          "prompt_en": "Back cover, smaller and calmer, pairing with the front. A small circular scene: the scarlet-skirt girl and the purple-and-teal braided girl now together, holding hands with the grey ox, green toad and brown sparrows. Warm golden sunlit tones, gentle and complete, calm space, reconciliation fulfilled. Leave room for a one-line text."
+        }
+      ]
+    },
+    {
+      "meta": {
+        "title": "잘 자, 깜깜이",
+        "source": "창작",
+        "age": "4-5",
+        "mood": "calm",
+        "message": "어둠도 곁에 누가 있으면 포근해진다",
+        "workflow": "Nano Banana character sheet -> per-cut i2i",
+        "cut_count": 14,
+        "book_id": "jaljja_kkamkkami"
+      },
+      "style_block": {
+        "common": "Soft pastel children's picture book illustration, calm nighttime palette (deep navy, soft indigo, warm candle-glow accents), gentle grainy paper texture, soft outlines, dreamy flat shading, rounded cute 2.5-head proportions.",
+        "character_add": "character reference sheet on clean dark-navy background",
+        "scene_add": "generous negative space, cozy bedtime composition",
+        "cover_add": "picture-book cover composition"
+      },
+      "characters": [
+        {
+          "id": "dada",
+          "name_ko": "다다",
+          "role": "주인공",
+          "id_point": "노란 별무늬 잠옷 + 부스스한 곱슬머리 (yellow-star pajamas)",
+          "prompt_en": "Character reference sheet of a small sleepy child, age 4-5, 2.5-head chibi proportions, round face with soft cheeks, fluffy messy curly hair, big gentle eyes. Wearing cozy pajamas with little yellow stars, holding a small worn blanket. Show 3 views: front full body, 3/4 side, back, plus 3 expression close-ups: scared face, hesitant face, peaceful sleepy smile. Identical outfit and colors across all views."
+        },
+        {
+          "id": "glim",
+          "name_ko": "깜깜이",
+          "role": "밤빛 친구",
+          "id_point": "둥근 달빛 몸 + 부드러운 노란 빛무리 (round glowing moonlight friend)",
+          "prompt_en": "Character reference sheet of a small friendly glowing night-light spirit, round soft body emitting a gentle warm yellow halo, tiny dot eyes and a calm little smile, semi-translucent like soft moonlight, floats in the air. Show front, 3/4 side, and glowing-dim variations, plus a close-up of its gentle face. Consistent soft glow across all views."
+        },
+        {
+          "id": "cat",
+          "name_ko": "까망 고양이",
+          "role": "함께 자는 친구",
+          "id_point": "동그란 까만 몸 + 초록 눈 (round black cat, green eyes)",
+          "prompt_en": "Character reference sheet of a small round black cat, chubby cute body, big round green eyes, tiny ears, calm sleepy expression. Show 3 views: front, 3/4 side, curled-up sleeping pose, plus a face close-up. Consistent design across all views."
+        }
+      ],
+      "cuts": [
+        {
+          "no": 1,
+          "ref": [
+            "dada"
+          ],
+          "emotion": "평온",
+          "prompt_en": "A cozy child's bedroom at dusk, warm lamp glow, toys neatly resting, the star-pajama child sitting on the bed hugging a small blanket, soft warm light, calm beginning."
+        },
+        {
+          "no": 2,
+          "ref": [
+            "dada"
+          ],
+          "emotion": "불안",
+          "prompt_en": "The bedroom lamp just switched off, the room sinking into deep navy darkness, the small star-pajama child sitting very small on the big bed clutching the blanket, large dark space around conveying unease."
+        },
+        {
+          "no": 3,
+          "ref": [
+            "dada"
+          ],
+          "emotion": "불안",
+          "prompt_en": "Close-up of the child's worried face peeking over the blanket pulled up to the eyes, wide nervous eyes in the dark, deep shadows, focus entirely on the frightened expression."
+        },
+        {
+          "no": 4,
+          "ref": [
+            "dada"
+          ],
+          "emotion": "망설임",
+          "prompt_en": "The dark room with vague shadow shapes on the walls (a chair, a coat) that look slightly scary, the child shrinking under the blanket glancing at them, tense hesitant mood, cool shadow tones."
+        },
+        {
+          "no": 5,
+          "ref": [
+            "dada",
+            "glim"
+          ],
+          "emotion": "발견",
+          "prompt_en": "A tiny warm yellow glow appearing in the corner of the dark room, the small round glowing night-light spirit softly lighting up, the child peeking out curiously, the first warm light piercing the navy darkness."
+        },
+        {
+          "no": 6,
+          "ref": [
+            "dada",
+            "glim"
+          ],
+          "emotion": "안심",
+          "prompt_en": "The glowing moonlight friend floating closer to the bed, casting a soft warm halo around the child, the child lowering the blanket with a calmer face, warm light gently pushing back the shadows."
+        },
+        {
+          "no": 7,
+          "ref": [
+            "glim"
+          ],
+          "emotion": "안심",
+          "prompt_en": "Close-up of the round glowing night-light spirit with its calm little smile and gentle warm halo, soft and reassuring, the friendly glow filling the frame."
+        },
+        {
+          "no": 8,
+          "ref": [
+            "dada",
+            "glim"
+          ],
+          "emotion": "발견",
+          "prompt_en": "The warm glow now revealing that the scary wall shadows were just a chair and a coat, the child looking relieved and slightly amused, the spirit floating beside, shadows softened and harmless."
+        },
+        {
+          "no": 9,
+          "ref": [
+            "dada",
+            "cat"
+          ],
+          "emotion": "함께",
+          "prompt_en": "A small round black cat with green eyes padding softly onto the bed, the star-pajama child reaching out to gently pet it, warm glow around them, growing sense of company and comfort."
+        },
+        {
+          "no": 10,
+          "ref": [
+            "dada",
+            "glim",
+            "cat"
+          ],
+          "emotion": "함께",
+          "prompt_en": "The child, the glowing spirit and the round black cat all together on the bed in a small warm circle of light, the dark room now feeling cozy rather than scary, gentle peaceful atmosphere."
+        },
+        {
+          "no": 11,
+          "ref": [
+            "dada",
+            "cat"
+          ],
+          "emotion": "편안함",
+          "prompt_en": "The child lying down on the pillow with the black cat curled up beside, eyes growing heavy and sleepy, soft warm glow, blanket tucked up cozy, calm restful mood."
+        },
+        {
+          "no": 12,
+          "ref": [
+            "dada",
+            "glim",
+            "cat"
+          ],
+          "emotion": "편안함",
+          "prompt_en": "The glowing spirit dimming softly like a night-light watching over the sleeping child and curled cat, gentle low warm glow, the room quiet and safe, tender protective mood."
+        },
+        {
+          "no": 13,
+          "ref": [
+            "dada",
+            "cat"
+          ],
+          "emotion": "잠듦",
+          "prompt_en": "Close-up of the child's peaceful sleeping face with a faint happy smile, the black cat sleeping nestled close, soft warm light on their faces, deeply calm and content."
+        },
+        {
+          "no": 14,
+          "ref": [
+            "dada",
+            "glim",
+            "cat"
+          ],
+          "emotion": "포근함",
+          "prompt_en": "Wide gentle view of the whole bedroom at night, the child and cat asleep, the night-light spirit a soft warm dot glowing nearby, stars faintly visible through the window, the dark room now warm and safe, the most peaceful final scene."
+        }
+      ],
+      "covers": [
+        {
+          "type": "front",
+          "ref": [
+            "dada",
+            "glim",
+            "cat"
+          ],
+          "title_area": "상단 1/3 밤하늘 여백 (별 사이)",
+          "prompt_en": "Front book cover at night, the star-pajama child sitting up in bed with a gentle calm face, the small glowing moonlight spirit floating beside casting a warm halo, the round black cat curled nearby. Deep navy background with soft warm glow at the center, a few faint stars. Leave clear dark sky space in the upper third for the title. Cozy, safe, dreamy mood."
+        },
+        {
+          "type": "back",
+          "ref": [
+            "dada",
+            "glim",
+            "cat"
+          ],
+          "title_area": "한 줄 메시지 자리 확보",
+          "prompt_en": "Back cover, smaller and calmer, pairing with the front. A small scene of the child and black cat asleep with the night-light spirit glowing softly nearby like a tiny moon. Deep navy and warm glow tones, gentle and complete, plenty of calm space. Leave room for a one-line text."
+        }
+      ]
+    }
+  ]
+}
