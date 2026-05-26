@@ -51,6 +51,7 @@ export default function Step8Client() {
   const [jsonModalOpen, setJsonModalOpen] = useState(false);
   const [jsonText, setJsonText] = useState('');
   const [jsonErr, setJsonErr] = useState('');
+  const [matchModalOpen, setMatchModalOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const fileInputRef = useRef(null);
   const modalFileRef = useRef(null);
@@ -386,7 +387,15 @@ export default function Step8Client() {
                     본문 컷
                     <button
                       type="button"
-                      className="mini sec-action"
+                      className="mini sec-action ghost match-btn"
+                      title="컷별 등장 인물(이름·역할)을 한눈에 보기"
+                      onClick={() => setMatchModalOpen(true)}
+                    >
+                      <UsersRound size={14} /> 인물매칭
+                    </button>
+                    <button
+                      type="button"
+                      className="mini"
                       title="모든 컷의 스타일 포함 풀버전 프롬프트를 빈 줄로 구분해 한 번에 복사"
                       onClick={() => copyText(cuts.map((c) => buildPrompt(book, c.prompt_en || '', 'scene')).join('\n\n'))}
                     >
@@ -502,6 +511,69 @@ export default function Step8Client() {
               />
               <button type="button" className="btn" onClick={() => setJsonModalOpen(false)}>취소</button>
               <button type="button" className="btn apply" onClick={applyJsonText}>적용</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CHARACTER-MATCH MODAL */}
+      {matchModalOpen && (
+        <div
+          className="modal-backdrop show"
+          role="dialog"
+          aria-modal="true"
+          onClick={(e) => { if (e.target.classList.contains('modal-backdrop')) setMatchModalOpen(false); }}
+        >
+          <div className="modal match-modal">
+            <div className="modal-head">
+              <h2><UsersRound size={18} /> 컷별 인물 매칭</h2>
+              <button type="button" className="modal-close" aria-label="닫기" onClick={() => setMatchModalOpen(false)}>
+                <X size={22} />
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="hint">
+                각 컷에 등장하는 캐릭터를 한 번에 확인할 수 있어요.
+              </div>
+              {cuts.length === 0 ? (
+                <div className="match-empty">등록된 컷이 없어요.</div>
+              ) : (
+                <div className="match-table">
+                  <div className="match-row match-head-row">
+                    <div className="match-col-no">#</div>
+                    <div className="match-col-emo">감정</div>
+                    <div className="match-col-chars">등장 인물 (역할)</div>
+                  </div>
+                  {cuts.map((cut) => {
+                    const refs = (cut.ref || [])
+                      .map((id) => charMap[id])
+                      .filter(Boolean);
+                    return (
+                      <div key={cut.no} className="match-row">
+                        <div className="match-col-no">
+                          <span className="match-no-badge">{cut.no}</span>
+                        </div>
+                        <div className="match-col-emo">{cut.emotion || '—'}</div>
+                        <div className="match-col-chars">
+                          {refs.length === 0 ? (
+                            <span className="match-none">—</span>
+                          ) : (
+                            refs.map((c) => (
+                              <span key={c.id} className="match-chip">
+                                <span className="dot" style={{ background: dotColor(c) }} />
+                                <b>{c.name_ko || c.id}</b>
+                              </span>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+            <div className="modal-foot">
+              <button type="button" className="btn" onClick={() => setMatchModalOpen(false)}>닫기</button>
             </div>
           </div>
         </div>
@@ -799,6 +871,35 @@ export default function Step8Client() {
         .picbook-root .modal-err{font-family:'Gaegu',cursive;font-size:.9rem;color:var(--scarlet);min-height:1.2em;}
         .picbook-root .modal-foot{display:flex;gap:8px;justify-content:flex-end;padding:14px 20px;border-top:1px dashed var(--line);flex-wrap:wrap;}
         .picbook-root .modal-foot .filepick{margin-right:auto;}
+
+        .picbook-root .match-btn{display:inline-flex;align-items:center;gap:5px;}
+        .picbook-root .match-modal{width:min(640px,94vw);}
+        .picbook-root .match-table{display:flex;flex-direction:column;gap:4px;font-family:'Gaegu',cursive;}
+        .picbook-root .match-row{display:grid;grid-template-columns:48px 96px 1fr;align-items:center;gap:10px;
+          padding:8px 10px;border-radius:10px;background:color-mix(in srgb,var(--paper) 55%,var(--card));
+          border:1px solid var(--line);}
+        .picbook-root .match-row:hover{background:color-mix(in srgb,var(--paper) 70%,var(--card));}
+        .picbook-root .match-head-row{background:transparent;border:none;font-size:.85rem;color:var(--ink-soft);padding:4px 10px 2px;}
+        .picbook-root .match-head-row:hover{background:transparent;}
+        .picbook-root .match-no-badge{display:inline-flex;align-items:center;justify-content:center;
+          width:32px;height:32px;border-radius:10px;background:var(--paper-deep);color:var(--ink);
+          font-weight:700;font-size:1.05rem;box-shadow:inset 0 -2px 0 var(--shadow);transform:rotate(-3deg);}
+        .picbook-root .match-col-emo{color:var(--scarlet);font-size:1rem;}
+        .picbook-root .match-col-chars{display:flex;flex-wrap:wrap;gap:5px;}
+        .picbook-root .match-chip{display:inline-flex;align-items:center;gap:5px;
+          background:var(--paper);border:1.3px solid var(--line);border-radius:999px;
+          padding:2px 10px 2px 7px;font-size:.92rem;color:var(--ink);}
+        .picbook-root .match-chip .dot{width:11px;height:11px;border-radius:50%;border:1px solid rgba(0,0,0,.15);
+          box-shadow:inset 0 -1.5px 2px rgba(0,0,0,.18), inset 0 1.5px 2px rgba(255,255,255,.4);}
+        .picbook-root .match-chip b{font-weight:700;}
+        .picbook-root .match-none{color:var(--ink-soft);font-size:.9rem;}
+        .picbook-root .match-empty{padding:24px;text-align:center;color:var(--ink-soft);font-family:'Gaegu',cursive;}
+        @media (max-width: 560px){
+          .picbook-root .match-row{grid-template-columns:40px 1fr;row-gap:6px;}
+          .picbook-root .match-col-emo{grid-column:2;font-size:.92rem;}
+          .picbook-root .match-col-chars{grid-column:1 / -1;}
+          .picbook-root .match-head-row{display:none;}
+        }
 
         @keyframes pbPopIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
