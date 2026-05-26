@@ -3,9 +3,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
-  Library, LayoutList, UsersRound, Clapperboard, Image as ImageIcon,
+  Library, UsersRound, Clapperboard,
   Menu, FileInput, FolderOpen, X, BookOpen, ArrowLeft, Ruler,
-  Sparkles, ExternalLink,
+  ExternalLink, MessageSquare, AudioLines, Music, Workflow, ScrollText,
 } from 'lucide-react';
 
 const SAMPLE_URL = '/picbook/sample_library.json';
@@ -28,23 +28,45 @@ function dotColor(c) {
   return '#c9a14a';
 }
 
+function splitNegative(common) {
+  if (!common) return { negative: '' };
+  const m = String(common).match(/(\bNo\s+text\b[\s\S]*?(?:wordless\s+illustration\.?|$))/i);
+  return { negative: m ? m[1].trim() : '' };
+}
+
 function buildPrompt(book, base, kind) {
   const sb = book?.style_block || {};
   const add =
     kind === 'char' ? (sb.character_add ? ' ' + sb.character_add : '') :
     kind === 'cover' ? (sb.cover_add ? ' ' + sb.cover_add : '') :
     (sb.scene_add ? ' ' + sb.scene_add : '');
-  return (sb.common ? sb.common + ' ' : '') + base + add;
+  const { negative } = splitNegative(sb.common);
+  return base + add + (negative ? ' ' + negative : '');
 }
 
 function escapeId(s) {
   return String(s || '');
 }
 
+function parseScript(text) {
+  if (!text) return '';
+  // 1, 1., 1), [1], (1), <1>, 1: 같은 단독 넘버링 라벨을 인식
+  const onlyNum = /^(?:\[\s*\d+\s*\]|\(\s*\d+\s*\)|<\s*\d+\s*>|\d+\s*[.):]?)$/;
+  const inlineNum = /^(?:\[\s*\d+\s*\]|\(\s*\d+\s*\)|<\s*\d+\s*>|\d+\s*[.):])\s*/;
+  // 본문 안에 [N] 만 있는 줄도 안전하게 제거
+  const cleaned = String(text)
+    .split('\n')
+    .filter((ln) => !onlyNum.test(ln.trim()))
+    .join('\n');
+  const blocks = cleaned.split(/\n\s*\n+/).map((b) => b.trim()).filter(Boolean);
+  const scenes = blocks.map((b) => b.replace(inlineNum, ''));
+  return scenes.join('\n\n');
+}
+
 export default function Step8Client() {
   const [lib, setLib] = useState(null);
   const [bookIdx, setBookIdx] = useState(0);
-  const [section, setSection] = useState('chars'); // chars | cuts | covers
+  const [section, setSection] = useState('chars'); // chars | cuts (cuts 안에 표지 탭 포함)
   const [activeChar, setActiveChar] = useState(0);
   const [cutFilter, setCutFilter] = useState('all');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -52,6 +74,10 @@ export default function Step8Client() {
   const [jsonText, setJsonText] = useState('');
   const [jsonErr, setJsonErr] = useState('');
   const [matchModalOpen, setMatchModalOpen] = useState(false);
+  const [scriptModalOpen, setScriptModalOpen] = useState(false);
+  const [scriptInput, setScriptInput] = useState('');
+  const [scriptPreview, setScriptPreview] = useState('');
+  const [scriptParsed, setScriptParsed] = useState('');
   const [toastMsg, setToastMsg] = useState('');
   const fileInputRef = useRef(null);
   const modalFileRef = useRef(null);
@@ -180,7 +206,7 @@ export default function Step8Client() {
   // 모달 ESC / Cmd+Enter
   useEffect(() => {
     function onKey(e) {
-      if (e.key === 'Escape') { setJsonModalOpen(false); setSidebarOpen(false); }
+      if (e.key === 'Escape') { setJsonModalOpen(false); setScriptModalOpen(false); setMatchModalOpen(false); setSidebarOpen(false); }
       if (jsonModalOpen && (e.metaKey || e.ctrlKey) && e.key === 'Enter') applyJsonText();
     }
     window.addEventListener('keydown', onKey);
@@ -223,6 +249,14 @@ export default function Step8Client() {
         <div className="top-actions">
           <button type="button" className="btn ghost" onClick={resetToSample} title="샘플 그림책 데이터로 되돌리기">
             샘플로 리셋
+          </button>
+          <button
+            type="button"
+            className="btn"
+            onClick={() => setScriptModalOpen(true)}
+            title="본문 대본을 붙여넣어 넘버링을 제거하고 빈 줄 두 번으로 파싱"
+          >
+            본문대본
           </button>
           <button type="button" className="btn" onClick={() => setJsonModalOpen(true)}>
             JSON 불러오기
@@ -267,7 +301,6 @@ export default function Step8Client() {
           </div>
 
           <div className="side-section">
-            <div className="side-title"><LayoutList size={18} /> 보기</div>
             <div className="nav-list">
               <button
                 type="button"
@@ -285,33 +318,65 @@ export default function Step8Client() {
               >
                 <span className="nav-ic"><Clapperboard size={18} /></span>
                 <span className="nav-lbl">본문 컷</span>
-                <span className="badge">{cuts.length}</span>
-              </button>
-              <button
-                type="button"
-                className={`nav-item${section === 'covers' ? ' active' : ''}`}
-                onClick={() => { setSection('covers'); if (window.innerWidth <= 900) setSidebarOpen(false); }}
-              >
-                <span className="nav-ic"><ImageIcon size={18} /></span>
-                <span className="nav-lbl">표지</span>
-                <span className="badge">{covers.length}</span>
+                <span className="badge">{cuts.length}{covers.length ? `+${covers.length}` : ''}</span>
               </button>
             </div>
             {!book && <div className="side-empty">책을 선택하세요</div>}
           </div>
 
           <div className="side-section">
-            <div className="side-title"><Sparkles size={18} /> 지침</div>
-            <a
-              className="nav-item guide-link"
-              href="https://chatgpt.com/g/g-6a1394316644819192df66a06c4795ea-pro-5dangye-aiwa-hamggehaneun-geurimcaeg-mandeulgi"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span className="nav-ic"><BookOpen size={18} /></span>
-              <span className="nav-lbl">그림책 지침 GPT</span>
-              <ExternalLink size={14} className="ext-ic" />
-            </a>
+            <div className="nav-list">
+              <a
+                className="nav-item guide-link"
+                href="https://chatgpt.com/g/g-6a1394316644819192df66a06c4795ea-pro-5dangye-aiwa-hamggehaneun-geurimcaeg-mandeulgi"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="nav-ic"><BookOpen size={18} /></span>
+                <span className="nav-lbl">그림책 지침 GPT</span>
+                <ExternalLink size={14} className="ext-ic" />
+              </a>
+              <a
+                className="nav-item guide-link"
+                href="https://chatgpt.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="nav-ic"><MessageSquare size={18} /></span>
+                <span className="nav-lbl">챗지피티 바로가기</span>
+                <ExternalLink size={14} className="ext-ic" />
+              </a>
+              <a
+                className="nav-item guide-link"
+                href="https://labs.google/fx/ko/tools/flow/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="nav-ic"><Workflow size={18} /></span>
+                <span className="nav-lbl">FLOW 바로가기</span>
+                <ExternalLink size={14} className="ext-ic" />
+              </a>
+              <a
+                className="nav-item guide-link"
+                href="https://elevenlabs.io/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="nav-ic"><AudioLines size={18} /></span>
+                <span className="nav-lbl">일레븐랩스 바로가기</span>
+                <ExternalLink size={14} className="ext-ic" />
+              </a>
+              <a
+                className="nav-item guide-link"
+                href="https://suno.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="nav-ic"><Music size={18} /></span>
+                <span className="nav-lbl">SUNO 바로가기</span>
+                <ExternalLink size={14} className="ext-ic" />
+              </a>
+            </div>
           </div>
         </aside>
 
@@ -349,7 +414,7 @@ export default function Step8Client() {
                     <button
                       type="button"
                       className="mini sec-action"
-                      title="모든 캐릭터의 스타일 포함 풀버전 프롬프트를 빈 줄로 구분해 한 번에 복사"
+                      title="모든 캐릭터의 프롬프트(본문+add+네거티브)를 빈 줄로 구분해 한 번에 복사"
                       onClick={() => copyText(chars.map((c) => buildPrompt(book, c.prompt_en || '', 'char')).join('\n\n'))}
                     >
                       전체 프롬프트 복사
@@ -388,6 +453,17 @@ export default function Step8Client() {
                     <button
                       type="button"
                       className="mini sec-action ghost match-btn"
+                      title={scriptParsed ? '파싱된 본문 대본 복사' : '먼저 우측 상단 본문대본 버튼으로 대본을 등록하세요'}
+                      onClick={() => {
+                        if (scriptParsed) copyText(scriptParsed);
+                        else setScriptModalOpen(true);
+                      }}
+                    >
+                      <ScrollText size={14} /> 대본추출
+                    </button>
+                    <button
+                      type="button"
+                      className="mini ghost match-btn"
                       title="컷별 등장 인물(이름·역할)을 한눈에 보기"
                       onClick={() => setMatchModalOpen(true)}
                     >
@@ -396,13 +472,16 @@ export default function Step8Client() {
                     <button
                       type="button"
                       className="mini"
-                      title="모든 컷의 스타일 포함 풀버전 프롬프트를 빈 줄로 구분해 한 번에 복사"
-                      onClick={() => copyText(cuts.map((c) => buildPrompt(book, c.prompt_en || '', 'scene')).join('\n\n'))}
+                      title="모든 컷·표지 프롬프트(본문+add+네거티브)를 빈 줄로 구분해 한 번에 복사"
+                      onClick={() => copyText([
+                        ...cuts.map((c) => buildPrompt(book, c.prompt_en || '', 'scene')),
+                        ...covers.map((c) => buildPrompt(book, c.prompt_en || '', 'cover')),
+                      ].join('\n\n'))}
                     >
                       전체 프롬프트 복사
                     </button>
                   </div>
-                  <div className="sec-sub">{cuts.length}컷 · 번호를 누르면 해당 컷만 보기 · ref 태그를 누르면 해당 캐릭터로 이동</div>
+                  <div className="sec-sub">{cuts.length}컷{covers.length ? ` · 표지 ${covers.length}` : ''} · 번호/표지 탭을 누르면 해당 항목만 보기 · ref 태그를 누르면 해당 캐릭터로 이동</div>
                   <div className="filterbar">
                     <button
                       type="button"
@@ -417,6 +496,18 @@ export default function Step8Client() {
                         onClick={() => setCutFilter(c.no)}
                       >{c.no}</button>
                     ))}
+                    {covers.map((co, i) => {
+                      const key = `cover-${co.type || i}`;
+                      const lbl = co.type === 'front' ? '앞표지' : co.type === 'back' ? '뒤표지' : `표지${i + 1}`;
+                      return (
+                        <button
+                          key={key}
+                          type="button"
+                          className={`fb fb-cover${cutFilter === key ? ' active' : ''}`}
+                          onClick={() => setCutFilter(key)}
+                        >{lbl}</button>
+                      );
+                    })}
                   </div>
                   <div className="cut-list">
                     {cuts.filter((c) => cutFilter === 'all' || c.no === cutFilter).map((cut) => (
@@ -429,35 +520,19 @@ export default function Step8Client() {
                         buildPromptFor={(base) => buildPrompt(book, base, 'scene')}
                       />
                     ))}
-                  </div>
-                </section>
-              )}
-
-              {section === 'covers' && (
-                <section className="sec-pane">
-                  <div className="sec-title">
-                    표지
-                    <button
-                      type="button"
-                      className="mini sec-action"
-                      title="모든 표지의 스타일 포함 풀버전 프롬프트를 빈 줄로 구분해 한 번에 복사"
-                      onClick={() => copyText(covers.map((c) => buildPrompt(book, c.prompt_en || '', 'cover')).join('\n\n'))}
-                    >
-                      전체 프롬프트 복사
-                    </button>
-                  </div>
-                  <div className="sec-sub">앞표지 · 뒤표지</div>
-                  <div className="cover-grid">
-                    {covers.map((co, i) => (
-                      <CoverCard
-                        key={i}
-                        cover={co}
-                        charMap={charMap}
-                        onCopy={(t) => copyText(t)}
-                        onJumpChar={jumpToChar}
-                        buildPromptFor={(base) => buildPrompt(book, base, 'cover')}
-                      />
-                    ))}
+                    {covers
+                      .map((co, i) => ({ co, i, key: `cover-${co.type || i}` }))
+                      .filter(({ key }) => cutFilter === 'all' || cutFilter === key)
+                      .map(({ co, i, key }) => (
+                        <CoverCard
+                          key={key}
+                          cover={co}
+                          charMap={charMap}
+                          onCopy={(t) => copyText(t)}
+                          onJumpChar={jumpToChar}
+                          buildPromptFor={(base) => buildPrompt(book, base, 'cover')}
+                        />
+                      ))}
                   </div>
                 </section>
               )}
@@ -516,6 +591,93 @@ export default function Step8Client() {
         </div>
       )}
 
+      {/* SCRIPT MODAL */}
+      {scriptModalOpen && (
+        <div
+          className="modal-backdrop show"
+          role="dialog"
+          aria-modal="true"
+          onClick={(e) => { if (e.target.classList.contains('modal-backdrop')) setScriptModalOpen(false); }}
+        >
+          <div className="modal script-modal">
+            <div className="modal-head">
+              <h2><ScrollText size={18} /> 본문 대본</h2>
+              <button type="button" className="modal-close" aria-label="닫기" onClick={() => setScriptModalOpen(false)}>
+                <X size={22} />
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="hint">
+                넘버링(1, 2, 3 …)이 있는 본문 대본을 붙여넣으세요. 숫자 줄은 자동으로 빠지고 각 문단은 빈 줄 두 개로 구분됩니다. 오른쪽 결과는 직접 수정할 수도 있어요.
+              </div>
+              <div className="script-grid">
+                <div className="script-col">
+                  <div className="script-col-title">붙여넣기</div>
+                  <textarea
+                    value={scriptInput}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      setScriptInput(v);
+                      setScriptPreview(parseScript(v));
+                    }}
+                    placeholder={'1\n\n저녁이 되면 ...\n\n2\n\n오늘 반찬은 ...'}
+                    autoFocus
+                  />
+                </div>
+                <div className="script-col">
+                  <div className="script-col-title">
+                    파싱 결과
+                    <span className="muted">({scriptPreview ? scriptPreview.split(/\n\n+/).filter(Boolean).length : 0}문단 · 직접 수정 가능)</span>
+                    <button
+                      type="button"
+                      className="script-reparse"
+                      title="왼쪽 입력에서 다시 파싱"
+                      onClick={() => setScriptPreview(parseScript(scriptInput))}
+                    >다시 파싱</button>
+                  </div>
+                  <textarea
+                    value={scriptPreview}
+                    onChange={(e) => setScriptPreview(e.target.value)}
+                    placeholder="여기에 결과가 표시돼요 (직접 입력·수정 가능)"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="modal-foot">
+              <button
+                type="button"
+                className="btn"
+                onClick={() => { setScriptInput(''); setScriptPreview(''); setScriptParsed(''); }}
+                title="입력·결과·저장된 대본을 모두 지움"
+              >
+                비우기
+              </button>
+              <button type="button" className="btn" onClick={() => setScriptModalOpen(false)}>닫기</button>
+              <button
+                type="button"
+                className="btn"
+                disabled={!scriptPreview}
+                onClick={() => { if (scriptPreview) copyText(scriptPreview); }}
+              >
+                복사
+              </button>
+              <button
+                type="button"
+                className="btn apply"
+                disabled={!scriptPreview}
+                onClick={() => {
+                  setScriptParsed(scriptPreview);
+                  showToast('대본을 저장했어요!');
+                  setScriptModalOpen(false);
+                }}
+              >
+                저장
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* CHARACTER-MATCH MODAL */}
       {matchModalOpen && (
         <div
@@ -533,27 +695,53 @@ export default function Step8Client() {
             </div>
             <div className="modal-body">
               <div className="hint">
-                각 컷에 등장하는 캐릭터를 한 번에 확인할 수 있어요.
+                각 컷·표지에 등장하는 캐릭터를 한 번에 확인할 수 있어요.
               </div>
-              {cuts.length === 0 ? (
-                <div className="match-empty">등록된 컷이 없어요.</div>
+              {cuts.length === 0 && covers.length === 0 ? (
+                <div className="match-empty">등록된 컷·표지가 없어요.</div>
               ) : (
                 <div className="match-table">
                   <div className="match-row match-head-row">
                     <div className="match-col-no">#</div>
                     <div className="match-col-emo">감정</div>
-                    <div className="match-col-chars">등장 인물 (역할)</div>
+                    <div className="match-col-chars">등장 인물</div>
                   </div>
                   {cuts.map((cut) => {
                     const refs = (cut.ref || [])
                       .map((id) => charMap[id])
                       .filter(Boolean);
                     return (
-                      <div key={cut.no} className="match-row">
+                      <div key={`cut-${cut.no}`} className="match-row">
                         <div className="match-col-no">
                           <span className="match-no-badge">{cut.no}</span>
                         </div>
                         <div className="match-col-emo">{cut.emotion || '—'}</div>
+                        <div className="match-col-chars">
+                          {refs.length === 0 ? (
+                            <span className="match-none">—</span>
+                          ) : (
+                            refs.map((c) => (
+                              <span key={c.id} className="match-chip">
+                                <span className="dot" style={{ background: dotColor(c) }} />
+                                <b>{c.name_ko || c.id}</b>
+                              </span>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {covers.map((co, i) => {
+                    const refs = (co.ref || [])
+                      .map((id) => charMap[id])
+                      .filter(Boolean);
+                    const lbl = co.type === 'front' ? '앞표지' : co.type === 'back' ? '뒤표지' : `표지${i + 1}`;
+                    return (
+                      <div key={`cover-${co.type || i}`} className="match-row match-row-cover">
+                        <div className="match-col-no">
+                          <span className="match-no-badge match-cover-badge">{lbl}</span>
+                        </div>
+                        <div className="match-col-emo">표지</div>
                         <div className="match-col-chars">
                           {refs.length === 0 ? (
                             <span className="match-none">—</span>
@@ -709,7 +897,7 @@ export default function Step8Client() {
         .picbook-root .book-tab{
           cursor:pointer;background:linear-gradient(135deg,var(--card),var(--paper-soft));
           border:1.5px solid var(--line);border-radius:6px 12px 12px 6px;
-          padding:10px 14px 10px 22px;width:100%;text-align:left;
+          padding:7px 14px 7px 22px;width:100%;text-align:left;
           box-shadow:0 3px 0 var(--shadow), 4px 5px 10px rgba(60,40,10,.07);
           transition:transform .15s,box-shadow .15s;position:relative;
           animation:pbPopIn .35s ease both;
@@ -723,7 +911,7 @@ export default function Step8Client() {
 
         .picbook-root .nav-list{display:flex;flex-direction:column;gap:6px;}
         .picbook-root .nav-item{cursor:pointer;background:var(--card);border:1.5px solid var(--line);border-radius:12px;
-          padding:9px 12px;font-family:'Gaegu',cursive;font-size:1rem;color:var(--ink-soft);
+          padding:6px 12px;font-family:'Gaegu',cursive;font-size:1rem;color:var(--ink-soft);
           display:flex;align-items:center;gap:10px;width:100%;text-align:left;
           box-shadow:0 2px 0 var(--shadow);transition:transform .12s,box-shadow .12s,background .15s;
           animation:pbPopIn .35s ease both;}
@@ -784,7 +972,10 @@ export default function Step8Client() {
           box-shadow:0 1px 3px rgba(0,0,0,.1);border-radius:1px;
         }
         .picbook-root .cp-head{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;}
-        .picbook-root .cp-name{font-family:'Gaegu',cursive;font-size:1.5rem;color:var(--ink);display:flex;align-items:center;gap:9px;}
+        .picbook-root .cp-name{font-family:'Gaegu',cursive;font-size:1.5rem;color:var(--ink);display:inline-flex;align-items:center;gap:9px;
+          background:none;border:none;padding:2px 6px;border-radius:8px;cursor:pointer;transition:background .15s,transform .1s;}
+        .picbook-root .cp-name:hover{background:color-mix(in srgb,var(--gold) 18%,transparent);}
+        .picbook-root .cp-name:active{transform:translateY(1px);}
         .picbook-root .cp-name .dot{width:20px;height:20px;border-radius:50%;border:1.5px solid rgba(0,0,0,.15);
           box-shadow:inset 0 -3px 5px rgba(0,0,0,.18), inset 0 3px 4px rgba(255,255,255,.45);}
         .picbook-root .cp-role{font-family:'Gaegu',cursive;font-size:.85rem;color:#fff;background:var(--leaf);border-radius:999px;padding:2px 12px;}
@@ -810,6 +1001,8 @@ export default function Step8Client() {
           border-radius:999px;padding:4px 13px;color:var(--ink-soft);transition:.15s;box-shadow:0 2px 0 var(--shadow);}
         .picbook-root .fb:hover{transform:translateY(-1px);}
         .picbook-root .fb.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+        .picbook-root .fb.fb-cover{color:var(--ink);background:color-mix(in srgb,var(--sky) 18%,var(--card));border-color:color-mix(in srgb,var(--sky) 45%,var(--line));}
+        .picbook-root .fb.fb-cover.active{background:var(--sky);color:#fff;border-color:var(--sky);}
 
         .picbook-root .cut{background:var(--card);border:1.5px solid var(--line);border-radius:16px;margin-bottom:14px;
           box-shadow:0 4px 0 var(--shadow);overflow:hidden;
@@ -875,15 +1068,20 @@ export default function Step8Client() {
         .picbook-root .match-btn{display:inline-flex;align-items:center;gap:5px;}
         .picbook-root .match-modal{width:min(640px,94vw);}
         .picbook-root .match-table{display:flex;flex-direction:column;gap:4px;font-family:'Gaegu',cursive;}
-        .picbook-root .match-row{display:grid;grid-template-columns:48px 96px 1fr;align-items:center;gap:10px;
+        .picbook-root .match-row{display:grid;grid-template-columns:68px 96px 1fr;align-items:center;gap:10px;
           padding:8px 10px;border-radius:10px;background:color-mix(in srgb,var(--paper) 55%,var(--card));
           border:1px solid var(--line);}
+        .picbook-root .match-col-no{display:flex;align-items:center;justify-content:center;}
         .picbook-root .match-row:hover{background:color-mix(in srgb,var(--paper) 70%,var(--card));}
         .picbook-root .match-head-row{background:transparent;border:none;font-size:.85rem;color:var(--ink-soft);padding:4px 10px 2px;}
         .picbook-root .match-head-row:hover{background:transparent;}
         .picbook-root .match-no-badge{display:inline-flex;align-items:center;justify-content:center;
           width:32px;height:32px;border-radius:10px;background:var(--paper-deep);color:var(--ink);
           font-weight:700;font-size:1.05rem;box-shadow:inset 0 -2px 0 var(--shadow);transform:rotate(-3deg);}
+        .picbook-root .match-no-badge.match-cover-badge{width:auto;padding:0 10px;height:26px;font-size:.82rem;
+          background:var(--sky);color:#fff;border-radius:999px;box-shadow:inset 0 -2px 0 rgba(0,0,0,.15);transform:rotate(0);
+          white-space:nowrap;letter-spacing:-.2px;}
+        .picbook-root .match-row-cover{background:color-mix(in srgb,var(--sky) 8%,var(--card));}
         .picbook-root .match-col-emo{color:var(--scarlet);font-size:1rem;}
         .picbook-root .match-col-chars{display:flex;flex-wrap:wrap;gap:5px;}
         .picbook-root .match-chip{display:inline-flex;align-items:center;gap:5px;
@@ -894,8 +1092,24 @@ export default function Step8Client() {
         .picbook-root .match-chip b{font-weight:700;}
         .picbook-root .match-none{color:var(--ink-soft);font-size:.9rem;}
         .picbook-root .match-empty{padding:24px;text-align:center;color:var(--ink-soft);font-family:'Gaegu',cursive;}
+
+        .picbook-root .script-modal{width:min(940px,96vw);}
+        .picbook-root .script-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+        .picbook-root .script-col{display:flex;flex-direction:column;gap:6px;min-width:0;}
+        .picbook-root .script-col-title{font-family:'Gaegu',cursive;font-size:.95rem;color:var(--ink);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+        .picbook-root .script-col-title .muted{color:var(--ink-soft);font-size:.85rem;}
+        .picbook-root .script-reparse{margin-left:auto;font-family:'Gaegu',cursive;font-size:.78rem;cursor:pointer;
+          background:var(--card);border:1.3px solid var(--line);border-radius:999px;padding:2px 10px;color:var(--ink-soft);
+          box-shadow:0 2px 0 var(--shadow);transition:transform .12s;}
+        .picbook-root .script-reparse:hover{transform:translateY(-1px);color:var(--ink);}
+        .picbook-root .script-col textarea{min-height:360px;}
+        .picbook-root .modal-foot .btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;}
+        @media (max-width: 720px){
+          .picbook-root .script-grid{grid-template-columns:1fr;}
+          .picbook-root .script-col textarea{min-height:220px;}
+        }
         @media (max-width: 560px){
-          .picbook-root .match-row{grid-template-columns:40px 1fr;row-gap:6px;}
+          .picbook-root .match-row{grid-template-columns:60px 1fr;row-gap:6px;}
           .picbook-root .match-col-emo{grid-column:2;font-size:.92rem;}
           .picbook-root .match-col-chars{grid-column:1 / -1;}
           .picbook-root .match-head-row{display:none;}
@@ -955,10 +1169,15 @@ function CharPanel({ char, appearCuts, onCopy, buildPromptFor }) {
   return (
     <div className="char-panel" key={char.id}>
       <div className="cp-head">
-        <span className="cp-name">
+        <button
+          type="button"
+          className="cp-name"
+          title="클릭해서 이름 복사"
+          onClick={() => onCopy(char.name_ko || char.id)}
+        >
           <span className="dot" style={{ background: dotColor(char) }} />
           {char.name_ko || char.id}
-        </span>
+        </button>
         {char.role && <span className="cp-role">{char.role}</span>}
       </div>
       <div className="cp-id">
@@ -977,7 +1196,7 @@ function CharPanel({ char, appearCuts, onCopy, buildPromptFor }) {
         <button
           type="button"
           className="mini"
-          title="style_block.common + 본문 + character_add를 합쳐 복사"
+          title="본문 + character_add + 네거티브를 합쳐 복사"
           onClick={() => onCopy(buildPromptFor(char.prompt_en || ''))}
         >
           프롬프트 복사
@@ -1022,7 +1241,7 @@ function CutCard({ cut, charMap, onCopy, onJumpChar, buildPromptFor }) {
           <button
             type="button"
             className="mini"
-            title="style_block.common + 본문 + scene_add를 합쳐 복사"
+            title="본문 + scene_add + 네거티브를 합쳐 복사"
             onClick={() => onCopy(buildPromptFor(cut.prompt_en || ''))}
           >
             프롬프트 복사
@@ -1054,7 +1273,7 @@ function CoverCard({ cover, charMap, onCopy, onJumpChar, buildPromptFor }) {
           <button
             type="button"
             className="mini"
-            title="style_block.common + 본문 + cover_add를 합쳐 복사"
+            title="본문 + cover_add + 네거티브를 합쳐 복사"
             onClick={() => onCopy(buildPromptFor(cover.prompt_en || ''))}
           >
             프롬프트 복사
