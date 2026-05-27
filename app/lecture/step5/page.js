@@ -516,7 +516,7 @@ export default function Step5Page() {
         <div className="tb-hero-glow" />
         <div className="tb-hero-row">
           <span className="tb-hero-eyebrow">TB STUDY · PRO 2</span>
-          <h1 className="tb-hero-title">유튜브 창작과정 · 뮤직영상 만들기</h1>
+          <h1 className="tb-hero-title">뮤직영상 마스터</h1>
         </div>
       </section>
 
@@ -647,7 +647,7 @@ export default function Step5Page() {
               뮤직생성 1/3
             </a>
             <a
-              href="https://chatgpt.com/g/g-69f0209fd8748191a9eb1ecb60987f89-pro-class-tb-myujigyeongsangmandeulgi-imijipeurompeuteu-2-3"
+              href="https://gemini.google.com/gem/1DVP7H4Dz6mFhtR2oPircgAHuCx8qTQ7B?usp=sharing"
               target="_blank"
               rel="noreferrer"
               className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full tb-pill-primary text-sm font-bold transition"
