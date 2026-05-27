@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
   Library, UsersRound, Clapperboard,
   Menu, FileInput, FolderOpen, X, BookOpen, ArrowLeft, Ruler,
-  ExternalLink, MessageSquare, AudioLines, Music, Workflow, ScrollText,
+  ExternalLink, MessageSquare, AudioLines, Music, Workflow, ScrollText, Wand2,
 } from 'lucide-react';
 
 const SAMPLE_URL = '/picbook/sample_library.json';
@@ -364,6 +364,16 @@ export default function Step8Client() {
               >
                 <span className="nav-ic"><AudioLines size={18} /></span>
                 <span className="nav-lbl">일레븐랩스 바로가기</span>
+                <ExternalLink size={14} className="ext-ic" />
+              </a>
+              <a
+                className="nav-item guide-link"
+                href="https://gemini.google.com/gem/6bbd0e1665fb/7ebb7f6cc46ea2b4?usp=sharing"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="nav-ic"><Wand2 size={18} /></span>
+                <span className="nav-lbl">음악만들기</span>
                 <ExternalLink size={14} className="ext-ic" />
               </a>
               <a
