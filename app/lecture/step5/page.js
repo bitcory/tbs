@@ -685,6 +685,15 @@ export default function Step5Page() {
               제미나이
             </a>
             <a
+              href="https://labs.google/fx/ko/tools/flow"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#7c3aed] hover:opacity-90 text-white text-sm font-bold tb-press"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              FLOW 바로가기
+            </a>
+            <a
               href="https://splitter.aitoolb.com/"
               target="_blank"
               rel="noreferrer"
