@@ -10,6 +10,7 @@ import {
 
 const SAMPLE_URL = '/picbook/sample_library.json';
 const CACHE_KEY = 'toolb_step8_picbook_v1';
+const SCRIPT_KEY = 'toolb_step8_script_v1';
 
 const DOT_RULES = [
   { rx: /scarlet|콩쥐|다홍/, color: '#d6452f' },
@@ -97,6 +98,18 @@ export default function Step8Client() {
       .then((r) => r.json())
       .then((obj) => setLib(normalizeLib(obj)))
       .catch(() => setLib(null));
+  }, []);
+
+  // 저장된 본문 대본 복원 — 새로고침 후에도 유지된다.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(SCRIPT_KEY);
+      if (saved) {
+        setScriptParsed(saved);
+        setScriptPreview(saved);
+        setScriptInput(saved);
+      }
+    } catch {}
   }, []);
 
   const book = lib?.books?.[bookIdx] || null;
@@ -657,7 +670,10 @@ export default function Step8Client() {
               <button
                 type="button"
                 className="btn"
-                onClick={() => { setScriptInput(''); setScriptPreview(''); setScriptParsed(''); }}
+                onClick={() => {
+                  setScriptInput(''); setScriptPreview(''); setScriptParsed('');
+                  try { localStorage.removeItem(SCRIPT_KEY); } catch {}
+                }}
                 title="입력·결과·저장된 대본을 모두 지움"
               >
                 비우기
@@ -677,6 +693,7 @@ export default function Step8Client() {
                 disabled={!scriptPreview}
                 onClick={() => {
                   setScriptParsed(scriptPreview);
+                  try { localStorage.setItem(SCRIPT_KEY, scriptPreview); } catch {}
                   showToast('대본을 저장했어요!');
                   setScriptModalOpen(false);
                 }}
