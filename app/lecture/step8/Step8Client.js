@@ -407,7 +407,12 @@ export default function Step8Client() {
         <main className="content">
           {!book && (
             <div className="lib-empty">
-              우측 상단 <b>JSON 불러오기</b> 버튼으로 그림책 데이터를 추가하세요 <BookOpen size={18} style={{ verticalAlign: '-3px' }} />
+              <div className="lib-empty-ic"><BookOpen size={40} /></div>
+              <div className="lib-empty-title">아직 책장이 비어 있어요</div>
+              <div className="lib-empty-desc">그림책 JSON 데이터를 불러와 캐릭터·컷·표지를 한눈에 펼쳐보세요.</div>
+              <button type="button" className="lib-empty-btn" onClick={() => setJsonModalOpen(true)}>
+                <FileInput size={18} /> JSON 불러오기
+              </button>
             </div>
           )}
 
@@ -954,8 +959,29 @@ export default function Step8Client() {
 
         .picbook-root .content{min-width:0;}
         .picbook-root .lib-empty{
-          text-align:center;padding:80px 20px;color:var(--ink-soft);font-family:'Gaegu',cursive;font-size:1.15rem;
+          display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;
+          margin:48px auto;max-width:480px;padding:48px 28px;
+          background:color-mix(in srgb,var(--card) 92%,transparent);
+          border:1.5px dashed var(--line);border-radius:20px;
+          box-shadow:0 4px 0 var(--shadow), 4px 6px 14px rgba(60,40,10,.06);
+          color:var(--ink-soft);font-family:'Gaegu',cursive;
+          animation:pbPopIn .4s ease both;
         }
+        .picbook-root .lib-empty-ic{
+          display:flex;align-items:center;justify-content:center;width:76px;height:76px;border-radius:50%;
+          background:radial-gradient(circle at 35% 30%,var(--gold-soft),color-mix(in srgb,var(--scarlet-soft) 70%,var(--card)));
+          color:var(--scarlet);box-shadow:inset 0 2px 4px rgba(255,255,255,.5), 0 3px 0 var(--shadow);margin-bottom:4px;
+        }
+        .picbook-root .lib-empty-title{font-size:1.45rem;color:var(--ink);font-weight:700;}
+        .picbook-root .lib-empty-desc{font-size:1rem;line-height:1.5;max-width:340px;}
+        .picbook-root .lib-empty-btn{
+          margin-top:12px;cursor:pointer;font-family:'Gaegu',cursive;font-size:1.1rem;color:#4a3410;
+          display:inline-flex;align-items:center;gap:8px;padding:11px 26px;border-radius:999px;
+          background:var(--gold);border:1.5px solid color-mix(in srgb,var(--gold) 70%,#000);
+          box-shadow:0 4px 0 #b67f1c;transition:transform .12s,box-shadow .12s;
+        }
+        .picbook-root .lib-empty-btn:hover{transform:translateY(-1px);box-shadow:0 5px 0 #b67f1c;}
+        .picbook-root .lib-empty-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #b67f1c;}
         .picbook-root .book-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin:0 0 4px;padding-bottom:10px;border-bottom:1px dashed var(--line);animation:pbPopIn .4s ease both;}
         .picbook-root .book-head h1{font-family:'Gaegu',cursive;font-weight:700;font-size:clamp(1.3rem,2.4vw,1.75rem);color:var(--ink);}
         .picbook-root .meta-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
