@@ -260,8 +260,8 @@ export default function Step8Client() {
           <span className="lib-name">{libName}</span>
         </div>
         <div className="top-actions">
-          <button type="button" className="btn ghost" onClick={resetToSample} title="샘플 그림책 데이터로 되돌리기">
-            샘플로 리셋
+          <button type="button" className="btn ghost" onClick={resetToSample} title="책장을 초기 상태로 되돌리기">
+            초기화
           </button>
           <button
             type="button"
