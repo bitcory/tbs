@@ -399,6 +399,16 @@ export default function Step8Client() {
                 <span className="nav-lbl">SUNO 바로가기</span>
                 <ExternalLink size={14} className="ext-ic" />
               </a>
+              <a
+                className="nav-item guide-link"
+                href="https://tbbook.aitoolb.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="nav-ic"><BookOpen size={18} /></span>
+                <span className="nav-lbl">매직북 바로가기</span>
+                <ExternalLink size={14} className="ext-ic" />
+              </a>
             </div>
           </div>
         </aside>

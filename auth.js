@@ -5,6 +5,11 @@ import { prisma } from "@/lib/prisma";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
+  // Auth.js v5 는 기본적으로 AUTH_SECRET 를 읽는다. 이 프로젝트는 v4 이름인
+  // NEXTAUTH_SECRET 만 설정돼 있어 시크릿이 비면 서버리스 인스턴스마다 임시
+  // 시크릿이 달라져 PKCE 쿠키 복호화가 실패한다(InvalidCheck: pkceCodeVerifier).
+  // 어느 이름이든 명시적으로 주입해 인스턴스 간 일관성을 보장한다.
+  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
   adapter: PrismaAdapter(prisma),
   providers: [
     Kakao({
