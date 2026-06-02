@@ -1181,7 +1181,10 @@ export default function Step8Client() {
         @keyframes pbPopIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
         @media (max-width: 900px){
-          .picbook-root .layout{grid-template-columns:1fr;gap:16px;padding:16px 18px 60px;}
+          /* z-index:auto 로 스택 컨텍스트를 풀어, fixed 사이드바(z-index:15)가
+             루트 기준으로 backdrop(z-index:14) 위로 올라오게 한다. 안 그러면
+             .layout(z-index:1) 안에 갇혀 backdrop 에 가려져 버튼이 안 눌림. */
+          .picbook-root .layout{grid-template-columns:1fr;gap:16px;padding:16px 18px 60px;z-index:auto;}
           .picbook-root .menu-toggle{display:inline-flex;}
           .picbook-root .sidebar{
             position:fixed;top:var(--topbar-h);left:0;
