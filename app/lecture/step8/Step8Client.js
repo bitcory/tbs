@@ -809,7 +809,10 @@ export default function Step8Client() {
         </div>
       )}
 
-      <style jsx global>{`
+      {/* styled-jsx 대신 일반 인라인 <style> — App Router 에서 styled-jsx 는 레지스트리
+          없이는 SSR HTML 에 안 실려 첫 페인트 때 사이드바가 스타일 없이 깜빡였다(FOUC).
+          전부 .picbook-root 전역 셀렉터라 스코핑이 불필요해 그대로 인라인한다. */}
+      <style dangerouslySetInnerHTML={{ __html: `
         @import url('https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nanum+Myeongjo:wght@400;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
         .picbook-root {
@@ -1226,7 +1229,7 @@ export default function Step8Client() {
         @media (prefers-reduced-motion: reduce){
           .picbook-root *{animation:none!important;transition:none!important;}
         }
-      `}</style>
+      ` }} />
     </div>
   );
 }
