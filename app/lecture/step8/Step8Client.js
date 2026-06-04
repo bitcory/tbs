@@ -131,10 +131,29 @@ export default function Step8Client() {
     return m;
   }, [book]);
 
+  // v6.2 GPT 는 샷 번호를 scene_no, 캐릭터 한글이름을 name 으로 출력한다.
+  // 구버전(no / name_ko)과 신버전을 모두 지원하도록 책 단위로 필드명을 정규화한다.
+  function normalizeBook(b) {
+    if (!b || typeof b !== 'object') return b;
+    const fixNo = (item) => {
+      const no = item.no ?? item.scene_no ?? item.cut_no ?? item.shot_no;
+      return no === undefined ? item : { ...item, no };
+    };
+    return {
+      ...b,
+      characters: (b.characters || []).map((c) => ({
+        ...c,
+        name_ko: c.name_ko ?? c.name ?? c.id,
+      })),
+      cuts: (b.cuts || []).map(fixNo),
+      covers: (b.covers || []).map(fixNo),
+    };
+  }
+
   function normalizeLib(obj) {
     if (!obj) return null;
-    if (obj.books) return obj;
-    return { library_meta: { name: '우리 그림책 서재' }, books: [obj] };
+    const lib = obj.books ? obj : { library_meta: { name: '우리 그림책 서재' }, books: [obj] };
+    return { ...lib, books: (lib.books || []).map(normalizeBook) };
   }
 
   function loadLib(obj) {
@@ -433,8 +452,8 @@ export default function Step8Client() {
                 <div className="meta-row">
                   {[
                     ['원작', book.meta?.source],
-                    ['연령', book.meta?.age ? `${book.meta.age}세` : null],
-                    ['분위기', book.meta?.mood],
+                    ['연령', book.meta?.age ? (/[세~]/.test(String(book.meta.age)) ? book.meta.age : `${book.meta.age}세`) : null],
+                    ['분위기', book.meta?.mood ?? book.meta?.theme],
                     ['컷 수', `${cuts.length}컷`],
                   ].filter(([, v]) => v).map(([k, v]) => (
                     <span key={k} className="chip">{k} · {v}</span>
