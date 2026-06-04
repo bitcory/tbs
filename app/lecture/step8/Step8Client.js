@@ -340,8 +340,8 @@ export default function Step8Client() {
           <div className="side-section">
             <div className="nav-list">
               <a
-                className="nav-item guide-link"
-                href="https://chatgpt.com/g/g-6a1394316644819192df66a06c4795ea-pro-5dangye-aiwa-hamggehaneun-geurimcaeg-mandeulgi"
+                className="nav-item guide-link guide-gpt"
+                href="https://chatgpt.com/g/g-6a213b075c3c8191bf103f609057af25-pro-4dangye-aiwa-hamggehaneun-geurimcaeg-mandeulgi-v6-2-fn"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -350,7 +350,7 @@ export default function Step8Client() {
                 <ExternalLink size={14} className="ext-ic" />
               </a>
               <a
-                className="nav-item guide-link"
+                className="nav-item guide-link guide-chat"
                 href="https://chatgpt.com/"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -360,7 +360,7 @@ export default function Step8Client() {
                 <ExternalLink size={14} className="ext-ic" />
               </a>
               <a
-                className="nav-item guide-link"
+                className="nav-item guide-link guide-flow"
                 href="https://labs.google/fx/ko/tools/flow/"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -370,7 +370,7 @@ export default function Step8Client() {
                 <ExternalLink size={14} className="ext-ic" />
               </a>
               <a
-                className="nav-item guide-link"
+                className="nav-item guide-link guide-voice"
                 href="https://elevenlabs.io/"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -380,7 +380,7 @@ export default function Step8Client() {
                 <ExternalLink size={14} className="ext-ic" />
               </a>
               <a
-                className="nav-item guide-link"
+                className="nav-item guide-link guide-music"
                 href="https://gemini.google.com/gem/6bbd0e1665fb/7ebb7f6cc46ea2b4?usp=sharing"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -390,7 +390,7 @@ export default function Step8Client() {
                 <ExternalLink size={14} className="ext-ic" />
               </a>
               <a
-                className="nav-item guide-link"
+                className="nav-item guide-link guide-suno"
                 href="https://suno.com/"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -400,7 +400,7 @@ export default function Step8Client() {
                 <ExternalLink size={14} className="ext-ic" />
               </a>
               <a
-                className="nav-item guide-link"
+                className="nav-item guide-link guide-book"
                 href="https://tbbook.aitoolb.com/"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -966,9 +966,43 @@ export default function Step8Client() {
         .picbook-root .nav-item.active{background:var(--ink);color:var(--paper);border-color:var(--ink);box-shadow:0 2px 0 rgba(0,0,0,.3);}
         .picbook-root .nav-item.active .badge{background:color-mix(in srgb,var(--paper) 18%,transparent);color:var(--paper);border-color:transparent;}
         .picbook-root a.nav-item{text-decoration:none;}
-        .picbook-root .nav-item.guide-link{color:var(--ink);}
-        .picbook-root .nav-item.guide-link .ext-ic{opacity:.55;}
+        .picbook-root .nav-item.guide-link{
+          --guide-bg:#fff2b8;--guide-border:#d7ad37;--guide-shadow:rgba(170,124,30,.28);--guide-accent:#94650f;
+          color:#202124;
+          background:linear-gradient(135deg,color-mix(in srgb,var(--guide-bg) 78%,#fff),var(--guide-bg));
+          border-color:var(--guide-border);
+          box-shadow:0 3px 0 var(--guide-shadow), 0 8px 18px color-mix(in srgb,var(--guide-shadow) 42%,transparent);
+          font-weight:900;
+          padding:8px 12px;
+          min-height:48px;
+        }
+        .picbook-root .nav-item.guide-link .nav-ic{
+          width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;flex:none;
+          color:#fff;background:var(--guide-accent);border-radius:9px;
+          border:1.5px solid color-mix(in srgb,var(--guide-accent) 80%,#000);
+          box-shadow:inset 0 1px 0 rgba(255,255,255,.35), 0 2px 0 color-mix(in srgb,var(--guide-shadow) 70%,transparent);
+        }
+        .picbook-root .nav-item.guide-link .nav-lbl{color:#1a1a1a;}
+        .picbook-root .nav-item.guide-link .ext-ic{opacity:.7;color:var(--guide-accent);flex:none;}
         .picbook-root .nav-item.guide-link:hover .ext-ic{opacity:1;}
+        .picbook-root .nav-item.guide-link:hover{
+          background:linear-gradient(135deg,#fff,var(--guide-bg));
+          border-color:var(--guide-border);
+          box-shadow:0 4px 0 var(--guide-shadow), 0 10px 20px color-mix(in srgb,var(--guide-shadow) 58%,transparent);
+        }
+        .picbook-root .nav-item.guide-gpt{--guide-bg:#ffb3ac;--guide-border:#df5d56;--guide-shadow:rgba(168,48,42,.34);--guide-accent:#a3322d;}
+        .picbook-root .nav-item.guide-chat{--guide-bg:#ffcb82;--guide-border:#de942e;--guide-shadow:rgba(160,94,10,.34);--guide-accent:#8a510e;}
+        .picbook-root .nav-item.guide-flow{--guide-bg:#ffe45a;--guide-border:#cbab1d;--guide-shadow:rgba(146,120,8,.32);--guide-accent:#6e5c08;}
+        .picbook-root .nav-item.guide-voice{--guide-bg:#b6e88e;--guide-border:#79b948;--guide-shadow:rgba(66,124,30,.32);--guide-accent:#3d7021;}
+        .picbook-root .nav-item.guide-music{--guide-bg:#9fe0f5;--guide-border:#46a6cf;--guide-shadow:rgba(30,110,148,.32);--guide-accent:#1c6a8c;}
+        .picbook-root .nav-item.guide-suno{--guide-bg:#b6c3ff;--guide-border:#6a80e2;--guide-shadow:rgba(56,72,160,.32);--guide-accent:#384a9c;}
+        .picbook-root .nav-item.guide-book{--guide-bg:#e3adf6;--guide-border:#ab63d0;--guide-shadow:rgba(116,50,150,.32);--guide-accent:#723a94;}
+        body.picbook-night .picbook-root .nav-item.guide-link{
+          color:#202124;
+          background:linear-gradient(135deg,color-mix(in srgb,var(--guide-bg) 54%,#fff),var(--guide-bg));
+          border-color:var(--guide-border);
+          box-shadow:0 3px 0 color-mix(in srgb,var(--guide-shadow) 80%,rgba(0,0,0,.18));
+        }
 
         .picbook-root .content{min-width:0;}
         .picbook-root .lib-empty{
