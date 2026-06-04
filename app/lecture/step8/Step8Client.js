@@ -274,6 +274,8 @@ export default function Step8Client() {
   const chars = book?.characters || [];
   const cuts = book?.cuts || [];
   const covers = book?.covers || [];
+  // emotion 필드가 있는 컷이 하나도 없으면 인물매칭 모달의 '감정' 컬럼을 숨긴다.
+  const matchHasEmotion = cuts.some((c) => c.emotion);
   const currentChar = chars[activeChar] || null;
 
   return (
@@ -778,10 +780,10 @@ export default function Step8Client() {
               {cuts.length === 0 && covers.length === 0 ? (
                 <div className="match-empty">등록된 컷·표지가 없어요.</div>
               ) : (
-                <div className="match-table">
+                <div className={`match-table${matchHasEmotion ? '' : ' no-emo'}`}>
                   <div className="match-row match-head-row">
                     <div className="match-col-no">#</div>
-                    <div className="match-col-emo">감정</div>
+                    {matchHasEmotion && <div className="match-col-emo">감정</div>}
                     <div className="match-col-chars">등장 인물</div>
                   </div>
                   {cuts.map((cut) => {
@@ -793,7 +795,7 @@ export default function Step8Client() {
                         <div className="match-col-no">
                           <span className="match-no-badge">{cut.no}</span>
                         </div>
-                        <div className="match-col-emo">{cut.emotion || '—'}</div>
+                        {matchHasEmotion && <div className="match-col-emo">{cut.emotion || '—'}</div>}
                         <div className="match-col-chars">
                           {refs.length === 0 ? (
                             <span className="match-none">—</span>
@@ -819,7 +821,7 @@ export default function Step8Client() {
                         <div className="match-col-no">
                           <span className="match-no-badge match-cover-badge">{lbl}</span>
                         </div>
-                        <div className="match-col-emo">표지</div>
+                        {matchHasEmotion && <div className="match-col-emo">표지</div>}
                         <div className="match-col-chars">
                           {refs.length === 0 ? (
                             <span className="match-none">—</span>
@@ -1208,6 +1210,7 @@ export default function Step8Client() {
         .picbook-root .match-btn{display:inline-flex;align-items:center;gap:5px;}
         .picbook-root .match-modal{width:min(640px,94vw);}
         .picbook-root .match-table{display:flex;flex-direction:column;gap:4px;font-family:'Gaegu',cursive;}
+        .picbook-root .match-table.no-emo .match-row{grid-template-columns:68px 1fr;}
         .picbook-root .match-row{display:grid;grid-template-columns:68px 96px 1fr;align-items:center;gap:10px;
           padding:8px 10px;border-radius:10px;background:color-mix(in srgb,var(--paper) 55%,var(--card));
           border:1px solid var(--line);}
