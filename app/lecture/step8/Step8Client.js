@@ -377,7 +377,7 @@ export default function Step8Client() {
             <div className="nav-list">
               <a
                 className="nav-item guide-link guide-gpt"
-                href="https://chatgpt.com/g/g-6a213b075c3c8191bf103f609057af25-pro-4dangye-aiwa-hamggehaneun-geurimcaeg-mandeulgi-v6-2-fn"
+                href="https://chatgpt.com/g/g-6a1394316644819192df66a06c4795ea-pro-4dangye-aiwa-hamggehaneun-geurimcaeg-mandeulgi-v6-0"
                 target="_blank"
                 rel="noopener noreferrer"
               >
