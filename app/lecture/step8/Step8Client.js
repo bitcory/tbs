@@ -871,7 +871,11 @@ export default function Step8Client() {
             radial-gradient(circle at 88% 82%, var(--paper-deep) 0%, transparent 50%),
             var(--paper);
           min-height:100vh;line-height:1.6;
-          position:relative;overflow-x:hidden;
+          /* overflow-x:clip 사용 (hidden 금지). hidden 이면 overflow-y 가 auto 로
+             계산돼 이 컨테이너가 스크롤 컨테이너가 되고, position:sticky 헤더가
+             뷰포트가 아닌 이 박스 기준으로 붙어 일부 브라우저에서 헤더가 가려지고
+             맨 위로 스크롤이 안 되는 트랩이 생긴다. clip 은 반대축을 건드리지 않는다. */
+          position:relative;overflow-x:clip;
           transition:background .5s, color .4s;
         }
         body.picbook-night .picbook-root {
