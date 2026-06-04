@@ -131,22 +131,39 @@ export default function Step8Client() {
     return m;
   }, [book]);
 
-  // v6.2 GPT 는 샷 번호를 scene_no, 캐릭터 한글이름을 name 으로 출력한다.
-  // 구버전(no / name_ko)과 신버전을 모두 지원하도록 책 단위로 필드명을 정규화한다.
+  // v6.2 GPT 출력은 버전마다 필드가 다르다. 책 단위로 정규화해 신·구 스키마를 모두 지원한다.
+  //  - 샷 번호: no / scene_no / cut_no / shot_no → 없으면 배열 순서로 자동 부여
+  //  - 캐릭터 한글이름: name_ko / name
+  //  - 등장 인물(ref): 없으면 컷 텍스트에서 캐릭터 id·이름을 스캔해 추론
   function normalizeBook(b) {
     if (!b || typeof b !== 'object') return b;
-    const fixNo = (item) => {
-      const no = item.no ?? item.scene_no ?? item.cut_no ?? item.shot_no;
-      return no === undefined ? item : { ...item, no };
+    const characters = (b.characters || []).map((c) => ({
+      ...c,
+      name_ko: c.name_ko ?? c.name ?? c.id,
+    }));
+    const escapeRe = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const charTerms = characters.map((c) => ({
+      id: c.id,
+      terms: [c.id, c.name_ko, c.name].filter(Boolean).map((t) => String(t).toLowerCase()),
+    }));
+    const inferRef = (item) => {
+      const hay = [item.prompt_en, item.composition, item.expression, item.background,
+        item.text, item.scene, item.character_position].filter(Boolean).join(' ').toLowerCase();
+      return charTerms
+        .filter(({ terms }) => terms.some((t) =>
+          /^[\x00-\x7f]+$/.test(t) ? new RegExp(`\\b${escapeRe(t)}\\b`).test(hay) : hay.includes(t)))
+        .map(({ id }) => id);
     };
+    const fix = (item, i) => ({
+      ...item,
+      no: item.no ?? item.scene_no ?? item.cut_no ?? item.shot_no ?? (i + 1),
+      ref: (Array.isArray(item.ref) && item.ref.length) ? item.ref : inferRef(item),
+    });
     return {
       ...b,
-      characters: (b.characters || []).map((c) => ({
-        ...c,
-        name_ko: c.name_ko ?? c.name ?? c.id,
-      })),
-      cuts: (b.cuts || []).map(fixNo),
-      covers: (b.covers || []).map(fixNo),
+      characters,
+      cuts: (b.cuts || []).map(fix),
+      covers: (b.covers || []).map(fix),
     };
   }
 
