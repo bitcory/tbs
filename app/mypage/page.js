@@ -5,7 +5,8 @@ import { prisma } from "@/lib/prisma";
 import * as S from "@/lib/uiStyles";
 import ProfileEditor from "./ProfileEditor";
 import BankInfoEditor from "./BankInfoEditor";
-import { updateProfile, updateBankInfo } from "./actions";
+import CapsrtConnectCard from "./CapsrtConnectCard";
+import { updateProfile, updateBankInfo, issueDesktopToken, revokeDesktopToken } from "./actions";
 import {
   Camera, Search, Film, MessagesSquare, ArrowUpRight, MessageSquarePlus,
 } from "lucide-react";
@@ -31,6 +32,14 @@ export default async function MyPage() {
   if (!me.onboarded) redirect("/onboarding");
 
   const isAdmin = me.role === "STAFF" || me.role === "SUPER_ADMIN";
+
+  // 캡컷SRT 앱: 사용 권한 + 발급된 연결코드
+  const capsrtAllowed = me.capsrtAccess || isAdmin;
+  const desktopToken = await prisma.desktopToken.findFirst({
+    where: { userId: me.id, revoked: false },
+    orderBy: { createdAt: "desc" },
+    select: { token: true },
+  });
 
   return (
     <div style={{ minHeight: "100vh", background: "#15141a", color: "#f5f4f7" }} className="auth-scroll">
@@ -216,6 +225,13 @@ export default async function MyPage() {
               카카오톡 오픈채팅방 입장
             </a>
           </div>
+
+          <CapsrtConnectCard
+            hasAccess={capsrtAllowed}
+            initialCode={desktopToken?.token ?? null}
+            issueAction={issueDesktopToken}
+            revokeAction={revokeDesktopToken}
+          />
         </div>
 
         {/* 회원정보 + 정산정보 — 한 줄 2개 */}

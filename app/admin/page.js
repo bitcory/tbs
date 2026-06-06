@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
-import { toggleStepAccess, toggleSuggestionViewer } from "./actions";
+import { toggleStepAccess, toggleSuggestionViewer, toggleCapsrtAccess } from "./actions";
 import RoleSelect from "./RoleSelect";
 import DeleteUserButton from "./DeleteUserButton";
 import StepGroupDropdown from "./StepGroupDropdown";
@@ -235,6 +235,7 @@ export default async function AdminPage({ searchParams }) {
                   <th colSpan={1 + SINGLE_STEPS.length} style={groupTh("#f97316")}>UP CLASS</th>
                   <th colSpan={PRO_STEPS.length} style={groupTh("#f5f4f7")}>PRO CLASS</th>
                   <th colSpan={MASTER_STEPS.length} style={groupTh("#fb7185")}>MASTER CLASS</th>
+                  <th colSpan={1} style={groupTh("#22d3ee")}>CAPCUT SRT</th>
                   <th colSpan={isSuper ? 2 : 1} style={groupTh("#a8a4b2")}>메타</th>
                 </tr>
                 <tr style={{ background: "#26242e", color: "#a8a4b2" }}>
@@ -254,6 +255,7 @@ export default async function AdminPage({ searchParams }) {
                   {MASTER_STEPS.map((s) => (
                     <th key={s.step} style={th}>{s.label}</th>
                   ))}
+                  <th style={th}>캡컷SRT 앱</th>
                   <th style={th}>가입일</th>
                   {isSuper && <th style={th}>관리</th>}
                 </tr>
@@ -489,6 +491,46 @@ export default async function AdminPage({ searchParams }) {
                         );
                       })}
 
+                      {/* CAPCUT SRT 데스크톱 앱 허용 */}
+                      {(() => {
+                        const cyan = { background: "rgba(34,211,238,0.18)", color: "#22d3ee" };
+                        const hasAccess = u.role !== "USER" || u.capsrtAccess;
+                        const canToggle = u.role === "USER";
+                        return (
+                          <td style={td}>
+                            {canToggle ? (
+                              <form
+                                action={async () => {
+                                  "use server";
+                                  await toggleCapsrtAccess(u.id, !hasAccess);
+                                }}
+                              >
+                                <button
+                                  className="tb-press-soft"
+                                  style={{
+                                    ...S.badge(hasAccess ? cyan : S.badgeGray),
+                                    border: "none",
+                                    cursor: "pointer",
+                                    fontFamily: "inherit",
+                                  }}
+                                >
+                                  {hasAccess ? "✓ 허용" : "✕ 차단"}
+                                </button>
+                              </form>
+                            ) : (
+                              <span
+                                style={{
+                                  ...S.badge(hasAccess ? cyan : S.badgeGray),
+                                  opacity: 0.6,
+                                }}
+                              >
+                                {hasAccess ? "자동" : "-"}
+                              </span>
+                            )}
+                          </td>
+                        );
+                      })()}
+
                       <td style={{ ...td, color: "#a8a4b2", fontSize: 12 }}>
                         {new Date(u.createdAt).toLocaleDateString("ko-KR")}
                       </td>
@@ -508,7 +550,7 @@ export default async function AdminPage({ searchParams }) {
                 {visibleRows.length === 0 && (
                   <tr>
                     <td
-                      colSpan={(isSuper ? 14 : 13) + (tab === "staff" ? 1 : 0)}
+                      colSpan={(isSuper ? 15 : 14) + (tab === "staff" ? 1 : 0)}
                       style={{ padding: "40px 12px", textAlign: "center", color: "#a8a4b2", fontSize: 14, borderTop: "1px solid #34323d" }}
                     >
                       {q

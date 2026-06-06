@@ -87,3 +87,50 @@ export async function updateBankInfo(formData) {
   return { ok: true };
 }
 
+// ===== CapCutSRT 데스크톱 앱 연결코드 =====
+import { randomBytes } from "crypto";
+
+// 사람이 옮겨적기 쉬운 연결코드 생성: CAPS-XXXX-XXXX-XXXX-XXXX (Crockford base32)
+function generateConnectionCode() {
+  const alphabet = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"; // 헷갈리는 I,L,O,U 제외
+  const bytes = randomBytes(16);
+  let s = "";
+  for (let i = 0; i < 16; i++) s += alphabet[bytes[i] & 31];
+  return `CAPS-${s.slice(0, 4)}-${s.slice(4, 8)}-${s.slice(8, 12)}-${s.slice(12, 16)}`;
+}
+
+// 연결코드 발급(재발급). 기존 코드는 폐기하고 새 코드 하나만 유지.
+// capsrtAccess 가 있어야 발급 가능(없으면 발급해도 앱이 거부됨).
+export async function issueDesktopToken() {
+  const s = await auth();
+  if (!s?.user) redirect("/login");
+
+  const me = await prisma.user.findUnique({
+    where: { id: s.user.id },
+    select: { capsrtAccess: true, role: true },
+  });
+  const allowed = !!me && (me.capsrtAccess || me.role === "STAFF" || me.role === "SUPER_ADMIN");
+  if (!allowed) {
+    return { ok: false, message: "캡컷SRT 앱 사용 권한이 없습니다. 관리자에게 문의하세요." };
+  }
+
+  // 기존 토큰 정리 후 새 코드 1개 발급
+  await prisma.desktopToken.deleteMany({ where: { userId: s.user.id } });
+  const token = generateConnectionCode();
+  await prisma.desktopToken.create({
+    data: { token, userId: s.user.id },
+  });
+
+  revalidatePath("/mypage");
+  return { ok: true, token };
+}
+
+// 연결코드 폐기(앱 연결 해제).
+export async function revokeDesktopToken() {
+  const s = await auth();
+  if (!s?.user) redirect("/login");
+  await prisma.desktopToken.deleteMany({ where: { userId: s.user.id } });
+  revalidatePath("/mypage");
+  return { ok: true };
+}
+

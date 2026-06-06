@@ -47,3 +47,13 @@ export async function toggleSuggestionViewer(userId, enabled) {
   });
   revalidatePath("/admin");
 }
+
+// CapCutSRT 데스크톱 앱 사용 허용 토글.
+export async function toggleCapsrtAccess(userId, enabled) {
+  await requireAdmin();
+  await prisma.user.update({
+    where: { id: userId },
+    data: { capsrtAccess: !!enabled },
+  });
+  revalidatePath("/admin");
+}

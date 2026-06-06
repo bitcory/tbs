@@ -39,6 +39,7 @@ model User {
   stepAccess         Int[]     @default([])
   onboarded          Boolean   @default(false)
   canViewSuggestions Boolean   @default(false)
+  capsrtAccess       Boolean   @default(false)  // CapCutSRT 데스크톱 앱 사용 허용
 
   privacyAgreedAt    DateTime?
   marketingOptIn     Boolean   @default(false)
@@ -60,6 +61,22 @@ model User {
   createdSessions   ClassSession[] @relation("ClassSessionCreator")
   enrollments       Enrollment[]
   suggestions       Suggestion[]
+  desktopTokens     DesktopToken[]
+}
+
+// CapCutSRT 데스크톱 앱 연결코드 (기기 토큰).
+// 마이페이지에서 발급 → 앱에 입력 → 앱이 매 실행 시 /api/desktop/verify 로 검증.
+model DesktopToken {
+  id         String    @id @default(cuid())
+  token      String    @unique           // 앱에 입력하는 연결코드
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label      String?                      // 기기 메모(선택)
+  revoked    Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime?
+
+  @@index([userId])
 }
 
 model Suggestion {
