@@ -8,7 +8,7 @@ import {
   Languages, Camera, Layers, Sparkles, ScrollText, Clock, FileText,
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { serializeBoardToPrompt, serializeAllBoards } from './serialize';
+import { serializeBoardToPrompt } from './serialize';
 const FrameExtractor = dynamic(() => import('@/app/components/FrameExtractor'), { ssr: false });
 const WatermarkRemover = dynamic(() => import('@/app/components/WatermarkRemover'), { ssr: false });
 
@@ -195,22 +195,11 @@ export default function Step7Page() {
     });
   };
 
-  // The master-prompt copy targets the active tab:
-  //   • Board tab (A / B) → only that board's prompt
-  //   • Overview tab → all boards joined
+  // Each board (A / B) is copied from its own master-prompt CTA inside BoardView.
   const activeBoardIndex = data && (activeTab === 'A' || activeTab === 'B')
     ? data.boards.findIndex(b => b.label === activeTab)
     : -1;
   const activeBoard = activeBoardIndex >= 0 ? data?.boards?.[activeBoardIndex] : null;
-
-  const masterPromptForActive = data
-    ? (activeBoard
-        ? serializeBoardToPrompt(activeBoard, data)
-        : serializeAllBoards(data).map(({ title, prompt }) => `### ${title}\n\n${prompt}`).join('\n\n———\n\n'))
-    : '';
-  const masterPromptButtonLabel = activeBoard
-    ? `Board ${activeBoard.label} 프롬프트`
-    : '마스터 프롬프트 전체';
 
   return (
     <div className="min-h-screen md:h-screen md:flex md:flex-col md:overflow-hidden bg-[#f8fafc] text-[#0f172a]">
@@ -572,8 +561,8 @@ export default function Step7Page() {
             </div>
           ) : (
             <>
-              {/* Top bulk-copy bar */}
-              <div className="flex-shrink-0 px-4 py-3 border-b border-[#e2e8f0] bg-[#ecfdf5]/40 rounded-t-2xl flex items-center justify-between gap-3 flex-wrap">
+              {/* Top info bar */}
+              <div className="flex-shrink-0 px-4 py-3 border-b border-[#e2e8f0] bg-[#ecfdf5]/40 rounded-t-2xl flex items-center gap-3 flex-wrap">
                 <div className="flex items-center gap-2 min-w-0">
                   <Clapperboard className="w-4 h-4 text-[#00996D] flex-shrink-0" />
                   <h2 className="text-base font-black text-[#0f172a] uppercase truncate">
@@ -595,15 +584,6 @@ export default function Step7Page() {
                       {data.production.aspect_ratio}
                     </span>
                   )}
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
-                  <button
-                    onClick={() => copyText(masterPromptForActive)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full tb-pill-primary text-sm font-bold transition"
-                  >
-                    <ScrollText className="w-3.5 h-3.5" />
-                    {masterPromptButtonLabel}
-                  </button>
                 </div>
               </div>
 
@@ -886,7 +866,7 @@ function BoardView({ board, boardIndex, data, onCopy, onUpdateBoard, onUpdatePan
           className="flex items-center gap-1.5 px-4 py-2 rounded-full tb-pill-primary text-sm font-bold transition flex-shrink-0"
         >
           <Copy className="w-3.5 h-3.5" />
-          마스터 프롬프트 복사
+          Board {board.label} 프롬프트 복사
         </button>
       </div>
 
