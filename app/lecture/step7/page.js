@@ -31,7 +31,7 @@ const FUNCTION_LABEL = {
   bridge_frame_start: '브릿지 시작',
 };
 
-const BOARD_DOT = { A: '#0ea5e9', B: '#8b5cf6' };
+const BOARD_DOT = { A: '#f97316', B: '#fb7185' };
 
 function cleanJson(raw) {
   const cleaned = String(raw || '').trim()
@@ -202,12 +202,12 @@ export default function Step7Page() {
   const activeBoard = activeBoardIndex >= 0 ? data?.boards?.[activeBoardIndex] : null;
 
   return (
-    <div className="min-h-screen md:h-screen md:flex md:flex-col md:overflow-hidden bg-[#f8fafc] text-[#0f172a]">
+    <div className="min-h-screen md:h-screen md:flex md:flex-col md:overflow-hidden bg-[#15141a] text-[#f5f4f7]">
       <style jsx global>{`
         .tb-hero {
           position: relative;
           padding: 16px 20px 36px;
-          background: linear-gradient(135deg, #016837 0%, #00996D 45%, #00B380 100%);
+          background: linear-gradient(135deg, #7c2d12 0%, #ea580c 45%, #f97316 100%);
           color: #fff;
           text-align: center;
           overflow: hidden;
@@ -225,7 +225,7 @@ export default function Step7Page() {
         }
         .tb-hero::after {
           content: ''; position: absolute; left: -10%; right: -10%; bottom: -1px;
-          height: 24px; background: #f8fafc; border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+          height: 24px; background: #15141a; border-radius: 50% 50% 0 0 / 100% 100% 0 0;
         }
         .tb-hero-glow {
           position: absolute; top: -40px; right: -60px; width: 260px; height: 260px;
@@ -255,63 +255,63 @@ export default function Step7Page() {
           margin: -22px 16px 0;
           padding: 10px 14px;
           display: flex; align-items: center; gap: 10px;
-          background: rgba(255,255,255,0.7);
-          border: 1px solid rgba(255,255,255,0.9);
+          background: rgba(31,29,38,0.7);
+          border: 1px solid rgba(255,255,255,0.1);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
           border-radius: 100px;
-          box-shadow: 0 18px 40px rgba(15, 23, 42, 0.1);
+          box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3);
         }
         .tb-pill-primary {
-          background: rgba(255,255,255,0.4);
-          color: #00774f;
-          border: 1.5px solid rgba(0,153,109,0.35);
+          background: rgba(249,115,22,0.18);
+          color: #fb923c;
+          border: 1.5px solid rgba(249,115,22,0.4);
           backdrop-filter: blur(18px) saturate(180%);
           -webkit-backdrop-filter: blur(18px) saturate(180%);
           box-shadow:
-            0 10px 24px rgba(0,153,109,0.22),
-            inset 2px 2px 1px 0 rgba(255,255,255,0.85),
-            inset -1px -1px 1px 1px rgba(255,255,255,0.5);
+            0 10px 24px rgba(249,115,22,0.22),
+            inset 2px 2px 1px 0 rgba(255,255,255,0.12),
+            inset -1px -1px 1px 1px rgba(255,255,255,0.06);
           transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,2.2), box-shadow 0.3s, background 0.3s;
         }
         .tb-pill-primary:hover {
-          background: rgba(255,255,255,0.55);
+          background: rgba(249,115,22,0.28);
           transform: translateY(-1px) scale(1.03);
           box-shadow:
-            0 16px 32px rgba(0,153,109,0.3),
-            inset 2px 2px 1px 0 rgba(255,255,255,0.95),
-            inset -1px -1px 1px 1px rgba(255,255,255,0.6);
+            0 16px 32px rgba(249,115,22,0.3),
+            inset 2px 2px 1px 0 rgba(255,255,255,0.16),
+            inset -1px -1px 1px 1px rgba(255,255,255,0.08);
         }
         .tb-pill-primary:active {
           transform: translateY(1px) scale(0.94);
           box-shadow:
-            0 4px 10px rgba(0,153,109,0.18),
-            inset 2px 2px 2px 0 rgba(0,0,0,0.08),
-            inset -1px -1px 1px 1px rgba(255,255,255,0.3);
+            0 4px 10px rgba(249,115,22,0.18),
+            inset 2px 2px 2px 0 rgba(0,0,0,0.3),
+            inset -1px -1px 1px 1px rgba(255,255,255,0.06);
           transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
         }
         .tb-pill-ghost {
-          background: rgba(255,255,255,0.55);
-          color: #334155;
-          border: 1px solid rgba(255,255,255,0.7);
+          background: rgba(38,36,46,0.55);
+          color: #f5f4f7;
+          border: 1px solid rgba(255,255,255,0.12);
           backdrop-filter: blur(14px) saturate(140%);
           -webkit-backdrop-filter: blur(14px) saturate(140%);
           box-shadow:
-            0 6px 16px rgba(15,23,42,0.08),
-            inset 1.5px 1.5px 0.5px 0 rgba(255,255,255,0.85),
-            inset -1px -1px 0.5px 1px rgba(255,255,255,0.45);
+            0 6px 16px rgba(0,0,0,0.25),
+            inset 1.5px 1.5px 0.5px 0 rgba(255,255,255,0.1),
+            inset -1px -1px 0.5px 1px rgba(255,255,255,0.05);
           transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,2.2), box-shadow 0.3s, background 0.3s;
         }
         .tb-pill-ghost:hover {
-          background: rgba(255,255,255,0.75);
+          background: rgba(38,36,46,0.75);
           transform: translateY(-1px) scale(1.03);
         }
         .tb-pill-ghost:active {
           transform: translateY(1px) scale(0.94);
           box-shadow:
-            0 3px 8px rgba(15,23,42,0.1),
-            inset 1.5px 1.5px 2px 0 rgba(0,0,0,0.08),
-            inset -1px -1px 0.5px 1px rgba(255,255,255,0.3);
+            0 3px 8px rgba(0,0,0,0.3),
+            inset 1.5px 1.5px 2px 0 rgba(0,0,0,0.3),
+            inset -1px -1px 0.5px 1px rgba(255,255,255,0.05);
           transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
         }
       `}</style>
@@ -331,7 +331,7 @@ export default function Step7Page() {
           <ArrowLeft className="w-3.5 h-3.5" />
           홈
         </Link>
-        <span className="text-[11px] font-bold tracking-[0.18em] text-[#00996D] uppercase hidden sm:inline">TOOLB LAB</span>
+        <span className="text-[11px] font-bold tracking-[0.18em] text-[#f97316] uppercase hidden sm:inline">TOOLB LAB</span>
         <div className="ml-auto flex items-center gap-2">
           <button
             onClick={() => setUploadOpen(true)}
@@ -343,7 +343,7 @@ export default function Step7Page() {
           {data && (
             <button
               onClick={reset}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#fecaca] text-[#dc2626] text-xs sm:text-sm font-bold tb-press-soft transition"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#26242e] border border-[#fecaca] text-[#dc2626] text-xs sm:text-sm font-bold tb-press-soft transition"
             >
               <Trash2 className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">초기화</span>
@@ -354,9 +354,9 @@ export default function Step7Page() {
 
       <div className="flex flex-col md:flex-row md:flex-1 md:min-h-0 w-full px-4 pt-6 pb-4 gap-4 2xl:px-6">
         {/* Sidebar */}
-        <aside className="w-full md:w-[300px] flex-shrink-0 bg-white border border-[#e2e8f0] rounded-2xl shadow-[0_8px_24px_rgba(15,23,42,0.06)] md:overflow-y-auto">
-          <div className="p-4 border-b border-[#e2e8f0]">
-            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#64748b]">
+        <aside className="w-full md:w-[300px] flex-shrink-0 bg-[#1f1d26] border border-[#34323d] rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.3)] md:overflow-y-auto">
+          <div className="p-4 border-b border-[#34323d]">
+            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#a8a4b2]">
               <Clapperboard className="w-3.5 h-3.5" />
               프로젝트 정보
             </div>
@@ -364,57 +364,57 @@ export default function Step7Page() {
               <div className="space-y-1.5">
                 {data.project?.title && (
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">제목</span>
-                    <span className="text-sm text-[#0f172a] font-bold flex-1 break-all">{data.project.title}</span>
+                    <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">제목</span>
+                    <span className="text-sm text-[#f5f4f7] font-bold flex-1 break-all">{data.project.title}</span>
                   </div>
                 )}
                 {data.project?.genre && (
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">장르</span>
-                    <span className="text-sm text-[#0f172a] font-bold flex-1">{data.project.genre}</span>
+                    <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">장르</span>
+                    <span className="text-sm text-[#f5f4f7] font-bold flex-1">{data.project.genre}</span>
                   </div>
                 )}
                 <div className="flex items-start gap-2">
-                  <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">모드</span>
-                  <span className="text-sm text-[#0f172a] font-bold flex-1">
+                  <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">모드</span>
+                  <span className="text-sm text-[#f5f4f7] font-bold flex-1">
                     {data.mode === 'B' ? 'B · A+B (10초+10초 = 20초)' : 'A · 1보드 (10초)'}
                   </span>
                 </div>
                 {data.project?.total_duration_seconds > 0 && (
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">러닝</span>
-                    <span className="text-sm text-[#0f172a] font-bold flex-1">{data.project.total_duration_seconds}초</span>
+                    <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">러닝</span>
+                    <span className="text-sm text-[#f5f4f7] font-bold flex-1">{data.project.total_duration_seconds}초</span>
                   </div>
                 )}
                 {Array.isArray(data.project?.tone) && data.project.tone.length > 0 && (
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">톤</span>
-                    <span className="text-sm text-[#0f172a] font-bold flex-1">{data.project.tone.join(' · ')}</span>
+                    <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">톤</span>
+                    <span className="text-sm text-[#f5f4f7] font-bold flex-1">{data.project.tone.join(' · ')}</span>
                   </div>
                 )}
                 {data.production?.aspect_ratio && (
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">비율</span>
-                    <span className="text-sm text-[#0f172a] font-bold flex-1">{data.production.aspect_ratio}</span>
+                    <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">비율</span>
+                    <span className="text-sm text-[#f5f4f7] font-bold flex-1">{data.production.aspect_ratio}</span>
                   </div>
                 )}
                 {data.scene?.title && (
-                  <div className="flex items-start gap-2 pt-1.5 border-t border-[#e2e8f0] mt-1.5">
-                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">씬</span>
-                    <span className="text-sm text-[#0f172a] font-bold flex-1 break-words">{data.scene.title}</span>
+                  <div className="flex items-start gap-2 pt-1.5 border-t border-[#34323d] mt-1.5">
+                    <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">씬</span>
+                    <span className="text-sm text-[#f5f4f7] font-bold flex-1 break-words">{data.scene.title}</span>
                   </div>
                 )}
                 {data.scene?.logline && (
-                  <p className="text-xs text-[#64748b] italic leading-snug pt-1">"{data.scene.logline}"</p>
+                  <p className="text-xs text-[#a8a4b2] italic leading-snug pt-1">"{data.scene.logline}"</p>
                 )}
               </div>
             ) : (
-              <p className="text-[13px] text-[#64748b]">JSON을 업로드하면 표시됩니다.</p>
+              <p className="text-[13px] text-[#a8a4b2]">JSON을 업로드하면 표시됩니다.</p>
             )}
           </div>
 
-          <div className="p-4 border-b border-[#e2e8f0]">
-            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#64748b]">
+          <div className="p-4 border-b border-[#34323d]">
+            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#a8a4b2]">
               <Wrench className="w-3.5 h-3.5" />
               도구
             </div>
@@ -423,7 +423,7 @@ export default function Step7Page() {
                 href="https://translate.google.co.kr/?sl=ko&tl=en&op=translate"
                 target="_blank"
                 rel="noreferrer"
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#1e40af] bg-[#eff6ff] hover:bg-[#dbeafe] tb-press-soft"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#93c5fd] bg-[#26242e] hover:bg-[#34323d] tb-press-soft"
               >
                 <Languages className="w-4 h-4" />
                 구글번역기
@@ -433,7 +433,7 @@ export default function Step7Page() {
                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition ${
                   toolView === 'frame-extractor'
                     ? 'tb-pill-primary'
-                    : 'text-[#92400e] bg-[#fef3c7] hover:bg-[#fde68a] tb-press-soft'
+                    : 'text-[#fbbf24] bg-[#26242e] hover:bg-[#34323d] tb-press-soft'
                 }`}
               >
                 <Film className="w-4 h-4" />
@@ -444,7 +444,7 @@ export default function Step7Page() {
                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition ${
                   toolView === 'watermark-remover'
                     ? 'tb-pill-primary'
-                    : 'text-[#155e75] bg-[#cffafe] hover:bg-[#a5f3fc] tb-press-soft'
+                    : 'text-[#67e8f9] bg-[#26242e] hover:bg-[#34323d] tb-press-soft'
                 }`}
               >
                 <Droplets className="w-4 h-4" />
@@ -454,7 +454,7 @@ export default function Step7Page() {
                 href="https://tbnc.aitoolb.com/"
                 target="_blank"
                 rel="noreferrer"
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#6b21a8] bg-[#f3e8ff] hover:bg-[#e9d5ff] tb-press-soft"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#fda4af] bg-[#26242e] hover:bg-[#34323d] tb-press-soft"
               >
                 <FileText className="w-4 h-4" />
                 파일명변경
@@ -463,7 +463,7 @@ export default function Step7Page() {
           </div>
 
           <div className="p-4 space-y-2">
-            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#64748b]">
+            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#a8a4b2]">
               <Gem className="w-3.5 h-3.5" />
               젬 가이드
             </div>
@@ -536,18 +536,18 @@ export default function Step7Page() {
         </aside>
 
         {/* Main */}
-        <main className="flex-1 min-w-0 flex flex-col md:overflow-hidden bg-white border border-[#e2e8f0] rounded-2xl shadow-[0_8px_24px_rgba(15,23,42,0.06)]">
+        <main className="flex-1 min-w-0 flex flex-col md:overflow-hidden bg-[#1f1d26] border border-[#34323d] rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.3)]">
           {toolView === 'frame-extractor' ? (
-            <FrameExtractor accentColor="#00996D" />
+            <FrameExtractor accentColor="#f97316" />
           ) : toolView === 'watermark-remover' ? (
-            <WatermarkRemover accentColor="#00996D" />
+            <WatermarkRemover accentColor="#f97316" />
           ) : !data ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-10">
-              <div className="w-20 h-20 mb-5 rounded-full flex items-center justify-center bg-[#ecfdf5] border border-[#e2e8f0]">
-                <Clapperboard className="w-10 h-10 text-[#00996D]" />
+              <div className="w-20 h-20 mb-5 rounded-full flex items-center justify-center bg-[#26242e] border border-[#34323d]">
+                <Clapperboard className="w-10 h-10 text-[#f97316]" />
               </div>
-              <h3 className="text-lg font-bold text-[#0f172a] mb-2">JSON을 불러와서 시작하세요</h3>
-              <p className="text-sm text-[#64748b] mb-5 leading-relaxed">
+              <h3 className="text-lg font-bold text-[#f5f4f7] mb-2">JSON을 불러와서 시작하세요</h3>
+              <p className="text-sm text-[#a8a4b2] mb-5 leading-relaxed">
                 젬에서 받은 멀티영상 스토리보드 JSON(v6)을 붙여넣으면<br />
                 보드별로 마스터 프롬프트가 즉시 만들어집니다.
               </p>
@@ -562,25 +562,25 @@ export default function Step7Page() {
           ) : (
             <>
               {/* Top info bar */}
-              <div className="flex-shrink-0 px-4 py-3 border-b border-[#e2e8f0] bg-[#ecfdf5]/40 rounded-t-2xl flex items-center gap-3 flex-wrap">
+              <div className="flex-shrink-0 px-4 py-3 border-b border-[#34323d] bg-[#f97316]/10 rounded-t-2xl flex items-center gap-3 flex-wrap">
                 <div className="flex items-center gap-2 min-w-0">
-                  <Clapperboard className="w-4 h-4 text-[#00996D] flex-shrink-0" />
-                  <h2 className="text-base font-black text-[#0f172a] uppercase truncate">
+                  <Clapperboard className="w-4 h-4 text-[#f97316] flex-shrink-0" />
+                  <h2 className="text-base font-black text-[#f5f4f7] uppercase truncate">
                     {data.project?.title || '멀티영상 만들기'}
                   </h2>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#64748b] flex-shrink-0">
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#a8a4b2] flex-shrink-0">
                     {data.boards.length}보드
                   </span>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#64748b] flex-shrink-0">
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#a8a4b2] flex-shrink-0">
                     {data.boards.reduce((acc, b) => acc + b.panels.length, 0)}패널
                   </span>
                   {data.project?.total_duration_seconds > 0 && (
-                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#64748b] flex-shrink-0">
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#a8a4b2] flex-shrink-0">
                       {data.project.total_duration_seconds}초
                     </span>
                   )}
                   {data.production?.aspect_ratio && (
-                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#64748b] flex-shrink-0">
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#a8a4b2] flex-shrink-0">
                       {data.production.aspect_ratio}
                     </span>
                   )}
@@ -588,11 +588,11 @@ export default function Step7Page() {
               </div>
 
               {/* Tab bar */}
-              <div className="flex-shrink-0 flex gap-1.5 p-3 border-b border-[#e2e8f0] bg-white overflow-x-auto">
+              <div className="flex-shrink-0 flex gap-1.5 p-3 border-b border-[#34323d] bg-[#1f1d26] overflow-x-auto">
                 <button
                   onClick={() => setActiveTab('overview')}
                   className={`flex items-center gap-2 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${
-                    activeTab === 'overview' ? 'tb-pill-primary' : 'text-[#64748b] bg-[#f1f5f9] hover:bg-[#e2e8f0] tb-press-soft'
+                    activeTab === 'overview' ? 'tb-pill-primary' : 'text-[#a8a4b2] bg-[#26242e] hover:bg-[#34323d] tb-press-soft'
                   }`}
                 >
                   <Layers className="w-3.5 h-3.5" />
@@ -607,7 +607,7 @@ export default function Step7Page() {
                       key={tabId}
                       onClick={() => setActiveTab(tabId)}
                       className={`flex items-center gap-2 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${
-                        isActive ? 'tb-pill-primary' : 'text-[#64748b] bg-[#f1f5f9] hover:bg-[#e2e8f0] tb-press-soft'
+                        isActive ? 'tb-pill-primary' : 'text-[#a8a4b2] bg-[#26242e] hover:bg-[#34323d] tb-press-soft'
                       }`}
                     >
                       <span
@@ -650,29 +650,29 @@ export default function Step7Page() {
           onClick={() => setUploadOpen(false)}
         >
           <div
-            className="bg-white rounded-2xl border border-[#e2e8f0] shadow-[0_24px_60px_rgba(15,23,42,0.25)] w-[640px] max-w-[95vw] max-h-[80vh] flex flex-col"
+            className="bg-[#1f1d26] rounded-2xl border border-[#34323d] shadow-[0_24px_60px_rgba(0,0,0,0.5)] w-[640px] max-w-[95vw] max-h-[80vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#e2e8f0]">
-              <span className="text-base font-bold text-[#0f172a] uppercase tracking-wider">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#34323d]">
+              <span className="text-base font-bold text-[#f5f4f7] uppercase tracking-wider">
                 멀티영상 JSON 업로드 (v6)
               </span>
               <button
                 onClick={() => setUploadOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#475569] tb-press-soft"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#26242e] hover:bg-[#34323d] text-[#a8a4b2] tb-press-soft"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-5 space-y-3 min-h-0">
-              <p className="text-sm text-[#64748b] leading-relaxed">
+              <p className="text-sm text-[#a8a4b2] leading-relaxed">
                 Cinematic Storyboard v6 JSON을 붙여넣으세요. Mode A는 1보드(10초/6패널), Mode B는 2보드(20초/12패널) 구조입니다.
                 마크다운 코드블록(```json)은 자동 제거됩니다.
               </p>
               <textarea
                 value={jsonInput}
                 onChange={(e) => setJsonInput(e.target.value)}
-                className="w-full h-[260px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
+                className="w-full h-[260px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#26242e] border border-[#34323d] text-[#f5f4f7] focus:outline-none focus:border-[#f97316] focus:ring-[3px] focus:ring-[#f97316]/20"
                 placeholder='{"version": "6.0", "mode": "A|B", "project": {...}, "scene": {...}, "boards": [...]}'
               />
               {uploadError && (
@@ -681,7 +681,7 @@ export default function Step7Page() {
                 </div>
               )}
             </div>
-            <div className="flex justify-end gap-2 px-5 py-3 border-t border-[#e2e8f0]">
+            <div className="flex justify-end gap-2 px-5 py-3 border-t border-[#34323d]">
               <button
                 onClick={() => setUploadOpen(false)}
                 className="px-4 py-1.5 rounded-full tb-pill-ghost text-sm font-bold transition"
@@ -719,14 +719,14 @@ function OverviewCard({ data, onCopy }) {
   return (
     <div className="space-y-4">
       {/* Scene */}
-      <div className="rounded-2xl overflow-hidden border border-[#e2e8f0] bg-white">
-        <div className="px-4 py-3 border-b border-[#e2e8f0] bg-[#ecfdf5]/60 flex items-center gap-2">
-          <Clapperboard className="w-4 h-4 text-[#00996D]" />
-          <span className="text-base font-bold text-[#0f172a]">{sc.title || '씬'}</span>
+      <div className="rounded-2xl overflow-hidden border border-[#34323d] bg-[#1f1d26]">
+        <div className="px-4 py-3 border-b border-[#34323d] bg-[#f97316]/10 flex items-center gap-2">
+          <Clapperboard className="w-4 h-4 text-[#f97316]" />
+          <span className="text-base font-bold text-[#f5f4f7]">{sc.title || '씬'}</span>
         </div>
         {sc.logline && (
-          <div className="px-4 py-3 border-b border-[#e2e8f0]">
-            <p className="text-sm italic text-[#334155] leading-relaxed">"{sc.logline}"</p>
+          <div className="px-4 py-3 border-b border-[#34323d]">
+            <p className="text-sm italic text-[#f5f4f7] leading-relaxed">"{sc.logline}"</p>
           </div>
         )}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2 p-4 text-[13px]">
@@ -742,20 +742,20 @@ function OverviewCard({ data, onCopy }) {
 
       {/* Consistency lock (Mode B) */}
       {cl && (
-        <div className="rounded-2xl overflow-hidden border border-[#e2e8f0] bg-white">
-          <div className="px-4 py-3 border-b border-[#e2e8f0] bg-[#fefce8] flex items-center justify-between">
+        <div className="rounded-2xl overflow-hidden border border-[#34323d] bg-[#1f1d26]">
+          <div className="px-4 py-3 border-b border-[#34323d] bg-[#fbbf24]/10 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Layers className="w-4 h-4 text-[#a16207]" />
-              <span className="text-sm font-bold text-[#0f172a] uppercase tracking-wider">Consistency Lock</span>
+              <Layers className="w-4 h-4 text-[#fbbf24]" />
+              <span className="text-sm font-bold text-[#f5f4f7] uppercase tracking-wider">Consistency Lock</span>
               {cl.bgm_policy && (
-                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#fde68a] text-[#a16207]">
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#fbbf24]/30 text-[#fbbf24]">
                   {cl.bgm_policy}
                 </span>
               )}
             </div>
             <button
               onClick={() => onCopy([cl.subject_en, cl.setting_en, cl.lighting_en].filter(Boolean).join('\n'))}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] tb-press-soft"
+              className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[11px] font-bold text-[#a8a4b2] tb-press-soft"
             >
               <Copy className="w-3 h-3" />
               락 3종 복사
@@ -771,19 +771,19 @@ function OverviewCard({ data, onCopy }) {
 
       {/* Bridge frame (Mode B) */}
       {bf && (bf.summary || bf.image_prompt_en) && (
-        <div className="rounded-2xl overflow-hidden border border-[#e2e8f0] bg-white">
-          <div className="px-4 py-3 border-b border-[#e2e8f0] bg-[#ecfeff] flex items-center justify-between">
+        <div className="rounded-2xl overflow-hidden border border-[#34323d] bg-[#1f1d26]">
+          <div className="px-4 py-3 border-b border-[#34323d] bg-[#22d3ee]/10 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Layers className="w-4 h-4 text-[#0891b2]" />
-              <span className="text-sm font-bold text-[#0f172a] uppercase tracking-wider">Bridge Frame</span>
-              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#a5f3fc] text-[#0891b2]">
+              <Layers className="w-4 h-4 text-[#22d3ee]" />
+              <span className="text-sm font-bold text-[#f5f4f7] uppercase tracking-wider">Bridge Frame</span>
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#22d3ee]/30 text-[#22d3ee]">
                 Board {bf.from_board}-P{bf.from_panel} → Board {bf.to_board}-P{bf.to_panel}
               </span>
             </div>
             {bf.image_prompt_en && (
               <button
                 onClick={() => onCopy(bf.image_prompt_en)}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] tb-press-soft"
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[11px] font-bold text-[#a8a4b2] tb-press-soft"
               >
                 <Copy className="w-3 h-3" />
                 복사
@@ -791,9 +791,9 @@ function OverviewCard({ data, onCopy }) {
             )}
           </div>
           <div className="p-4 space-y-2">
-            {bf.summary && <p className="text-sm text-[#334155]">{bf.summary}</p>}
+            {bf.summary && <p className="text-sm text-[#f5f4f7]">{bf.summary}</p>}
             {bf.image_prompt_en && (
-              <div className="text-[13px] font-mono text-[#0f172a] bg-[#f8fafc] border border-[#e2e8f0] rounded-xl p-2.5">
+              <div className="text-[13px] font-mono text-[#f5f4f7] bg-[#26242e] border border-[#34323d] rounded-xl p-2.5">
                 {bf.image_prompt_en}
               </div>
             )}
@@ -803,8 +803,8 @@ function OverviewCard({ data, onCopy }) {
 
       {/* Grok workflow (Mode B) */}
       {gw && Array.isArray(gw.steps) && gw.steps.length > 0 && (
-        <div className="rounded-2xl overflow-hidden border border-[#e2e8f0] bg-white">
-          <div className="px-4 py-3 border-b border-[#e2e8f0] bg-[#0f172a] text-white flex items-center gap-2">
+        <div className="rounded-2xl overflow-hidden border border-[#34323d] bg-[#1f1d26]">
+          <div className="px-4 py-3 border-b border-[#34323d] bg-[#0f172a] text-white flex items-center gap-2">
             <ScrollText className="w-4 h-4 text-[#fbbf24]" />
             <span className="text-sm font-bold uppercase tracking-wider">Grok 체이닝 워크플로우</span>
           </div>
@@ -815,8 +815,8 @@ function OverviewCard({ data, onCopy }) {
                   {s.step || i + 1}
                 </span>
                 <div className="flex-1 min-w-0">
-                  {s.title && <div className="text-sm font-bold text-[#0f172a]">{s.title}</div>}
-                  {s.description && <p className="text-[12.5px] text-[#475569] leading-relaxed mt-0.5">{s.description}</p>}
+                  {s.title && <div className="text-sm font-bold text-[#f5f4f7]">{s.title}</div>}
+                  {s.description && <p className="text-[12.5px] text-[#a8a4b2] leading-relaxed mt-0.5">{s.description}</p>}
                 </div>
               </li>
             ))}
@@ -852,11 +852,11 @@ function BoardView({ board, boardIndex, data, onCopy, onUpdateBoard, onUpdatePan
         <div className="flex items-center gap-2 min-w-0">
           <ScrollText className="w-4 h-4 flex-shrink-0" style={{ color: dot }} />
           <div className="min-w-0">
-            <div className="text-sm font-bold text-[#0f172a]">
+            <div className="text-sm font-bold text-[#f5f4f7]">
               Board {board.label} 마스터 프롬프트
-              {board.title_suffix && <span className="ml-1.5 text-[#64748b] font-medium">· {board.title_suffix}</span>}
+              {board.title_suffix && <span className="ml-1.5 text-[#a8a4b2] font-medium">· {board.title_suffix}</span>}
             </div>
-            <div className="text-[12px] text-[#64748b] leading-snug">
+            <div className="text-[12px] text-[#a8a4b2] leading-snug">
               헤더 / 씬 정보 / 메인 프레임 / 6패널(3×2 grid) / 라벨 / 무드보드까지 한 덩어리로 묶은 이미지 생성용 프롬프트
             </div>
           </div>
@@ -876,24 +876,24 @@ function BoardView({ board, boardIndex, data, onCopy, onUpdateBoard, onUpdatePan
         style={{ background: `${dot}06`, borderColor: `${dot}33` }}
       >
         <Clock className="w-4 h-4 flex-shrink-0" style={{ color: dot }} />
-        <span className="text-[11px] font-black uppercase tracking-wider text-[#64748b]">페이싱</span>
-        <span className="text-base font-mono font-bold text-[#0f172a]">{pacing}</span>
-        <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${pacingValid ? 'bg-white border border-[#e2e8f0] text-[#0f172a]' : 'bg-[#fee2e2] border border-[#fca5a5] text-[#b91c1c]'}`}>
+        <span className="text-[11px] font-black uppercase tracking-wider text-[#a8a4b2]">페이싱</span>
+        <span className="text-base font-mono font-bold text-[#f5f4f7]">{pacing}</span>
+        <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${pacingValid ? 'bg-[#26242e] border border-[#34323d] text-[#f5f4f7]' : 'bg-[#fee2e2] border border-[#fca5a5] text-[#b91c1c]'}`}>
           {pacingTotal}초 / {board.duration_seconds || 10}초{!pacingValid && ' · 합계 불일치'}
         </span>
       </div>
 
       {/* Main frame */}
-      <div className="rounded-2xl overflow-hidden border border-[#e2e8f0] bg-white shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
-        <div className="px-4 py-3 border-b border-[#e2e8f0] flex items-center justify-between gap-3" style={{ background: `${dot}10` }}>
+      <div className="rounded-2xl overflow-hidden border border-[#34323d] bg-[#1f1d26] shadow-[0_2px_8px_rgba(0,0,0,0.3)]">
+        <div className="px-4 py-3 border-b border-[#34323d] flex items-center justify-between gap-3" style={{ background: `${dot}10` }}>
           <div className="flex items-center gap-2.5 min-w-0">
             <span className="text-[12px] font-black px-2 py-0.5 rounded-full" style={{ background: `${dot}25`, color: dot }}>
               MAIN FRAME
             </span>
-            <span className="text-base font-bold text-[#0f172a] truncate">
+            <span className="text-base font-bold text-[#f5f4f7] truncate">
               Board {board.label} {board.title_suffix ? `· ${board.title_suffix}` : ''}
             </span>
-            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#334155] flex-shrink-0">
+            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#f5f4f7] flex-shrink-0">
               {board.duration_seconds}초
             </span>
           </div>
@@ -903,12 +903,12 @@ function BoardView({ board, boardIndex, data, onCopy, onUpdateBoard, onUpdatePan
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-1.5 min-w-0">
-                <Sparkles className="w-3.5 h-3.5 text-[#00996D] flex-shrink-0" />
-                <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">메인 프레임 프롬프트 (50–80 words, EN)</span>
+                <Sparkles className="w-3.5 h-3.5 text-[#f97316] flex-shrink-0" />
+                <span className="text-[11px] uppercase tracking-wider text-[#a8a4b2] font-bold">메인 프레임 프롬프트 (50–80 words, EN)</span>
               </div>
               <button
                 onClick={() => onCopy(board.main_frame?.prompt_en || '')}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] tb-press-soft flex-shrink-0"
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[11px] font-bold text-[#a8a4b2] tb-press-soft flex-shrink-0"
               >
                 <Copy className="w-3 h-3" />
                 복사
@@ -918,26 +918,26 @@ function BoardView({ board, boardIndex, data, onCopy, onUpdateBoard, onUpdatePan
               value={board.main_frame?.prompt_en || ''}
               onChange={(e) => onUpdateBoard({ main_frame: { ...board.main_frame, prompt_en: e.target.value } })}
               rows={6}
-              className="w-full min-h-[140px] resize-y bg-white border border-[#e2e8f0] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
+              className="w-full min-h-[140px] resize-y bg-[#26242e] border border-[#34323d] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#f5f4f7] focus:outline-none focus:border-[#f97316] focus:ring-[3px] focus:ring-[#f97316]/20"
             />
           </div>
 
           {(board.production_notes?.length > 0 || board.moodboard_keywords?.length > 0) && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
               {board.production_notes?.length > 0 && (
-                <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-xl p-3">
-                  <div className="text-[10px] font-black text-[#64748b] uppercase tracking-wider mb-1.5">PRODUCTION NOTES</div>
-                  <ul className="space-y-1 text-[12.5px] text-[#334155] list-disc pl-4">
+                <div className="bg-[#26242e] border border-[#34323d] rounded-xl p-3">
+                  <div className="text-[10px] font-black text-[#a8a4b2] uppercase tracking-wider mb-1.5">PRODUCTION NOTES</div>
+                  <ul className="space-y-1 text-[12.5px] text-[#f5f4f7] list-disc pl-4">
                     {board.production_notes.map((n, i) => <li key={i}>{n}</li>)}
                   </ul>
                 </div>
               )}
               {board.moodboard_keywords?.length > 0 && (
-                <div className="bg-[#fefce8] border border-[#fde68a] rounded-xl p-3">
-                  <div className="text-[10px] font-black text-[#a16207] uppercase tracking-wider mb-1.5">MOODBOARD</div>
+                <div className="bg-[#fbbf24]/10 border border-[#fbbf24]/30 rounded-xl p-3">
+                  <div className="text-[10px] font-black text-[#fbbf24] uppercase tracking-wider mb-1.5">MOODBOARD</div>
                   <div className="flex flex-wrap gap-1.5">
                     {board.moodboard_keywords.map((k, i) => (
-                      <span key={i} className="text-[11px] px-2 py-0.5 rounded-full bg-white border border-[#fde68a] text-[#a16207] font-bold">
+                      <span key={i} className="text-[11px] px-2 py-0.5 rounded-full bg-[#26242e] border border-[#fbbf24]/30 text-[#fbbf24] font-bold">
                         {k}
                       </span>
                     ))}
@@ -968,9 +968,9 @@ function PanelCard({ panel, boardDot, onCopy, onUpdate }) {
   const fnLabel = panel.function ? (FUNCTION_LABEL[panel.function] || panel.function) : '';
 
   return (
-    <div className="rounded-2xl overflow-hidden border border-[#e2e8f0] bg-white shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
+    <div className="rounded-2xl overflow-hidden border border-[#34323d] bg-[#1f1d26] shadow-[0_2px_8px_rgba(0,0,0,0.3)]">
       <div
-        className="px-4 py-3 border-b border-[#e2e8f0] flex items-center justify-between gap-3 flex-wrap"
+        className="px-4 py-3 border-b border-[#34323d] flex items-center justify-between gap-3 flex-wrap"
         style={{ background: `${boardDot}08` }}
       >
         <div className="flex items-center gap-2.5 min-w-0">
@@ -978,21 +978,21 @@ function PanelCard({ panel, boardDot, onCopy, onUpdate }) {
             P{String(panel.number).padStart(2, '0')}
           </span>
           {panel.timecode && (
-            <span className="text-[12px] font-mono font-bold text-[#334155]">{panel.timecode}</span>
+            <span className="text-[12px] font-mono font-bold text-[#f5f4f7]">{panel.timecode}</span>
           )}
           {panel.duration_seconds > 0 && (
-            <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#334155]">
+            <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#f5f4f7]">
               <Clock className="w-3 h-3" />
               {panel.duration_seconds}초
             </span>
           )}
           {fnLabel && (
-            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#334155]">
+            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#f5f4f7]">
               {fnLabel}
             </span>
           )}
           {panel.is_bridge && (
-            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#ecfeff] border border-[#a5f3fc] text-[#0891b2]">
+            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#22d3ee]/10 border border-[#22d3ee]/30 text-[#22d3ee]">
               BRIDGE
             </span>
           )}
@@ -1004,12 +1004,12 @@ function PanelCard({ panel, boardDot, onCopy, onUpdate }) {
         <div>
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5 min-w-0">
-              <ImageIcon className="w-3.5 h-3.5 text-[#00996D] flex-shrink-0" />
-              <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">이미지 프롬프트 (15–30 words, EN)</span>
+              <ImageIcon className="w-3.5 h-3.5 text-[#f97316] flex-shrink-0" />
+              <span className="text-[11px] uppercase tracking-wider text-[#a8a4b2] font-bold">이미지 프롬프트 (15–30 words, EN)</span>
             </div>
             <button
               onClick={() => onCopy(panel.image_prompt_en)}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] tb-press-soft flex-shrink-0"
+              className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[11px] font-bold text-[#a8a4b2] tb-press-soft flex-shrink-0"
             >
               <Copy className="w-3 h-3" />
               복사
@@ -1019,7 +1019,7 @@ function PanelCard({ panel, boardDot, onCopy, onUpdate }) {
             value={panel.image_prompt_en}
             onChange={(e) => onUpdate({ image_prompt_en: e.target.value })}
             rows={3}
-            className="w-full min-h-[80px] resize-y bg-white border border-[#e2e8f0] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
+            className="w-full min-h-[80px] resize-y bg-[#26242e] border border-[#34323d] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#f5f4f7] focus:outline-none focus:border-[#f97316] focus:ring-[3px] focus:ring-[#f97316]/20"
           />
         </div>
 
@@ -1061,15 +1061,15 @@ function PanelCard({ panel, boardDot, onCopy, onUpdate }) {
 
 function LabelField({ icon: Icon, label, value, onChange, onCopy }) {
   return (
-    <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-xl p-2.5 min-w-0">
+    <div className="bg-[#26242e] border border-[#34323d] rounded-xl p-2.5 min-w-0">
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-1.5 min-w-0">
-          <Icon className="w-3 h-3 text-[#94a3b8] flex-shrink-0" />
-          <span className="text-[10px] font-black text-[#64748b] uppercase tracking-wider truncate">{label}</span>
+          <Icon className="w-3 h-3 text-[#a8a4b2] flex-shrink-0" />
+          <span className="text-[10px] font-black text-[#a8a4b2] uppercase tracking-wider truncate">{label}</span>
         </div>
         <button
           onClick={onCopy}
-          className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[10px] font-bold text-[#94a3b8] tb-press-soft flex-shrink-0"
+          className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[10px] font-bold text-[#a8a4b2] tb-press-soft flex-shrink-0"
         >
           <Copy className="w-2.5 h-2.5" />
         </button>
@@ -1078,7 +1078,7 @@ function LabelField({ icon: Icon, label, value, onChange, onCopy }) {
         value={value || ''}
         onChange={(e) => onChange(e.target.value)}
         rows={2}
-        className="w-full min-h-[40px] resize-y bg-white border border-[#e2e8f0] rounded-lg p-2 text-[12px] leading-snug text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[2px] focus:ring-[#00B380]/20"
+        className="w-full min-h-[40px] resize-y bg-[#26242e] border border-[#34323d] rounded-lg p-2 text-[12px] leading-snug text-[#f5f4f7] focus:outline-none focus:border-[#f97316] focus:ring-[2px] focus:ring-[#f97316]/20"
       />
     </div>
   );
@@ -1087,11 +1087,11 @@ function LabelField({ icon: Icon, label, value, onChange, onCopy }) {
 function LockRow({ k, v, onCopy }) {
   return (
     <div className="flex items-start gap-2">
-      <span className="text-[10px] font-black text-[#94a3b8] uppercase tracking-wider w-20 pt-0.5 flex-shrink-0">{k}</span>
-      <span className="flex-1 text-[#0f172a] break-words">{v}</span>
+      <span className="text-[10px] font-black text-[#a8a4b2] uppercase tracking-wider w-20 pt-0.5 flex-shrink-0">{k}</span>
+      <span className="flex-1 text-[#f5f4f7] break-words">{v}</span>
       <button
         onClick={onCopy}
-        className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[10px] font-bold text-[#94a3b8] tb-press-soft flex-shrink-0"
+        className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[10px] font-bold text-[#a8a4b2] tb-press-soft flex-shrink-0"
       >
         <Copy className="w-2.5 h-2.5" />
       </button>
@@ -1102,8 +1102,8 @@ function LockRow({ k, v, onCopy }) {
 function Stat({ k, v }) {
   return (
     <div className="flex items-start gap-2 min-w-0">
-      <span className="text-[10px] font-black text-[#94a3b8] uppercase tracking-wider w-20 pt-0.5 flex-shrink-0">{k}</span>
-      <span className="flex-1 text-[#334155] break-words">{v}</span>
+      <span className="text-[10px] font-black text-[#a8a4b2] uppercase tracking-wider w-20 pt-0.5 flex-shrink-0">{k}</span>
+      <span className="flex-1 text-[#f5f4f7] break-words">{v}</span>
     </div>
   );
 }

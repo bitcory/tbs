@@ -18,9 +18,9 @@ const ACTS = ['Hook', 'Build', 'Climax', 'CTA'];
 
 const ACT_COLORS = [
   { dot: '#ef4444', label: '기', english: 'Hook' },
-  { dot: '#f59e0b', label: '승', english: 'Build' },
-  { dot: '#8b5cf6', label: '전', english: 'Climax' },
-  { dot: '#10b981', label: '결', english: 'CTA' },
+  { dot: '#fbbf24', label: '승', english: 'Build' },
+  { dot: '#fb7185', label: '전', english: 'Climax' },
+  { dot: '#f97316', label: '결', english: 'CTA' },
 ];
 
 const NARRATIVE_ROLES = [
@@ -588,7 +588,7 @@ function UploadSlot({ image, onFile }) {
     return (
       <>
         <div
-          className="relative w-full rounded-xl overflow-hidden border border-[#e2e8f0] cursor-pointer group bg-[#0f172a] flex items-center justify-center"
+          className="relative w-full rounded-xl overflow-hidden border border-[#34323d] cursor-pointer group bg-[#15141a] flex items-center justify-center"
           onClick={openPicker}
           onDragOver={(e) => { e.preventDefault(); }}
           onDrop={handleDrop}
@@ -630,21 +630,21 @@ function UploadSlot({ image, onFile }) {
       onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add('dragover'); }}
       onDragLeave={(e) => e.currentTarget.classList.remove('dragover')}
       onDrop={handleDrop}
-      className="tb-upload-slot aspect-video rounded-xl flex flex-col items-center justify-center gap-2.5 p-6 cursor-pointer text-[#64748b] outline-none focus:ring-[3px] focus:ring-[#00B380]/40 focus:border-[#00B380] focus:bg-[#ecfdf5]"
+      className="tb-upload-slot aspect-video rounded-xl flex flex-col items-center justify-center gap-2.5 p-6 cursor-pointer text-[#a8a4b2] outline-none focus:ring-[3px] focus:ring-[#fb923c]/40 focus:border-[#fb923c] focus:bg-[#26242e]"
     >
       <button
         type="button"
         onClick={(e) => { e.stopPropagation(); openPicker(); }}
         onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
         onDrop={(e) => { e.stopPropagation(); handleDrop(e); }}
-        className="flex items-center gap-2 px-6 py-3 rounded-full bg-[#00996D] hover:bg-[#00774f] text-white text-sm font-bold tb-press shadow-[0_6px_16px_rgba(0,153,109,0.3)]"
+        className="flex items-center gap-2 px-6 py-3 rounded-full bg-[#f97316] hover:bg-[#ea580c] text-white text-sm font-bold tb-press shadow-[0_6px_16px_rgba(249,115,22,0.3)]"
       >
         <Upload className="w-4 h-4" />
         이미지 선택
       </button>
       <div className="text-center text-[11px] leading-relaxed mt-1">
-        <div className="font-bold text-[#475569]">클릭 · 드래그&amp;드롭 · Ctrl+V 붙여넣기</div>
-        <div className="text-[10px] mt-0.5 text-[#94a3b8]">PNG · JPG · WEBP (≤5MB)</div>
+        <div className="font-bold text-[#f5f4f7]">클릭 · 드래그&amp;드롭 · Ctrl+V 붙여넣기</div>
+        <div className="text-[10px] mt-0.5 text-[#a8a4b2]">PNG · JPG · WEBP (≤5MB)</div>
       </div>
       <input
         ref={fileRef}
@@ -863,8 +863,8 @@ export default function Step4Page() {
     const el = sceneRefs.current[pendingScrollId];
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      el.classList.add('ring-2', 'ring-emerald-500/60');
-      setTimeout(() => el.classList.remove('ring-2', 'ring-emerald-500/60'), 2000);
+      el.classList.add('ring-2', 'ring-[#f97316]/60');
+      setTimeout(() => el.classList.remove('ring-2', 'ring-[#f97316]/60'), 2000);
     }
     setPendingScrollId(null);
   }, [activeAct, pendingScrollId]);
@@ -875,12 +875,12 @@ export default function Step4Page() {
   const allDialogues = storyboard ? storyboard.scenes.map(s => s.dialogue).filter(Boolean).join('\n\n') : '';
 
   return (
-    <div className="min-h-screen md:h-screen md:flex md:flex-col md:overflow-hidden bg-[#f8fafc] text-[#0f172a]">
+    <div className="min-h-screen md:h-screen md:flex md:flex-col md:overflow-hidden bg-[#15141a] text-[#f5f4f7]">
       <style jsx global>{`
         .tb-hero {
           position: relative;
           padding: 16px 20px 36px;
-          background: linear-gradient(135deg, #016837 0%, #00996D 45%, #00B380 100%);
+          background: linear-gradient(135deg, #7c2d12 0%, #ea580c 45%, #f97316 100%);
           color: #fff;
           text-align: center;
           overflow: hidden;
@@ -909,7 +909,7 @@ export default function Step4Page() {
           content: '';
           position: absolute; left: -10%; right: -10%; bottom: -1px;
           height: 24px;
-          background: #f8fafc;
+          background: #15141a;
           border-radius: 50% 50% 0 0 / 100% 100% 0 0;
         }
         .tb-hero-glow {
@@ -949,76 +949,76 @@ export default function Step4Page() {
           margin: -22px 16px 0;
           padding: 10px 14px;
           display: flex; align-items: center; gap: 10px;
-          background: rgba(255,255,255,0.7);
-          border: 1px solid rgba(255,255,255,0.9);
+          background: rgba(31,29,38,0.7);
+          border: 1px solid rgba(255,255,255,0.1);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
           border-radius: 100px;
-          box-shadow: 0 18px 40px rgba(15, 23, 42, 0.1);
+          box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
         }
         .tb-pill-primary {
-          background: rgba(255,255,255,0.4);
-          color: #00774f;
-          border: 1.5px solid rgba(0,153,109,0.35);
+          background: rgba(249,115,22,0.18);
+          color: #fb923c;
+          border: 1.5px solid rgba(249,115,22,0.35);
           backdrop-filter: blur(18px) saturate(180%);
           -webkit-backdrop-filter: blur(18px) saturate(180%);
           box-shadow:
-            0 10px 24px rgba(0,153,109,0.22),
-            inset 2px 2px 1px 0 rgba(255,255,255,0.85),
-            inset -1px -1px 1px 1px rgba(255,255,255,0.5);
+            0 10px 24px rgba(249,115,22,0.22),
+            inset 2px 2px 1px 0 rgba(255,255,255,0.12),
+            inset -1px -1px 1px 1px rgba(255,255,255,0.06);
           transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,2.2), box-shadow 0.3s, background 0.3s;
         }
         .tb-pill-primary:hover {
-          background: rgba(255,255,255,0.55);
+          background: rgba(249,115,22,0.28);
           transform: translateY(-1px) scale(1.03);
           box-shadow:
-            0 16px 32px rgba(0,153,109,0.3),
-            inset 2px 2px 1px 0 rgba(255,255,255,0.95),
-            inset -1px -1px 1px 1px rgba(255,255,255,0.6);
+            0 16px 32px rgba(249,115,22,0.3),
+            inset 2px 2px 1px 0 rgba(255,255,255,0.16),
+            inset -1px -1px 1px 1px rgba(255,255,255,0.08);
         }
         .tb-pill-primary:active {
           transform: translateY(1px) scale(0.94);
           box-shadow:
-            0 4px 10px rgba(0,153,109,0.18),
-            inset 2px 2px 2px 0 rgba(0,0,0,0.08),
-            inset -1px -1px 1px 1px rgba(255,255,255,0.3);
+            0 4px 10px rgba(249,115,22,0.18),
+            inset 2px 2px 2px 0 rgba(0,0,0,0.3),
+            inset -1px -1px 1px 1px rgba(255,255,255,0.06);
           transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
         }
         .tb-pill-ghost {
-          background: rgba(255,255,255,0.55);
-          color: #334155;
-          border: 1px solid rgba(255,255,255,0.7);
+          background: rgba(38,36,46,0.7);
+          color: #f5f4f7;
+          border: 1px solid rgba(255,255,255,0.1);
           backdrop-filter: blur(14px) saturate(140%);
           -webkit-backdrop-filter: blur(14px) saturate(140%);
           box-shadow:
-            0 6px 16px rgba(15,23,42,0.08),
-            inset 1.5px 1.5px 0.5px 0 rgba(255,255,255,0.85),
-            inset -1px -1px 0.5px 1px rgba(255,255,255,0.45);
+            0 6px 16px rgba(0,0,0,0.3),
+            inset 1.5px 1.5px 0.5px 0 rgba(255,255,255,0.1),
+            inset -1px -1px 0.5px 1px rgba(255,255,255,0.05);
           transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,2.2), box-shadow 0.3s, background 0.3s;
         }
         .tb-pill-ghost:hover {
-          background: rgba(255,255,255,0.75);
+          background: rgba(52,50,61,0.8);
           transform: translateY(-1px) scale(1.03);
         }
         .tb-pill-ghost:active {
           transform: translateY(1px) scale(0.94);
           box-shadow:
-            0 3px 8px rgba(15,23,42,0.1),
-            inset 1.5px 1.5px 2px 0 rgba(0,0,0,0.08),
-            inset -1px -1px 0.5px 1px rgba(255,255,255,0.3);
+            0 3px 8px rgba(0,0,0,0.4),
+            inset 1.5px 1.5px 2px 0 rgba(0,0,0,0.3),
+            inset -1px -1px 0.5px 1px rgba(255,255,255,0.05);
           transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
         }
         .tb-upload-slot {
-          border: 2px dashed #cbd5e1;
+          border: 2px dashed #34323d;
           transition: border-color 0.2s, background 0.2s;
         }
         .tb-upload-slot:hover {
-          border-color: #00B380;
-          background: #ecfdf5;
+          border-color: #fb923c;
+          background: #26242e;
         }
         .tb-upload-slot.dragover {
-          border-color: #00B380;
-          background: #ecfdf5;
+          border-color: #fb923c;
+          background: #26242e;
         }
       `}</style>
 
@@ -1037,9 +1037,9 @@ export default function Step4Page() {
           <ArrowLeft className="w-3.5 h-3.5" />
           홈
         </Link>
-        <span className="text-[11px] font-bold tracking-[0.18em] text-[#00996D] uppercase hidden sm:inline">TOOLB LAB</span>
+        <span className="text-[11px] font-bold tracking-[0.18em] text-[#f97316] uppercase hidden sm:inline">TOOLB LAB</span>
         <div className="ml-auto flex items-center gap-2">
-          <span className="text-[11px] sm:text-xs font-bold tracking-[0.14em] text-[#00774f] uppercase flex items-center gap-1">
+          <span className="text-[11px] sm:text-xs font-bold tracking-[0.14em] text-[#fb923c] uppercase flex items-center gap-1">
             <Upload className="w-3 h-3" />
             JSON 업로드
           </span>
@@ -1061,7 +1061,7 @@ export default function Step4Page() {
             onClick={() => openUpload('video_prompts')}
             disabled={!storyboard}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-bold transition ${
-              storyboard ? 'tb-pill-ghost' : 'opacity-40 cursor-not-allowed bg-white/40 border border-white/70 text-[#64748b]'
+              storyboard ? 'tb-pill-ghost' : 'opacity-40 cursor-not-allowed bg-[#26242e]/40 border border-white/10 text-[#a8a4b2]'
             }`}
             title={!storyboard ? '이미지 프롬프트를 먼저 업로드하세요' : ''}
           >
@@ -1073,51 +1073,51 @@ export default function Step4Page() {
 
       <div className="flex flex-col md:flex-row md:flex-1 md:min-h-0 w-full px-4 pt-6 pb-4 gap-4 2xl:px-6">
         {/* Sidebar */}
-        <aside className="w-full md:w-[300px] flex-shrink-0 bg-white border border-[#e2e8f0] rounded-2xl shadow-[0_8px_24px_rgba(15,23,42,0.06)] md:overflow-y-auto">
-          <div className="p-4 border-b border-[#e2e8f0]">
-            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#64748b]">
+        <aside className="w-full md:w-[300px] flex-shrink-0 bg-[#1f1d26] border border-[#34323d] rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.4)] md:overflow-y-auto">
+          <div className="p-4 border-b border-[#34323d]">
+            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#a8a4b2]">
               <Clapperboard className="w-3.5 h-3.5" />
               광고영상 정보
             </div>
             {storyboard ? (
               <div className="space-y-1.5">
                 <div className="flex items-start gap-2">
-                  <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">제목</span>
-                  <span className="text-sm text-[#0f172a] font-bold flex-1 break-all">{storyboard.title}</span>
+                  <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">제목</span>
+                  <span className="text-sm text-[#f5f4f7] font-bold flex-1 break-all">{storyboard.title}</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">씬 수</span>
-                  <span className="text-sm text-[#0f172a] font-bold flex-1">{storyboard.meta.total_scenes}개</span>
+                  <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">씬 수</span>
+                  <span className="text-sm text-[#f5f4f7] font-bold flex-1">{storyboard.meta.total_scenes}개</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">비율</span>
-                  <span className="text-sm text-[#0f172a] font-bold flex-1">{storyboard.meta.aspect_ratio}</span>
+                  <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">비율</span>
+                  <span className="text-sm text-[#f5f4f7] font-bold flex-1">{storyboard.meta.aspect_ratio}</span>
                 </div>
                 {storyboard.meta.rendering_style && (
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">스타일</span>
-                    <span className="text-sm text-[#0f172a] font-bold flex-1">{storyboard.meta.rendering_style}</span>
+                    <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">스타일</span>
+                    <span className="text-sm text-[#f5f4f7] font-bold flex-1">{storyboard.meta.rendering_style}</span>
                   </div>
                 )}
                 {storyboard.meta.total_duration_sec > 0 && (
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">러닝타임</span>
-                    <span className="text-sm text-[#0f172a] font-bold flex-1">{storyboard.meta.total_duration_sec}초</span>
+                    <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">러닝타임</span>
+                    <span className="text-sm text-[#f5f4f7] font-bold flex-1">{storyboard.meta.total_duration_sec}초</span>
                   </div>
                 )}
                 {storyboard.meta.narrative_arc && (
                   <div className="flex items-start gap-2 pt-1">
-                    <span className="text-xs text-[#64748b] font-medium italic leading-relaxed">“{storyboard.meta.narrative_arc}”</span>
+                    <span className="text-xs text-[#a8a4b2] font-medium italic leading-relaxed">“{storyboard.meta.narrative_arc}”</span>
                   </div>
                 )}
               </div>
             ) : (
-              <p className="text-[13px] text-[#64748b]">JSON을 업로드하면 표시됩니다.</p>
+              <p className="text-[13px] text-[#a8a4b2]">JSON을 업로드하면 표시됩니다.</p>
             )}
           </div>
 
-          <div className="p-4 border-b border-[#e2e8f0]">
-            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#64748b]">
+          <div className="p-4 border-b border-[#34323d]">
+            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#a8a4b2]">
               <Wrench className="w-3.5 h-3.5" />
               도구
             </div>
@@ -1126,7 +1126,7 @@ export default function Step4Page() {
                 href="https://translate.google.co.kr/?sl=ko&tl=en&op=translate"
                 target="_blank"
                 rel="noreferrer"
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#1e40af] bg-[#eff6ff] hover:bg-[#dbeafe] tb-press-soft"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#93c5fd] bg-[#26242e] hover:bg-[#34323d] tb-press-soft"
               >
                 <Languages className="w-4 h-4" />
                 구글번역기
@@ -1136,7 +1136,7 @@ export default function Step4Page() {
                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition ${
                   toolView === 'frame-extractor'
                     ? 'tb-pill-primary'
-                    : 'text-[#92400e] bg-[#fef3c7] hover:bg-[#fde68a] tb-press-soft'
+                    : 'text-[#fbbf24] bg-[#26242e] hover:bg-[#34323d] tb-press-soft'
                 }`}
               >
                 <Film className="w-4 h-4" />
@@ -1147,7 +1147,7 @@ export default function Step4Page() {
                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition ${
                   toolView === 'watermark-remover'
                     ? 'tb-pill-primary'
-                    : 'text-[#155e75] bg-[#cffafe] hover:bg-[#a5f3fc] tb-press-soft'
+                    : 'text-[#67e8f9] bg-[#26242e] hover:bg-[#34323d] tb-press-soft'
                 }`}
               >
                 <Droplets className="w-4 h-4" />
@@ -1157,7 +1157,7 @@ export default function Step4Page() {
                 href="https://tbnc.aitoolb.com/"
                 target="_blank"
                 rel="noreferrer"
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#6b21a8] bg-[#f3e8ff] hover:bg-[#e9d5ff] tb-press-soft"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#d8b4fe] bg-[#26242e] hover:bg-[#34323d] tb-press-soft"
               >
                 <FileText className="w-4 h-4" />
                 파일명변경
@@ -1166,7 +1166,7 @@ export default function Step4Page() {
           </div>
 
           <div className="p-4 space-y-2">
-            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#64748b]">
+            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#a8a4b2]">
               <Gem className="w-3.5 h-3.5" />
               젬 가이드
             </div>
@@ -1214,7 +1214,7 @@ export default function Step4Page() {
               href="https://grok.com/"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#0f172a] hover:opacity-90 text-white text-sm font-bold tb-press"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#26242e] hover:opacity-90 text-white text-sm font-bold tb-press"
             >
               <ExternalLink className="w-3.5 h-3.5" />
               Grok 바로가기
@@ -1241,18 +1241,18 @@ export default function Step4Page() {
         </aside>
 
         {/* Main */}
-        <main className="flex-1 min-w-0 flex flex-col md:overflow-hidden bg-white border border-[#e2e8f0] rounded-2xl shadow-[0_8px_24px_rgba(15,23,42,0.06)]">
+        <main className="flex-1 min-w-0 flex flex-col md:overflow-hidden bg-[#1f1d26] border border-[#34323d] rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.4)]">
           {toolView === 'frame-extractor' ? (
-            <FrameExtractor accentColor="#00996D" />
+            <FrameExtractor accentColor="#f97316" />
           ) : toolView === 'watermark-remover' ? (
-            <WatermarkRemover accentColor="#00996D" />
+            <WatermarkRemover accentColor="#f97316" />
           ) : !storyboard ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-10">
-              <div className="w-20 h-20 mb-5 rounded-full flex items-center justify-center bg-[#ecfdf5] border border-[#e2e8f0]">
-                <Clapperboard className="w-10 h-10 text-[#00996D]" />
+              <div className="w-20 h-20 mb-5 rounded-full flex items-center justify-center bg-[#26242e] border border-[#34323d]">
+                <Clapperboard className="w-10 h-10 text-[#fb923c]" />
               </div>
-              <h3 className="text-lg font-bold text-[#0f172a] mb-2">이미지 프롬프트가 없습니다</h3>
-              <p className="text-sm text-[#64748b] mb-5 leading-relaxed">
+              <h3 className="text-lg font-bold text-[#f5f4f7] mb-2">이미지 프롬프트가 없습니다</h3>
+              <p className="text-sm text-[#a8a4b2] mb-5 leading-relaxed">
                 <b>image_prompts.json</b> 을 먼저 업로드하여 씬과 프롬프트를 확인하세요.<br />
                 이후 이미지 생성 → <b>video_prompts.json</b> 업로드로 영상 프롬프트를 병합합니다.
               </p>
@@ -1264,7 +1264,7 @@ export default function Step4Page() {
                 이미지 프롬프트 JSON 업로드
               </button>
               {character && (
-                <div className="mt-5 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#ecfdf5] border border-[#a7f3d0] text-[#00774f] text-xs font-bold">
+                <div className="mt-5 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#26242e] border border-[#7c2d12] text-[#fb923c] text-xs font-bold">
                   <User className="w-3.5 h-3.5" />
                   캐릭터 "{character.name || character.character_id}" 로드됨 — 이미지 프롬프트 업로드 후 표시됩니다
                 </div>
@@ -1273,14 +1273,14 @@ export default function Step4Page() {
           ) : (
             <>
               {/* Top bulk-copy bar */}
-              <div className="flex-shrink-0 px-4 py-3 border-b border-[#e2e8f0] bg-[#ecfdf5]/40 rounded-t-2xl flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex-shrink-0 px-4 py-3 border-b border-[#34323d] bg-[#26242e]/40 rounded-t-2xl flex items-center justify-between gap-3 flex-wrap">
                 <div className="flex items-center gap-2 min-w-0">
-                  <Clapperboard className="w-4 h-4 text-[#00996D] flex-shrink-0" />
-                  <h2 className="text-base font-black text-[#0f172a] uppercase truncate">{storyboard.title}</h2>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#64748b] flex-shrink-0">
+                  <Clapperboard className="w-4 h-4 text-[#fb923c] flex-shrink-0" />
+                  <h2 className="text-base font-black text-[#f5f4f7] uppercase truncate">{storyboard.title}</h2>
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#a8a4b2] flex-shrink-0">
                     {storyboard.meta.total_scenes}씬
                   </span>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#64748b] flex-shrink-0">
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#a8a4b2] flex-shrink-0">
                     {storyboard.meta.aspect_ratio}
                   </span>
                 </div>
@@ -1294,14 +1294,14 @@ export default function Step4Page() {
                   </button>
                   <button
                     onClick={() => copyText(allVideoPrompts)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[#334155] text-sm font-bold tb-press-soft"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[#f5f4f7] text-sm font-bold tb-press-soft"
                   >
                     <Film className="w-3.5 h-3.5" />
                     영상프롬프트
                   </button>
                   <button
                     onClick={() => copyText(allDialogues)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#6d28d9] hover:opacity-90 text-white text-sm font-bold tb-press"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#f43f5e] hover:opacity-90 text-white text-sm font-bold tb-press"
                   >
                     <MessageSquare className="w-3.5 h-3.5" />
                     대사
@@ -1310,13 +1310,13 @@ export default function Step4Page() {
               </div>
 
               {/* Act tab bar */}
-              <div className="flex-shrink-0 flex gap-1.5 p-3 border-b border-[#e2e8f0] bg-white overflow-x-auto">
+              <div className="flex-shrink-0 flex gap-1.5 p-3 border-b border-[#34323d] bg-[#1f1d26] overflow-x-auto">
                 {character && (
                   <button
                     onClick={() => setActiveAct('character')}
                     className={`flex items-center gap-2 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${activeAct === 'character'
                       ? 'tb-pill-primary'
-                      : 'text-[#64748b] bg-[#f1f5f9] hover:bg-[#e2e8f0] tb-press-soft'
+                      : 'text-[#a8a4b2] bg-[#26242e] hover:bg-[#34323d] tb-press-soft'
                       }`}
                   >
                     <User className="w-3.5 h-3.5" style={{ opacity: activeAct === 'character' ? 1 : 0.7 }} />
@@ -1333,7 +1333,7 @@ export default function Step4Page() {
                       onClick={() => setActiveAct(i)}
                       className={`flex items-center gap-2 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${isActive
                         ? 'tb-pill-primary'
-                        : 'text-[#64748b] bg-[#f1f5f9] hover:bg-[#e2e8f0] tb-press-soft'
+                        : 'text-[#a8a4b2] bg-[#26242e] hover:bg-[#34323d] tb-press-soft'
                         }`}
                     >
                       <span
@@ -1361,25 +1361,25 @@ export default function Step4Page() {
               <div className="flex-1 overflow-y-auto p-5 space-y-5">
                 {activeAct === 'character' ? (
                   character ? (
-                    <div className="rounded-2xl overflow-hidden border border-[#e2e8f0] bg-white shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
-                      <div className="px-4 py-3 border-b border-[#e2e8f0] flex items-center justify-between gap-3 bg-[#ecfdf5]/60">
+                    <div className="rounded-2xl overflow-hidden border border-[#34323d] bg-[#1f1d26] shadow-[0_2px_8px_rgba(0,0,0,0.3)]">
+                      <div className="px-4 py-3 border-b border-[#34323d] flex items-center justify-between gap-3 bg-[#26242e]/60">
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <span className="text-[12px] font-black px-2 py-0.5 rounded-full bg-[#00996D]/15 text-[#00996D] flex items-center gap-1">
+                          <span className="text-[12px] font-black px-2 py-0.5 rounded-full bg-[#f97316]/15 text-[#fb923c] flex items-center gap-1">
                             <User className="w-3 h-3" />
                             CHAR
                           </span>
-                          <span className="text-base font-bold text-[#0f172a] truncate">
+                          <span className="text-base font-bold text-[#f5f4f7] truncate">
                             {character.name || '(이름 없음)'}
                           </span>
                           {character.role && (
-                            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#334155] flex-shrink-0">
+                            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#f5f4f7] flex-shrink-0">
                               {character.role}
                             </span>
                           )}
                         </div>
                         <button
                           onClick={() => { setCharacter(null); setActiveAct(0); }}
-                          className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#fee2e2] border border-[#e2e8f0] text-[11px] font-bold text-[#b91c1c] tb-press-soft flex-shrink-0"
+                          className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#26242e] hover:bg-[#7c2d12] border border-[#34323d] text-[11px] font-bold text-[#f87171] tb-press-soft flex-shrink-0"
                         >
                           <Trash2 className="w-3 h-3" />
                           제거
@@ -1388,16 +1388,16 @@ export default function Step4Page() {
 
                       <div className="grid grid-cols-1 md:grid-cols-[minmax(400px,520px)_minmax(0,1fr)]">
                         {/* LEFT: image upload */}
-                        <div className="p-4 border-b md:border-b-0 md:border-r border-[#e2e8f0]">
+                        <div className="p-4 border-b md:border-b-0 md:border-r border-[#34323d]">
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-1.5">
-                              <ImageIcon className="w-3.5 h-3.5 text-[#00996D]" />
-                              <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">이미지</span>
+                              <ImageIcon className="w-3.5 h-3.5 text-[#fb923c]" />
+                              <span className="text-[11px] uppercase tracking-wider text-[#a8a4b2] font-bold">이미지</span>
                             </div>
                             {character.imageUpload && (
                               <button
                                 onClick={clearCharacterImage}
-                                className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-white hover:bg-[#fee2e2] border border-[#e2e8f0] text-[11px] font-bold text-[#b91c1c] tb-press-soft"
+                                className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#26242e] hover:bg-[#7c2d12] border border-[#34323d] text-[11px] font-bold text-[#f87171] tb-press-soft"
                               >
                                 <Trash2 className="w-3 h-3" />
                                 제거
@@ -1414,17 +1414,17 @@ export default function Step4Page() {
                         <div className="p-4 min-w-0">
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-1.5 min-w-0">
-                              <ImageIcon className="w-3.5 h-3.5 text-[#00996D] flex-shrink-0" />
-                              <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">캐릭터 프롬프트</span>
+                              <ImageIcon className="w-3.5 h-3.5 text-[#fb923c] flex-shrink-0" />
+                              <span className="text-[11px] uppercase tracking-wider text-[#a8a4b2] font-bold">캐릭터 프롬프트</span>
                               {character.aspect_ratio && (
-                                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#ecfdf5] text-[#00996D] font-bold">
+                                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#26242e] text-[#fb923c] font-bold">
                                   {character.aspect_ratio}
                                 </span>
                               )}
                             </div>
                             <button
                               onClick={() => copyText(character.prompt)}
-                              className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] tb-press-soft flex-shrink-0"
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[11px] font-bold text-[#a8a4b2] tb-press-soft flex-shrink-0"
                             >
                               <Copy className="w-3 h-3" />
                               복사
@@ -1435,18 +1435,18 @@ export default function Step4Page() {
                             onChange={(e) => updateCharacterPrompt(e.target.value)}
                             rows={12}
                             placeholder="캐릭터 프롬프트... (네거티브 포함)"
-                            className="w-full min-h-[300px] resize-y bg-white border border-[#e2e8f0] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
+                            className="w-full min-h-[300px] resize-y bg-[#26242e] border border-[#34323d] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#f5f4f7] focus:outline-none focus:border-[#fb923c] focus:ring-[3px] focus:ring-[#fb923c]/20"
                           />
                         </div>
                       </div>
                     </div>
                   ) : (
-                    <div className="text-center py-10 text-[#64748b] text-sm">
+                    <div className="text-center py-10 text-[#a8a4b2] text-sm">
                       캐릭터 JSON이 없습니다.
                     </div>
                   )
                 ) : scenesByAct[activeAct].length === 0 ? (
-                  <div className="text-center py-10 text-[#64748b] text-sm">
+                  <div className="text-center py-10 text-[#a8a4b2] text-sm">
                     이 구간에 해당하는 씬이 없습니다.
                   </div>
                 ) : (
@@ -1456,11 +1456,11 @@ export default function Step4Page() {
                       <div
                         key={scene.id}
                         ref={(el) => { sceneRefs.current[scene.id] = el; }}
-                        className="rounded-2xl overflow-hidden border border-[#e2e8f0] bg-white shadow-[0_2px_8px_rgba(15,23,42,0.04)] transition-all"
+                        className="rounded-2xl overflow-hidden border border-[#34323d] bg-[#1f1d26] shadow-[0_2px_8px_rgba(0,0,0,0.3)] transition-all"
                       >
                         {/* Scene header */}
                         <div
-                          className="px-4 py-3 border-b border-[#e2e8f0] flex items-center justify-between gap-3"
+                          className="px-4 py-3 border-b border-[#34323d] flex items-center justify-between gap-3"
                           style={{ background: `${tc.dot}10` }}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
@@ -1470,34 +1470,34 @@ export default function Step4Page() {
                             >
                               #{String(scene.scene_number).padStart(2, '0')}
                             </span>
-                            <span className="text-base font-bold text-[#0f172a] truncate">{scene.title}</span>
+                            <span className="text-base font-bold text-[#f5f4f7] truncate">{scene.title}</span>
                           </div>
                           {scene.emotion && (
-                            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#334155] flex-shrink-0">
+                            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#f5f4f7] flex-shrink-0">
                               감정: {scene.emotion}
                             </span>
                           )}
                         </div>
 
                         {scene.description && (
-                          <div className="px-4 py-3 border-b border-[#e2e8f0]">
-                            <p className="text-sm text-[#334155] leading-relaxed">{scene.description}</p>
+                          <div className="px-4 py-3 border-b border-[#34323d]">
+                            <p className="text-sm text-[#f5f4f7] leading-relaxed">{scene.description}</p>
                           </div>
                         )}
 
                         {/* 3-column content */}
                         <div className="grid grid-cols-1 md:grid-cols-[minmax(400px,520px)_minmax(0,1fr)_minmax(220px,320px)]">
                           {/* LEFT: image upload */}
-                          <div className="p-4 border-b md:border-b-0 md:border-r border-[#e2e8f0]">
+                          <div className="p-4 border-b md:border-b-0 md:border-r border-[#34323d]">
                             <div className="flex items-center justify-between mb-2">
                               <div className="flex items-center gap-1.5">
-                                <ImageIcon className="w-3.5 h-3.5 text-[#00996D]" />
-                                <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">이미지</span>
+                                <ImageIcon className="w-3.5 h-3.5 text-[#fb923c]" />
+                                <span className="text-[11px] uppercase tracking-wider text-[#a8a4b2] font-bold">이미지</span>
                               </div>
                               {scene.imageUpload && (
                                 <button
                                   onClick={() => clearImage(scene.id)}
-                                  className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-white hover:bg-[#fee2e2] border border-[#e2e8f0] text-[11px] font-bold text-[#b91c1c] tb-press-soft"
+                                  className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#26242e] hover:bg-[#7c2d12] border border-[#34323d] text-[11px] font-bold text-[#f87171] tb-press-soft"
                                 >
                                   <Trash2 className="w-3 h-3" />
                                   제거
@@ -1511,19 +1511,19 @@ export default function Step4Page() {
                           </div>
 
                           {/* MIDDLE: image + video prompts */}
-                          <div className="p-4 border-b md:border-b-0 md:border-r border-[#e2e8f0] space-y-3 min-w-0">
+                          <div className="p-4 border-b md:border-b-0 md:border-r border-[#34323d] space-y-3 min-w-0">
                             <div>
                               <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-1.5 min-w-0">
-                                  <ImageIcon className="w-3.5 h-3.5 text-[#00996D] flex-shrink-0" />
-                                  <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">이미지 프롬프트</span>
-                                  <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#ecfdf5] text-[#00996D] font-bold">
+                                  <ImageIcon className="w-3.5 h-3.5 text-[#fb923c] flex-shrink-0" />
+                                  <span className="text-[11px] uppercase tracking-wider text-[#a8a4b2] font-bold">이미지 프롬프트</span>
+                                  <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#26242e] text-[#fb923c] font-bold">
                                     {scene.prompts.image.tool}
                                   </span>
                                 </div>
                                 <button
                                   onClick={() => copyText(scene.prompts.image.prompt)}
-                                  className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] tb-press-soft flex-shrink-0"
+                                  className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[11px] font-bold text-[#a8a4b2] tb-press-soft flex-shrink-0"
                                 >
                                   <Copy className="w-3 h-3" />
                                   복사
@@ -1534,21 +1534,21 @@ export default function Step4Page() {
                                 onChange={(e) => updateImagePrompt(scene.id, e.target.value)}
                                 rows={4}
                                 placeholder="이미지 프롬프트..."
-                                className="w-full min-h-[90px] resize-y bg-white border border-[#e2e8f0] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
+                                className="w-full min-h-[90px] resize-y bg-[#26242e] border border-[#34323d] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#f5f4f7] focus:outline-none focus:border-[#fb923c] focus:ring-[3px] focus:ring-[#fb923c]/20"
                               />
                             </div>
                             <div>
                               <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-1.5 min-w-0">
                                   <Film className="w-3.5 h-3.5 text-[#f43f5e] flex-shrink-0" />
-                                  <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">영상 프롬프트</span>
-                                  <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#fee2e2] text-[#b91c1c] font-bold">
+                                  <span className="text-[11px] uppercase tracking-wider text-[#a8a4b2] font-bold">영상 프롬프트</span>
+                                  <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#26242e] text-[#fca5a5] font-bold">
                                     {scene.prompts.video.tool} · {scene.prompts.video.duration}s
                                   </span>
                                 </div>
                                 <button
                                   onClick={() => copyText(scene.prompts.video.prompt)}
-                                  className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] tb-press-soft flex-shrink-0"
+                                  className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[11px] font-bold text-[#a8a4b2] tb-press-soft flex-shrink-0"
                                 >
                                   <Copy className="w-3 h-3" />
                                   복사
@@ -1559,21 +1559,21 @@ export default function Step4Page() {
                                 onChange={(e) => updateVideoPrompt(scene.id, e.target.value)}
                                 rows={4}
                                 placeholder="영상 프롬프트..."
-                                className="w-full min-h-[90px] resize-y bg-white border border-[#e2e8f0] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
+                                className="w-full min-h-[90px] resize-y bg-[#26242e] border border-[#34323d] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#f5f4f7] focus:outline-none focus:border-[#fb923c] focus:ring-[3px] focus:ring-[#fb923c]/20"
                               />
                             </div>
                           </div>
 
                           {/* RIGHT: dialogue */}
-                          <div className="p-4 bg-[#faf5ff] min-w-0">
+                          <div className="p-4 bg-[#26242e] min-w-0">
                             <div className="flex items-center justify-between mb-2">
                               <div className="flex items-center gap-1.5 min-w-0">
-                                <MessageSquare className="w-3.5 h-3.5 text-[#6d28d9] flex-shrink-0" />
-                                <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">대사</span>
+                                <MessageSquare className="w-3.5 h-3.5 text-[#f43f5e] flex-shrink-0" />
+                                <span className="text-[11px] uppercase tracking-wider text-[#a8a4b2] font-bold">대사</span>
                               </div>
                               <button
                                 onClick={() => copyText(scene.dialogue)}
-                                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] tb-press-soft flex-shrink-0"
+                                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[11px] font-bold text-[#a8a4b2] tb-press-soft flex-shrink-0"
                               >
                                 <Copy className="w-3 h-3" />
                                 복사
@@ -1584,7 +1584,7 @@ export default function Step4Page() {
                               onChange={(e) => updateDialogue(scene.id, e.target.value)}
                               rows={9}
                               placeholder="등장인물의 대사나 내레이션..."
-                              className="w-full min-h-[220px] resize-y bg-white border border-[#e2e8f0] rounded-xl p-2.5 text-[13px] leading-relaxed text-[#0f172a] focus:outline-none focus:border-[#6d28d9] focus:ring-[3px] focus:ring-[#6d28d9]/20"
+                              className="w-full min-h-[220px] resize-y bg-[#26242e] border border-[#34323d] rounded-xl p-2.5 text-[13px] leading-relaxed text-[#f5f4f7] focus:outline-none focus:border-[#f43f5e] focus:ring-[3px] focus:ring-[#f43f5e]/20"
                             />
                           </div>
                         </div>
@@ -1605,53 +1605,53 @@ export default function Step4Page() {
           onClick={() => setUploadOpen(false)}
         >
           <div
-            className="bg-white rounded-2xl border border-[#e2e8f0] shadow-[0_24px_60px_rgba(15,23,42,0.25)] w-[640px] max-w-[95vw] max-h-[80vh] flex flex-col"
+            className="bg-[#1f1d26] rounded-2xl border border-[#34323d] shadow-[0_24px_60px_rgba(0,0,0,0.5)] w-[640px] max-w-[95vw] max-h-[80vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#e2e8f0]">
-              <span className="text-base font-bold text-[#0f172a] uppercase tracking-wider">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#34323d]">
+              <span className="text-base font-bold text-[#f5f4f7] uppercase tracking-wider">
                 {uploadType === 'character' ? '캐릭터 JSON 업로드'
                   : uploadType === 'video_prompts' ? '영상 프롬프트 JSON 업로드'
                   : '이미지 프롬프트 JSON 업로드'}
               </span>
               <button
                 onClick={() => setUploadOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#475569] tb-press-soft"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#26242e] hover:bg-[#34323d] text-[#a8a4b2] tb-press-soft"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-5 space-y-3 min-h-0">
               {uploadType === 'character' ? (
-                <p className="text-sm text-[#64748b] leading-relaxed">
+                <p className="text-sm text-[#a8a4b2] leading-relaxed">
                   <b>character.json</b> 을 붙여넣으세요.
-                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">meta</code>,
-                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">appearance</code>,
-                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">image_prompt</code>,
-                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">expressions</code>
-                  또는 <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">visual_identity</code>,
-                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">consistency_rules</code> 필드 지원.
+                  <code className="bg-[#26242e] px-1.5 py-0.5 rounded text-[#fb923c] font-mono text-[12px] mx-1">meta</code>,
+                  <code className="bg-[#26242e] px-1.5 py-0.5 rounded text-[#fb923c] font-mono text-[12px] mx-1">appearance</code>,
+                  <code className="bg-[#26242e] px-1.5 py-0.5 rounded text-[#fb923c] font-mono text-[12px] mx-1">image_prompt</code>,
+                  <code className="bg-[#26242e] px-1.5 py-0.5 rounded text-[#fb923c] font-mono text-[12px] mx-1">expressions</code>
+                  또는 <code className="bg-[#26242e] px-1.5 py-0.5 rounded text-[#fb923c] font-mono text-[12px]">visual_identity</code>,
+                  <code className="bg-[#26242e] px-1.5 py-0.5 rounded text-[#fb923c] font-mono text-[12px]">consistency_rules</code> 필드 지원.
                 </p>
               ) : uploadType === 'video_prompts' ? (
-                <p className="text-sm text-[#64748b] leading-relaxed">
+                <p className="text-sm text-[#a8a4b2] leading-relaxed">
                   <b>video_prompts.json</b> 을 붙여넣으세요. 각 씬의
-                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">scene_id</code>로 기존 씬에 병합되며,
-                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">video_prompt</code>(camera_motion, character_motion, sound_design 등)와
-                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">dialogue</code>가 반영됩니다.
+                  <code className="bg-[#26242e] px-1.5 py-0.5 rounded text-[#fb923c] font-mono text-[12px] mx-1">scene_id</code>로 기존 씬에 병합되며,
+                  <code className="bg-[#26242e] px-1.5 py-0.5 rounded text-[#fb923c] font-mono text-[12px] mx-1">video_prompt</code>(camera_motion, character_motion, sound_design 등)와
+                  <code className="bg-[#26242e] px-1.5 py-0.5 rounded text-[#fb923c] font-mono text-[12px] mx-1">dialogue</code>가 반영됩니다.
                 </p>
               ) : (
-                <p className="text-sm text-[#64748b] leading-relaxed">
-                  <b>image_prompts.json</b> 을 붙여넣으세요. <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">scenes</code> (또는 <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">image_prompts</code>) 배열이 필요하며, 각 씬은
-                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">scene_id</code>,
-                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">narrative_role</code>(Hook/Setup/Problem/Escalation/Turn/Decision/Action/Obstacle/Reveal/Experience/Peak/CTA),
-                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">background</code>,
-                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px] mx-1">image_prompt</code> 필드를 가질 수 있습니다.
+                <p className="text-sm text-[#a8a4b2] leading-relaxed">
+                  <b>image_prompts.json</b> 을 붙여넣으세요. <code className="bg-[#26242e] px-1.5 py-0.5 rounded text-[#fb923c] font-mono text-[12px]">scenes</code> (또는 <code className="bg-[#26242e] px-1.5 py-0.5 rounded text-[#fb923c] font-mono text-[12px]">image_prompts</code>) 배열이 필요하며, 각 씬은
+                  <code className="bg-[#26242e] px-1.5 py-0.5 rounded text-[#fb923c] font-mono text-[12px] mx-1">scene_id</code>,
+                  <code className="bg-[#26242e] px-1.5 py-0.5 rounded text-[#fb923c] font-mono text-[12px] mx-1">narrative_role</code>(Hook/Setup/Problem/Escalation/Turn/Decision/Action/Obstacle/Reveal/Experience/Peak/CTA),
+                  <code className="bg-[#26242e] px-1.5 py-0.5 rounded text-[#fb923c] font-mono text-[12px] mx-1">background</code>,
+                  <code className="bg-[#26242e] px-1.5 py-0.5 rounded text-[#fb923c] font-mono text-[12px] mx-1">image_prompt</code> 필드를 가질 수 있습니다.
                 </p>
               )}
               <textarea
                 value={jsonInput}
                 onChange={(e) => setJsonInput(e.target.value)}
-                className="w-full h-[260px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
+                className="w-full h-[260px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#26242e] border border-[#34323d] text-[#f5f4f7] focus:outline-none focus:border-[#fb923c] focus:ring-[3px] focus:ring-[#fb923c]/20"
                 placeholder={uploadType === 'character'
                   ? '{"character":{"character_id":"...","meta":{"name":"..."},"appearance":{...},"image_prompt":{...},"expressions":[...]}}'
                   : uploadType === 'video_prompts'
@@ -1660,12 +1660,12 @@ export default function Step4Page() {
                 }
               />
               {uploadError && (
-                <div className="text-sm text-[#b91c1c] bg-[#fee2e2] border border-[#fca5a5] rounded-xl px-3 py-2 font-semibold">
+                <div className="text-sm text-[#fca5a5] bg-[#26242e] border border-[#b91c1c] rounded-xl px-3 py-2 font-semibold">
                   {uploadError}
                 </div>
               )}
             </div>
-            <div className="flex justify-end gap-2 px-5 py-3 border-t border-[#e2e8f0]">
+            <div className="flex justify-end gap-2 px-5 py-3 border-t border-[#34323d]">
               <button
                 onClick={() => setUploadOpen(false)}
                 className="px-4 py-1.5 rounded-full tb-pill-ghost text-sm font-bold transition"

@@ -23,7 +23,7 @@ const SHOT_FALLBACK_LABEL = {
 
 const SHOT_DOT = {
   S01: '#0ea5e9',
-  S02: '#10b981',
+  S02: '#f97316',
   S03: '#f59e0b',
   S04: '#ec4899',
   S05: '#8b5cf6',
@@ -446,7 +446,7 @@ function UploadSlot({ image, onFile }) {
     return (
       <>
         <div
-          className="relative w-full rounded-xl overflow-hidden border border-[#e2e8f0] cursor-pointer group bg-[#0f172a] flex items-center justify-center"
+          className="relative w-full rounded-xl overflow-hidden border border-[#34323d] cursor-pointer group bg-[#0f172a] flex items-center justify-center"
           onClick={openPicker}
           onDragOver={(e) => { e.preventDefault(); }}
           onDrop={handleDrop}
@@ -482,21 +482,21 @@ function UploadSlot({ image, onFile }) {
       onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add('dragover'); }}
       onDragLeave={(e) => e.currentTarget.classList.remove('dragover')}
       onDrop={handleDrop}
-      className="tb-upload-slot aspect-video rounded-xl flex flex-col items-center justify-center gap-2.5 p-6 cursor-pointer text-[#64748b] outline-none focus:ring-[3px] focus:ring-[#00B380]/40 focus:border-[#00B380] focus:bg-[#ecfdf5]"
+      className="tb-upload-slot aspect-video rounded-xl flex flex-col items-center justify-center gap-2.5 p-6 cursor-pointer text-[#a8a4b2] outline-none focus:ring-[3px] focus:ring-[#fb923c]/40 focus:border-[#fb923c] focus:bg-[#26242e]"
     >
       <button
         type="button"
         onClick={(e) => { e.stopPropagation(); openPicker(); }}
         onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
         onDrop={(e) => { e.stopPropagation(); handleDrop(e); }}
-        className="flex items-center gap-2 px-6 py-3 rounded-full bg-[#00996D] hover:bg-[#00774f] text-white text-sm font-bold tb-press shadow-[0_6px_16px_rgba(0,153,109,0.3)]"
+        className="flex items-center gap-2 px-6 py-3 rounded-full bg-[#f97316] hover:bg-[#ea580c] text-white text-sm font-bold tb-press shadow-[0_6px_16px_rgba(249,115,22,0.3)]"
       >
         <Upload className="w-4 h-4" />
         이미지 선택
       </button>
       <div className="text-center text-[11px] leading-relaxed mt-1">
-        <div className="font-bold text-[#475569]">클릭 · 드래그&amp;드롭 · Ctrl+V 붙여넣기</div>
-        <div className="text-[10px] mt-0.5 text-[#94a3b8]">PNG · JPG · WEBP (≤5MB)</div>
+        <div className="font-bold text-[#f5f4f7]">클릭 · 드래그&amp;드롭 · Ctrl+V 붙여넣기</div>
+        <div className="text-[10px] mt-0.5 text-[#a8a4b2]">PNG · JPG · WEBP (≤5MB)</div>
       </div>
       <input
         ref={fileRef}
@@ -660,12 +660,12 @@ export default function Step6Page() {
   const projectTitle = data?.project?.title || sc.title || '';
 
   return (
-    <div className="min-h-screen md:h-screen md:flex md:flex-col md:overflow-hidden bg-[#f8fafc] text-[#0f172a]">
+    <div className="min-h-screen md:h-screen md:flex md:flex-col md:overflow-hidden bg-[#15141a] text-[#f5f4f7]">
       <style jsx global>{`
         .tb-hero {
           position: relative;
           padding: 16px 20px 36px;
-          background: linear-gradient(135deg, #016837 0%, #00996D 45%, #00B380 100%);
+          background: linear-gradient(135deg, #7c2d12 0%, #f97316 45%, #fb923c 100%);
           color: #fff;
           text-align: center;
           overflow: hidden;
@@ -683,7 +683,7 @@ export default function Step6Page() {
         }
         .tb-hero::after {
           content: ''; position: absolute; left: -10%; right: -10%; bottom: -1px;
-          height: 24px; background: #f8fafc; border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+          height: 24px; background: #15141a; border-radius: 50% 50% 0 0 / 100% 100% 0 0;
         }
         .tb-hero-glow {
           position: absolute; top: -40px; right: -60px; width: 260px; height: 260px;
@@ -713,76 +713,76 @@ export default function Step6Page() {
           margin: -22px 16px 0;
           padding: 10px 14px;
           display: flex; align-items: center; gap: 10px;
-          background: rgba(255,255,255,0.7);
-          border: 1px solid rgba(255,255,255,0.9);
+          background: rgba(31,29,38,0.7);
+          border: 1px solid rgba(255,255,255,0.08);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
           border-radius: 100px;
-          box-shadow: 0 18px 40px rgba(15, 23, 42, 0.1);
+          box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
         }
         .tb-pill-primary {
-          background: rgba(255,255,255,0.4);
-          color: #00774f;
-          border: 1.5px solid rgba(0,153,109,0.35);
+          background: rgba(249,115,22,0.16);
+          color: #fb923c;
+          border: 1.5px solid rgba(249,115,22,0.4);
           backdrop-filter: blur(18px) saturate(180%);
           -webkit-backdrop-filter: blur(18px) saturate(180%);
           box-shadow:
-            0 10px 24px rgba(0,153,109,0.22),
-            inset 2px 2px 1px 0 rgba(255,255,255,0.85),
-            inset -1px -1px 1px 1px rgba(255,255,255,0.5);
+            0 10px 24px rgba(249,115,22,0.22),
+            inset 2px 2px 1px 0 rgba(255,255,255,0.12),
+            inset -1px -1px 1px 1px rgba(255,255,255,0.06);
           transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,2.2), box-shadow 0.3s, background 0.3s;
         }
         .tb-pill-primary:hover {
-          background: rgba(255,255,255,0.55);
+          background: rgba(249,115,22,0.26);
           transform: translateY(-1px) scale(1.03);
           box-shadow:
-            0 16px 32px rgba(0,153,109,0.3),
-            inset 2px 2px 1px 0 rgba(255,255,255,0.95),
-            inset -1px -1px 1px 1px rgba(255,255,255,0.6);
+            0 16px 32px rgba(249,115,22,0.3),
+            inset 2px 2px 1px 0 rgba(255,255,255,0.16),
+            inset -1px -1px 1px 1px rgba(255,255,255,0.08);
         }
         .tb-pill-primary:active {
           transform: translateY(1px) scale(0.94);
           box-shadow:
-            0 4px 10px rgba(0,153,109,0.18),
-            inset 2px 2px 2px 0 rgba(0,0,0,0.08),
-            inset -1px -1px 1px 1px rgba(255,255,255,0.3);
+            0 4px 10px rgba(249,115,22,0.18),
+            inset 2px 2px 2px 0 rgba(0,0,0,0.3),
+            inset -1px -1px 1px 1px rgba(255,255,255,0.06);
           transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
         }
         .tb-pill-ghost {
-          background: rgba(255,255,255,0.55);
-          color: #334155;
-          border: 1px solid rgba(255,255,255,0.7);
+          background: rgba(255,255,255,0.05);
+          color: #f5f4f7;
+          border: 1px solid rgba(255,255,255,0.1);
           backdrop-filter: blur(14px) saturate(140%);
           -webkit-backdrop-filter: blur(14px) saturate(140%);
           box-shadow:
-            0 6px 16px rgba(15,23,42,0.08),
-            inset 1.5px 1.5px 0.5px 0 rgba(255,255,255,0.85),
-            inset -1px -1px 0.5px 1px rgba(255,255,255,0.45);
+            0 6px 16px rgba(0,0,0,0.3),
+            inset 1.5px 1.5px 0.5px 0 rgba(255,255,255,0.08),
+            inset -1px -1px 0.5px 1px rgba(255,255,255,0.04);
           transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,2.2), box-shadow 0.3s, background 0.3s;
         }
         .tb-pill-ghost:hover {
-          background: rgba(255,255,255,0.75);
+          background: rgba(255,255,255,0.1);
           transform: translateY(-1px) scale(1.03);
         }
         .tb-pill-ghost:active {
           transform: translateY(1px) scale(0.94);
           box-shadow:
-            0 3px 8px rgba(15,23,42,0.1),
-            inset 1.5px 1.5px 2px 0 rgba(0,0,0,0.08),
-            inset -1px -1px 0.5px 1px rgba(255,255,255,0.3);
+            0 3px 8px rgba(0,0,0,0.35),
+            inset 1.5px 1.5px 2px 0 rgba(0,0,0,0.3),
+            inset -1px -1px 0.5px 1px rgba(255,255,255,0.04);
           transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
         }
         .tb-upload-slot {
-          border: 2px dashed #cbd5e1;
+          border: 2px dashed #34323d;
           transition: border-color 0.2s, background 0.2s;
         }
         .tb-upload-slot:hover {
-          border-color: #00B380;
-          background: #ecfdf5;
+          border-color: #fb923c;
+          background: #26242e;
         }
         .tb-upload-slot.dragover {
-          border-color: #00B380;
-          background: #ecfdf5;
+          border-color: #fb923c;
+          background: #26242e;
         }
       `}</style>
 
@@ -801,7 +801,7 @@ export default function Step6Page() {
           <ArrowLeft className="w-3.5 h-3.5" />
           홈
         </Link>
-        <span className="text-[11px] font-bold tracking-[0.18em] text-[#00996D] uppercase hidden sm:inline">TOOLB LAB</span>
+        <span className="text-[11px] font-bold tracking-[0.18em] text-[#f97316] uppercase hidden sm:inline">TOOLB LAB</span>
         <div className="ml-auto flex items-center gap-2">
           <button
             onClick={() => setUploadOpen(true)}
@@ -813,7 +813,7 @@ export default function Step6Page() {
           {data && (
             <button
               onClick={reset}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#fecaca] text-[#dc2626] text-xs sm:text-sm font-bold tb-press-soft transition"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#26242e] border border-[#fecaca] text-[#dc2626] text-xs sm:text-sm font-bold tb-press-soft transition"
             >
               <Trash2 className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">초기화</span>
@@ -824,9 +824,9 @@ export default function Step6Page() {
 
       <div className="flex flex-col md:flex-row md:flex-1 md:min-h-0 w-full px-4 pt-6 pb-4 gap-4 2xl:px-6">
         {/* Sidebar */}
-        <aside className="w-full md:w-[300px] flex-shrink-0 bg-white border border-[#e2e8f0] rounded-2xl shadow-[0_8px_24px_rgba(15,23,42,0.06)] md:overflow-y-auto">
-          <div className="p-4 border-b border-[#e2e8f0]">
-            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#64748b]">
+        <aside className="w-full md:w-[300px] flex-shrink-0 bg-[#1f1d26] border border-[#34323d] rounded-2xl shadow-[0_8px_24px_rgba(15,23,42,0.06)] md:overflow-y-auto">
+          <div className="p-4 border-b border-[#34323d]">
+            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#a8a4b2]">
               <Clapperboard className="w-3.5 h-3.5" />
               프로젝트 정보
             </div>
@@ -834,36 +834,36 @@ export default function Step6Page() {
               <div className="space-y-1.5">
                 {projectTitle && (
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">제목</span>
-                    <span className="text-sm text-[#0f172a] font-bold flex-1 break-all">{projectTitle}</span>
+                    <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">제목</span>
+                    <span className="text-sm text-[#f5f4f7] font-bold flex-1 break-all">{projectTitle}</span>
                   </div>
                 )}
                 <div className="flex items-start gap-2">
-                  <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">컷 수</span>
-                  <span className="text-sm text-[#0f172a] font-bold flex-1">{data.shots.length}컷</span>
+                  <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">컷 수</span>
+                  <span className="text-sm text-[#f5f4f7] font-bold flex-1">{data.shots.length}컷</span>
                 </div>
                 {data.project?.aspect_ratio && (
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">비율</span>
-                    <span className="text-sm text-[#0f172a] font-bold flex-1">{data.project.aspect_ratio}</span>
+                    <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">비율</span>
+                    <span className="text-sm text-[#f5f4f7] font-bold flex-1">{data.project.aspect_ratio}</span>
                   </div>
                 )}
                 {sc.location && (
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">장소</span>
-                    <span className="text-sm text-[#0f172a] font-bold flex-1">{sc.location}</span>
+                    <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">장소</span>
+                    <span className="text-sm text-[#f5f4f7] font-bold flex-1">{sc.location}</span>
                   </div>
                 )}
                 {sc.time_of_day && (
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">시간</span>
-                    <span className="text-sm text-[#0f172a] font-bold flex-1">{sc.time_of_day}</span>
+                    <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">시간</span>
+                    <span className="text-sm text-[#f5f4f7] font-bold flex-1">{sc.time_of_day}</span>
                   </div>
                 )}
                 {data.project?.total_duration_sec > 0 && (
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">러닝</span>
-                    <span className="text-sm text-[#0f172a] font-bold flex-1">
+                    <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">러닝</span>
+                    <span className="text-sm text-[#f5f4f7] font-bold flex-1">
                       {data.project.total_duration_sec}초
                       {data.project?.clip_duration_sec ? ` (컷당 ${data.project.clip_duration_sec}초)` : ''}
                     </span>
@@ -871,35 +871,35 @@ export default function Step6Page() {
                 )}
                 {data.project?.video_model && (
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">영상</span>
-                    <span className="text-sm text-[#0f172a] font-bold flex-1">{data.project.video_model}</span>
+                    <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">영상</span>
+                    <span className="text-sm text-[#f5f4f7] font-bold flex-1">{data.project.video_model}</span>
                   </div>
                 )}
                 {data.project?.image_model && (
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">이미지</span>
-                    <span className="text-sm text-[#0f172a] font-bold flex-1">{data.project.image_model}</span>
+                    <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">이미지</span>
+                    <span className="text-sm text-[#f5f4f7] font-bold flex-1">{data.project.image_model}</span>
                   </div>
                 )}
                 {(data.synopsis || sc.synopsis) && (
                   <div className="flex items-start gap-2 pt-1">
-                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">시놉시스</span>
-                    <span className="text-[12px] text-[#334155] leading-relaxed flex-1">{data.synopsis || sc.synopsis}</span>
+                    <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">시놉시스</span>
+                    <span className="text-[12px] text-[#f5f4f7] leading-relaxed flex-1">{data.synopsis || sc.synopsis}</span>
                   </div>
                 )}
                 {(sc.mood || sc.atmosphere || sc.tone) && (
                   <div className="flex items-start gap-2 pt-1">
-                    <span className="text-xs text-[#64748b] font-medium italic leading-relaxed">"{sc.mood || sc.atmosphere || sc.tone}"</span>
+                    <span className="text-xs text-[#a8a4b2] font-medium italic leading-relaxed">"{sc.mood || sc.atmosphere || sc.tone}"</span>
                   </div>
                 )}
               </div>
             ) : (
-              <p className="text-[13px] text-[#64748b]">JSON을 업로드하면 표시됩니다.</p>
+              <p className="text-[13px] text-[#a8a4b2]">JSON을 업로드하면 표시됩니다.</p>
             )}
           </div>
 
-          <div className="p-4 border-b border-[#e2e8f0]">
-            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#64748b]">
+          <div className="p-4 border-b border-[#34323d]">
+            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#a8a4b2]">
               <Wrench className="w-3.5 h-3.5" />
               도구
             </div>
@@ -908,7 +908,7 @@ export default function Step6Page() {
                 href="https://translate.google.co.kr/?sl=ko&tl=en&op=translate"
                 target="_blank"
                 rel="noreferrer"
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#1e40af] bg-[#eff6ff] hover:bg-[#dbeafe] tb-press-soft"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#93c5fd] bg-[#26242e] hover:bg-[#34323d] tb-press-soft"
               >
                 <Languages className="w-4 h-4" />
                 구글번역기
@@ -918,7 +918,7 @@ export default function Step6Page() {
                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition ${
                   toolView === 'frame-extractor'
                     ? 'tb-pill-primary'
-                    : 'text-[#92400e] bg-[#fef3c7] hover:bg-[#fde68a] tb-press-soft'
+                    : 'text-[#fbbf24] bg-[#26242e] hover:bg-[#34323d] tb-press-soft'
                 }`}
               >
                 <Film className="w-4 h-4" />
@@ -929,7 +929,7 @@ export default function Step6Page() {
                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition ${
                   toolView === 'watermark-remover'
                     ? 'tb-pill-primary'
-                    : 'text-[#155e75] bg-[#cffafe] hover:bg-[#a5f3fc] tb-press-soft'
+                    : 'text-[#67e8f9] bg-[#26242e] hover:bg-[#34323d] tb-press-soft'
                 }`}
               >
                 <Droplets className="w-4 h-4" />
@@ -939,7 +939,7 @@ export default function Step6Page() {
                 href="https://tbnc.aitoolb.com/"
                 target="_blank"
                 rel="noreferrer"
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#6b21a8] bg-[#f3e8ff] hover:bg-[#e9d5ff] tb-press-soft"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#fb7185] bg-[#26242e] hover:bg-[#34323d] tb-press-soft"
               >
                 <FileText className="w-4 h-4" />
                 파일명변경
@@ -948,7 +948,7 @@ export default function Step6Page() {
           </div>
 
           <div className="p-4 space-y-2">
-            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#64748b]">
+            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#a8a4b2]">
               <Gem className="w-3.5 h-3.5" />
               젬 가이드
             </div>
@@ -994,7 +994,7 @@ export default function Step6Page() {
               href="https://grok.com/"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#0f172a] hover:opacity-90 text-white text-sm font-bold tb-press"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#26242e] hover:opacity-90 text-white text-sm font-bold tb-press"
             >
               <ExternalLink className="w-3.5 h-3.5" />
               Grok 바로가기
@@ -1021,18 +1021,18 @@ export default function Step6Page() {
         </aside>
 
         {/* Main */}
-        <main className="flex-1 min-w-0 flex flex-col md:overflow-hidden bg-white border border-[#e2e8f0] rounded-2xl shadow-[0_8px_24px_rgba(15,23,42,0.06)]">
+        <main className="flex-1 min-w-0 flex flex-col md:overflow-hidden bg-[#1f1d26] border border-[#34323d] rounded-2xl shadow-[0_8px_24px_rgba(15,23,42,0.06)]">
           {toolView === 'frame-extractor' ? (
-            <FrameExtractor accentColor="#00996D" />
+            <FrameExtractor accentColor="#f97316" />
           ) : toolView === 'watermark-remover' ? (
-            <WatermarkRemover accentColor="#00996D" />
+            <WatermarkRemover accentColor="#f97316" />
           ) : !data ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-10">
-              <div className="w-20 h-20 mb-5 rounded-full flex items-center justify-center bg-[#ecfdf5] border border-[#e2e8f0]">
-                <Clapperboard className="w-10 h-10 text-[#00996D]" />
+              <div className="w-20 h-20 mb-5 rounded-full flex items-center justify-center bg-[#26242e] border border-[#34323d]">
+                <Clapperboard className="w-10 h-10 text-[#f97316]" />
               </div>
-              <h3 className="text-lg font-bold text-[#0f172a] mb-2">JSON을 불러와서 시작하세요</h3>
-              <p className="text-sm text-[#64748b] mb-5 leading-relaxed">
+              <h3 className="text-lg font-bold text-[#f5f4f7] mb-2">JSON을 불러와서 시작하세요</h3>
+              <p className="text-sm text-[#a8a4b2] mb-5 leading-relaxed">
                 Gemini 젬에서 받은 시네마틱 5컷 JSON을 붙여넣으면<br />
                 캐릭터 시트(A·B)와 5컷 프롬프트가 탭으로 정리됩니다.
               </p>
@@ -1047,15 +1047,15 @@ export default function Step6Page() {
           ) : (
             <>
               {/* Top bulk-copy bar */}
-              <div className="flex-shrink-0 px-4 py-3 border-b border-[#e2e8f0] bg-[#ecfdf5]/40 rounded-t-2xl flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex-shrink-0 px-4 py-3 border-b border-[#34323d] bg-[#26242e]/40 rounded-t-2xl flex items-center justify-between gap-3 flex-wrap">
                 <div className="flex items-center gap-2 min-w-0">
-                  <Clapperboard className="w-4 h-4 text-[#00996D] flex-shrink-0" />
-                  <h2 className="text-base font-black text-[#0f172a] uppercase truncate">{projectTitle || '시네마틱 5컷'}</h2>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#64748b] flex-shrink-0">
+                  <Clapperboard className="w-4 h-4 text-[#f97316] flex-shrink-0" />
+                  <h2 className="text-base font-black text-[#f5f4f7] uppercase truncate">{projectTitle || '시네마틱 5컷'}</h2>
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#a8a4b2] flex-shrink-0">
                     {data.shots.length}컷
                   </span>
                   {data.project?.aspect_ratio && (
-                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#64748b] flex-shrink-0">
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#a8a4b2] flex-shrink-0">
                       {data.project.aspect_ratio}
                     </span>
                   )}
@@ -1063,7 +1063,7 @@ export default function Step6Page() {
                 <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
                   <button
                     onClick={() => copyText(allCharacterPrompts)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[#334155] text-sm font-bold tb-press-soft"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[#f5f4f7] text-sm font-bold tb-press-soft"
                   >
                     <User className="w-3.5 h-3.5" />
                     캐릭터 전체
@@ -1077,14 +1077,14 @@ export default function Step6Page() {
                   </button>
                   <button
                     onClick={() => copyText(allVideoPrompts)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[#334155] text-sm font-bold tb-press-soft"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[#f5f4f7] text-sm font-bold tb-press-soft"
                   >
                     <Film className="w-3.5 h-3.5" />
                     영상 전체
                   </button>
                   <button
                     onClick={() => copyText(allDialogues)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#6d28d9] hover:opacity-90 text-white text-sm font-bold tb-press"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#f43f5e] hover:opacity-90 text-white text-sm font-bold tb-press"
                   >
                     <MessageSquare className="w-3.5 h-3.5" />
                     대사 전체
@@ -1093,7 +1093,7 @@ export default function Step6Page() {
               </div>
 
               {/* Tab bar */}
-              <div className="flex-shrink-0 flex gap-1.5 p-3 border-b border-[#e2e8f0] bg-white overflow-x-auto">
+              <div className="flex-shrink-0 flex gap-1.5 p-3 border-b border-[#34323d] bg-[#1f1d26] overflow-x-auto">
                 {['A', 'B'].map((who) => {
                   const isActive = activeTab === who;
                   const ch = data.characters[who];
@@ -1102,7 +1102,7 @@ export default function Step6Page() {
                       key={who}
                       onClick={() => setActiveTab(who)}
                       className={`flex items-center gap-2 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${
-                        isActive ? 'tb-pill-primary' : 'text-[#64748b] bg-[#f1f5f9] hover:bg-[#e2e8f0] tb-press-soft'
+                        isActive ? 'tb-pill-primary' : 'text-[#a8a4b2] bg-[#26242e] hover:bg-[#3f3c49] tb-press-soft'
                       }`}
                     >
                       <User className="w-3.5 h-3.5" style={{ opacity: isActive ? 1 : 0.7 }} />
@@ -1115,13 +1115,13 @@ export default function Step6Page() {
                 })}
                 {data.shots.map((s) => {
                   const isActive = activeTab === s.shot_id;
-                  const dot = SHOT_DOT[s.shot_id] || '#94a3b8';
+                  const dot = SHOT_DOT[s.shot_id] || '#a8a4b2';
                   return (
                     <button
                       key={s.shot_id}
                       onClick={() => setActiveTab(s.shot_id)}
                       className={`flex items-center gap-2 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${
-                        isActive ? 'tb-pill-primary' : 'text-[#64748b] bg-[#f1f5f9] hover:bg-[#e2e8f0] tb-press-soft'
+                        isActive ? 'tb-pill-primary' : 'text-[#a8a4b2] bg-[#26242e] hover:bg-[#3f3c49] tb-press-soft'
                       }`}
                     >
                       <span
@@ -1171,46 +1171,46 @@ export default function Step6Page() {
           onClick={() => setUploadOpen(false)}
         >
           <div
-            className="bg-white rounded-2xl border border-[#e2e8f0] shadow-[0_24px_60px_rgba(15,23,42,0.25)] w-[640px] max-w-[95vw] max-h-[80vh] flex flex-col"
+            className="bg-[#1f1d26] rounded-2xl border border-[#34323d] shadow-[0_24px_60px_rgba(15,23,42,0.25)] w-[640px] max-w-[95vw] max-h-[80vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#e2e8f0]">
-              <span className="text-base font-bold text-[#0f172a] uppercase tracking-wider">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#34323d]">
+              <span className="text-base font-bold text-[#f5f4f7] uppercase tracking-wider">
                 시네마틱 5컷 JSON 업로드
               </span>
               <button
                 onClick={() => setUploadOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#475569] tb-press-soft"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#26242e] hover:bg-[#3f3c49] text-[#f5f4f7] tb-press-soft"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-5 space-y-3 min-h-0">
-              <p className="text-sm text-[#64748b] leading-relaxed">
+              <p className="text-sm text-[#a8a4b2] leading-relaxed">
                 v3.0 Stage 1 (캐릭터 시트) 와 Stage 2 (5컷) 를 따로 붙여넣어도 자동으로 병합됩니다.
                 <br />
                 <span className="inline-flex items-center gap-1 mt-1 flex-wrap">
-                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">stage: "character_sheet"</code>
-                  <span className="text-[#94a3b8]">·</span>
-                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">stage: "shots"</code>
-                  <span className="text-[#94a3b8]">·</span>
-                  <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">stage: "cinematic_sequence"</code>
-                  <span className="text-[#94a3b8]">자동 인식</span>
+                  <code className="bg-[#26242e] px-1.5 py-0.5 rounded text-[#f97316] font-mono text-[12px]">stage: "character_sheet"</code>
+                  <span className="text-[#a8a4b2]">·</span>
+                  <code className="bg-[#26242e] px-1.5 py-0.5 rounded text-[#f97316] font-mono text-[12px]">stage: "shots"</code>
+                  <span className="text-[#a8a4b2]">·</span>
+                  <code className="bg-[#26242e] px-1.5 py-0.5 rounded text-[#f97316] font-mono text-[12px]">stage: "cinematic_sequence"</code>
+                  <span className="text-[#a8a4b2]">자동 인식</span>
                 </span>
               </p>
               <textarea
                 value={jsonInput}
                 onChange={(e) => setJsonInput(e.target.value)}
-                className="w-full h-[260px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
+                className="w-full h-[260px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#26242e] border border-[#34323d] text-[#f5f4f7] focus:outline-none focus:border-[#fb923c] focus:ring-[3px] focus:ring-[#fb923c]/20"
                 placeholder={'Stage 1: { "stage": "character_sheet", "version": "3.0", "characters": { "A": {...}, "B": {...} } }\nStage 2: { "stage": "shots", "version": "3.0", "shots": [{"shot_id": "S01", ...}, ...] }'}
               />
               {uploadError && (
-                <div className="text-sm text-[#b91c1c] bg-[#fee2e2] border border-[#fca5a5] rounded-xl px-3 py-2 font-semibold">
+                <div className="text-sm text-[#fca5a5] bg-[#3a1f24] border border-[#7f1d1d] rounded-xl px-3 py-2 font-semibold">
                   {uploadError}
                 </div>
               )}
             </div>
-            <div className="flex justify-end gap-2 px-5 py-3 border-t border-[#e2e8f0]">
+            <div className="flex justify-end gap-2 px-5 py-3 border-t border-[#34323d]">
               <button
                 onClick={() => setUploadOpen(false)}
                 className="px-4 py-1.5 rounded-full tb-pill-ghost text-sm font-bold transition"
@@ -1243,19 +1243,19 @@ function CharacterCard({ who, character, onCopy, onUpdatePrompt, onImageFile, on
   if (!c) return null;
 
   return (
-    <div className="rounded-2xl overflow-hidden border border-[#e2e8f0] bg-white shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
+    <div className="rounded-2xl overflow-hidden border border-[#34323d] bg-[#1f1d26] shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-[#e2e8f0] flex items-center justify-between gap-3 bg-[#ecfdf5]/60">
+      <div className="px-4 py-3 border-b border-[#34323d] flex items-center justify-between gap-3 bg-[#26242e]/60">
         <div className="flex items-center gap-2.5 min-w-0">
-          <span className="text-[12px] font-black px-2 py-0.5 rounded-full bg-[#00996D]/15 text-[#00996D] flex items-center gap-1">
+          <span className="text-[12px] font-black px-2 py-0.5 rounded-full bg-[#f97316]/15 text-[#f97316] flex items-center gap-1">
             <User className="w-3 h-3" />
             CHAR {who}
           </span>
-          <span className="text-base font-bold text-[#0f172a] truncate">
+          <span className="text-base font-bold text-[#f5f4f7] truncate">
             {c.name || '(이름 없음)'}
           </span>
           {c.role && (
-            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#334155] flex-shrink-0">
+            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#f5f4f7] flex-shrink-0">
               {c.role}
             </span>
           )}
@@ -1274,16 +1274,16 @@ function CharacterCard({ who, character, onCopy, onUpdatePrompt, onImageFile, on
       {/* 2-col: image upload | sheet prompt */}
       <div className="grid grid-cols-1 md:grid-cols-[minmax(400px,520px)_minmax(0,1fr)]">
         {/* LEFT: image */}
-        <div className="p-4 border-b md:border-b-0 md:border-r border-[#e2e8f0]">
+        <div className="p-4 border-b md:border-b-0 md:border-r border-[#34323d]">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5">
-              <ImageIcon className="w-3.5 h-3.5 text-[#00996D]" />
-              <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">캐릭터 시트 이미지</span>
+              <ImageIcon className="w-3.5 h-3.5 text-[#f97316]" />
+              <span className="text-[11px] uppercase tracking-wider text-[#a8a4b2] font-bold">캐릭터 시트 이미지</span>
             </div>
             {c.imageUpload && (
               <button
                 onClick={onClearImage}
-                className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-white hover:bg-[#fee2e2] border border-[#e2e8f0] text-[11px] font-bold text-[#b91c1c] tb-press-soft"
+                className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#26242e] hover:bg-[#3a1f24] border border-[#34323d] text-[11px] font-bold text-[#fca5a5] tb-press-soft"
               >
                 <Trash2 className="w-3 h-3" />
                 제거
@@ -1296,18 +1296,18 @@ function CharacterCard({ who, character, onCopy, onUpdatePrompt, onImageFile, on
         {/* RIGHT: info + sheet prompt */}
         <div className="p-4 min-w-0 space-y-3">
           {c.vibe && (
-            <p className="bg-[#f8fafc] border-l-4 border-[#00996D] px-3 py-2 rounded-r-md text-[13px] text-[#334155] italic leading-snug">
+            <p className="bg-[#26242e] border-l-4 border-[#f97316] px-3 py-2 rounded-r-md text-[13px] text-[#f5f4f7] italic leading-snug">
               {c.vibe}
             </p>
           )}
           {c.sheet_struct?.character_identity?.summary && (
-            <p className="bg-[#ecfdf5] border border-[#a7f3d0] px-3 py-2 rounded-md text-[12.5px] text-[#065f46] leading-snug">
+            <p className="bg-[#26242e] border border-[#7c2d12] px-3 py-2 rounded-md text-[12.5px] text-[#fdba74] leading-snug">
               {c.sheet_struct.character_identity.summary}
             </p>
           )}
           {c.voice_profile && (
-            <div className="flex flex-wrap gap-x-3 gap-y-1 px-3 py-2 rounded-xl bg-[#fefce8] border border-[#fde68a] text-[12px]">
-              <span className="text-[10px] font-black text-[#a16207] uppercase tracking-wider self-center">VOICE</span>
+            <div className="flex flex-wrap gap-x-3 gap-y-1 px-3 py-2 rounded-xl bg-[#26242e] border border-[#34323d] text-[12px]">
+              <span className="text-[10px] font-black text-[#fbbf24] uppercase tracking-wider self-center">VOICE</span>
               {c.voice_profile.tone && <Stat k="톤" v={c.voice_profile.tone} />}
               {c.voice_profile.pace && <Stat k="페이스" v={c.voice_profile.pace} />}
               {c.voice_profile.emotion_baseline && <Stat k="기본감정" v={c.voice_profile.emotion_baseline} />}
@@ -1317,17 +1317,17 @@ function CharacterCard({ who, character, onCopy, onUpdatePrompt, onImageFile, on
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
-                <ImageIcon className="w-3.5 h-3.5 text-[#00996D] flex-shrink-0" />
-                <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">캐릭터 시트 프롬프트</span>
+                <ImageIcon className="w-3.5 h-3.5 text-[#f97316] flex-shrink-0" />
+                <span className="text-[11px] uppercase tracking-wider text-[#a8a4b2] font-bold">캐릭터 시트 프롬프트</span>
                 {c.sheet_struct && (
-                  <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#ecfdf5] text-[#00996D] font-bold">
+                  <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#26242e] text-[#f97316] font-bold">
                     v3 · 9섹션 compiled
                   </span>
                 )}
               </div>
               <button
                 onClick={() => onCopy(c.sheet_prompt || '')}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] tb-press-soft"
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[11px] font-bold text-[#a8a4b2] tb-press-soft"
               >
                 <Copy className="w-3 h-3" />
                 복사
@@ -1338,7 +1338,7 @@ function CharacterCard({ who, character, onCopy, onUpdatePrompt, onImageFile, on
               onChange={(e) => onUpdatePrompt(e.target.value)}
               rows={10}
               placeholder="sheet_prompt..."
-              className="w-full min-h-[240px] resize-y bg-white border border-[#e2e8f0] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
+              className="w-full min-h-[240px] resize-y bg-[#26242e] border border-[#34323d] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#f5f4f7] focus:outline-none focus:border-[#fb923c] focus:ring-[3px] focus:ring-[#fb923c]/20"
             />
           </div>
         </div>
@@ -1370,11 +1370,11 @@ function CharSpecGrid({ character }) {
   if (items.length === 0) return null;
 
   return (
-    <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[12.5px] bg-[#f8fafc] rounded-xl p-3 border border-[#e2e8f0]">
+    <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[12.5px] bg-[#26242e] rounded-xl p-3 border border-[#34323d]">
       {items.map(([k, v]) => (
         <div key={k} className="flex gap-2 min-w-0">
-          <span className="text-[#94a3b8] font-bold shrink-0 w-12">{k}</span>
-          <span className="text-[#334155] truncate" title={v}>{v}</span>
+          <span className="text-[#a8a4b2] font-bold shrink-0 w-12">{k}</span>
+          <span className="text-[#f5f4f7] truncate" title={v}>{v}</span>
         </div>
       ))}
     </div>
@@ -1383,7 +1383,7 @@ function CharSpecGrid({ character }) {
 
 function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImage }) {
   if (!shot) return null;
-  const dot = SHOT_DOT[shot.shot_id] || '#94a3b8';
+  const dot = SHOT_DOT[shot.shot_id] || '#a8a4b2';
   const cam = shot.camera || {};
   const blocking = shot.blocking || {};
   const emotion = shot.emotion || {};
@@ -1391,10 +1391,10 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
   const dm = shot.dialogue_meta || null;
 
   return (
-    <div className="rounded-2xl overflow-hidden border border-[#e2e8f0] bg-white shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
+    <div className="rounded-2xl overflow-hidden border border-[#34323d] bg-[#1f1d26] shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
       {/* Header */}
       <div
-        className="px-4 py-3 border-b border-[#e2e8f0] flex items-center justify-between gap-3"
+        className="px-4 py-3 border-b border-[#34323d] flex items-center justify-between gap-3"
         style={{ background: `${dot}10` }}
       >
         <div className="flex items-center gap-2.5 min-w-0">
@@ -1404,11 +1404,11 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
           >
             {shot.shot_id}
           </span>
-          <span className="text-base font-bold text-[#0f172a] truncate">
+          <span className="text-base font-bold text-[#f5f4f7] truncate">
             {shot.shot_label || SHOT_FALLBACK_LABEL[shot.shot_id] || shot.shot_type}
           </span>
           {shot.duration_sec > 0 && (
-            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#334155] flex-shrink-0">
+            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#f5f4f7] flex-shrink-0">
               {shot.duration_sec}초
             </span>
           )}
@@ -1421,13 +1421,13 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
       </div>
 
       {shot.purpose && (
-        <div className="px-4 py-3 border-b border-[#e2e8f0]">
-          <p className="text-sm text-[#334155] leading-relaxed">{shot.purpose}</p>
+        <div className="px-4 py-3 border-b border-[#34323d]">
+          <p className="text-sm text-[#f5f4f7] leading-relaxed">{shot.purpose}</p>
         </div>
       )}
 
       {/* Camera / Blocking / Emotion summary strip */}
-      <div className="px-4 py-3 border-b border-[#e2e8f0] bg-[#f8fafc] flex flex-wrap gap-x-4 gap-y-1.5 text-[12.5px]">
+      <div className="px-4 py-3 border-b border-[#34323d] bg-[#26242e] flex flex-wrap gap-x-4 gap-y-1.5 text-[12.5px]">
         {cam.framing && <Stat icon={Camera} k="프레이밍" v={cam.framing} />}
         {cam.lens && <Stat k="렌즈" v={cam.lens} />}
         {cam.aperture && <Stat k="조리개" v={cam.aperture} />}
@@ -1441,14 +1441,14 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
 
       {/* Audio strip (v2) */}
       {audio && (audio.ambient || audio.foley || audio.sfx || audio.music_cue) && (
-        <div className="px-4 py-2.5 border-b border-[#e2e8f0] bg-[#fdf4ff] flex flex-wrap gap-x-4 gap-y-1.5 text-[12.5px]">
-          <span className="text-[10px] font-black text-[#a21caf] uppercase tracking-wider self-center">AUDIO</span>
+        <div className="px-4 py-2.5 border-b border-[#34323d] bg-[#26242e] flex flex-wrap gap-x-4 gap-y-1.5 text-[12.5px]">
+          <span className="text-[10px] font-black text-[#e879f9] uppercase tracking-wider self-center">AUDIO</span>
           {audio.ambient && audio.ambient !== '없음' && <Stat k="앰비언트" v={audio.ambient} />}
           {audio.foley && audio.foley !== '없음' && <Stat k="폴리" v={audio.foley} />}
           {audio.sfx && audio.sfx !== '없음' && <Stat k="SFX" v={audio.sfx} />}
           {audio.music_cue && audio.music_cue !== '없음' && <Stat k="음악" v={audio.music_cue} />}
           {audio.bgm_policy && (
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e9d5ff] text-[#a21caf] self-center">
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#e879f9] self-center">
               {audio.bgm_policy}
             </span>
           )}
@@ -1458,8 +1458,8 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
       {/* Dialogue meta strip — speaker / delivery (preserved from JSON).
           v2.2 lines[] 일 경우 모든 발화의 화자/딜리버리를 노출. */}
       {dm && (Array.isArray(dm.lines) ? dm.lines.length > 0 : (dm.speaker || dm.delivery)) && (
-        <div className="px-4 py-2.5 border-b border-[#e2e8f0] bg-[#fefce8] flex flex-wrap gap-x-4 gap-y-1.5 text-[12.5px]">
-          <span className="text-[10px] font-black text-[#a16207] uppercase tracking-wider self-center">DIALOGUE</span>
+        <div className="px-4 py-2.5 border-b border-[#34323d] bg-[#26242e] flex flex-wrap gap-x-4 gap-y-1.5 text-[12.5px]">
+          <span className="text-[10px] font-black text-[#fbbf24] uppercase tracking-wider self-center">DIALOGUE</span>
           {Array.isArray(dm.lines) ? (
             dm.lines.map((l, idx) => {
               const sp = l.speaker || l.character_id || l.character || '';
@@ -1486,16 +1486,16 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
       {/* 3-col: image | image+video prompts | dialogue */}
       <div className="grid grid-cols-1 md:grid-cols-[minmax(400px,520px)_minmax(0,1fr)_minmax(220px,320px)]">
         {/* LEFT: image upload */}
-        <div className="p-4 border-b md:border-b-0 md:border-r border-[#e2e8f0]">
+        <div className="p-4 border-b md:border-b-0 md:border-r border-[#34323d]">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5">
-              <ImageIcon className="w-3.5 h-3.5 text-[#00996D]" />
-              <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">이미지</span>
+              <ImageIcon className="w-3.5 h-3.5 text-[#f97316]" />
+              <span className="text-[11px] uppercase tracking-wider text-[#a8a4b2] font-bold">이미지</span>
             </div>
             {shot.imageUpload && (
               <button
                 onClick={onClearImage}
-                className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-white hover:bg-[#fee2e2] border border-[#e2e8f0] text-[11px] font-bold text-[#b91c1c] tb-press-soft"
+                className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#26242e] hover:bg-[#3a1f24] border border-[#34323d] text-[11px] font-bold text-[#fca5a5] tb-press-soft"
               >
                 <Trash2 className="w-3 h-3" />
                 제거
@@ -1506,19 +1506,19 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
         </div>
 
         {/* MIDDLE: i2i + video prompts */}
-        <div className="p-4 border-b md:border-b-0 md:border-r border-[#e2e8f0] space-y-3 min-w-0">
+        <div className="p-4 border-b md:border-b-0 md:border-r border-[#34323d] space-y-3 min-w-0">
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-1.5 min-w-0">
-                <ImageIcon className="w-3.5 h-3.5 text-[#00996D] flex-shrink-0" />
-                <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">이미지 프롬프트 (i2i)</span>
-                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#ecfdf5] text-[#00996D] font-bold">
+                <ImageIcon className="w-3.5 h-3.5 text-[#f97316] flex-shrink-0" />
+                <span className="text-[11px] uppercase tracking-wider text-[#a8a4b2] font-bold">이미지 프롬프트 (i2i)</span>
+                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#26242e] text-[#f97316] font-bold">
                   Nano Banana
                 </span>
               </div>
               <button
                 onClick={() => onCopy(shot.image_prompt)}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] tb-press-soft flex-shrink-0"
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[11px] font-bold text-[#a8a4b2] tb-press-soft flex-shrink-0"
               >
                 <Copy className="w-3 h-3" />
                 복사
@@ -1529,24 +1529,24 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
               onChange={(e) => onUpdate({ image_prompt: e.target.value })}
               rows={5}
               placeholder="이미지 프롬프트..."
-              className="w-full min-h-[110px] resize-y bg-white border border-[#e2e8f0] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
+              className="w-full min-h-[110px] resize-y bg-[#26242e] border border-[#34323d] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#f5f4f7] focus:outline-none focus:border-[#fb923c] focus:ring-[3px] focus:ring-[#fb923c]/20"
             />
           </div>
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
                 <Film className="w-3.5 h-3.5 text-[#f43f5e] flex-shrink-0" />
-                <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">영상 프롬프트</span>
-                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#fee2e2] text-[#b91c1c] font-bold">
+                <span className="text-[11px] uppercase tracking-wider text-[#a8a4b2] font-bold">영상 프롬프트</span>
+                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#3a1f24] text-[#fca5a5] font-bold">
                   사용자 입력
                 </span>
-                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#faf5ff] text-[#6d28d9] font-bold border border-[#e9d5ff]">
+                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#26242e] text-[#f43f5e] font-bold border border-[#34323d]">
                   대사 ↔ "..." 자동 동기화
                 </span>
               </div>
               <button
                 onClick={() => onCopy(appendNoBgm(shot.video_prompt))}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] tb-press-soft flex-shrink-0"
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[11px] font-bold text-[#a8a4b2] tb-press-soft flex-shrink-0"
               >
                 <Copy className="w-3 h-3" />
                 복사
@@ -1557,21 +1557,21 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
               onChange={(e) => onUpdate({ video_prompt: e.target.value })}
               rows={5}
               placeholder="이 컷의 영상 프롬프트를 자유롭게 작성하세요. 카메라 워크, 인물 동작, 컷 길이 등."
-              className="w-full min-h-[110px] resize-y bg-white border border-[#e2e8f0] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
+              className="w-full min-h-[110px] resize-y bg-[#26242e] border border-[#34323d] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#f5f4f7] focus:outline-none focus:border-[#fb923c] focus:ring-[3px] focus:ring-[#fb923c]/20"
             />
           </div>
         </div>
 
         {/* RIGHT: dialogue */}
-        <div className="p-4 bg-[#faf5ff] min-w-0">
+        <div className="p-4 bg-[#26242e] min-w-0">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5 min-w-0">
-              <MessageSquare className="w-3.5 h-3.5 text-[#6d28d9] flex-shrink-0" />
-              <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">대사</span>
+              <MessageSquare className="w-3.5 h-3.5 text-[#f43f5e] flex-shrink-0" />
+              <span className="text-[11px] uppercase tracking-wider text-[#a8a4b2] font-bold">대사</span>
             </div>
             <button
               onClick={() => onCopy(shot.dialogue)}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] tb-press-soft flex-shrink-0"
+              className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[11px] font-bold text-[#a8a4b2] tb-press-soft flex-shrink-0"
             >
               <Copy className="w-3 h-3" />
               복사
@@ -1588,7 +1588,7 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
                     const prefix = `${name}: `;
                     onUpdate({ dialogue: (shot.dialogue ? shot.dialogue + '\n' : '') + prefix });
                   }}
-                  className="px-2.5 py-1 rounded-full bg-white border border-[#e2e8f0] text-[11px] font-bold text-[#475569] tb-press-soft hover:bg-[#f1f5f9]"
+                  className="px-2.5 py-1 rounded-full bg-[#26242e] border border-[#34323d] text-[11px] font-bold text-[#f5f4f7] tb-press-soft hover:bg-[#34323d]"
                 >
                   + {who} 대사
                 </button>
@@ -1600,7 +1600,7 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
             onChange={(e) => onUpdate({ dialogue: e.target.value })}
             rows={9}
             placeholder={`A: 첫 대사\nB: 답변...`}
-            className="w-full min-h-[220px] resize-y bg-white border border-[#e2e8f0] rounded-xl p-2.5 text-[13px] leading-relaxed text-[#0f172a] focus:outline-none focus:border-[#6d28d9] focus:ring-[3px] focus:ring-[#6d28d9]/20"
+            className="w-full min-h-[220px] resize-y bg-[#26242e] border border-[#34323d] rounded-xl p-2.5 text-[13px] leading-relaxed text-[#f5f4f7] focus:outline-none focus:border-[#f43f5e] focus:ring-[3px] focus:ring-[#f43f5e]/20"
           />
         </div>
       </div>
@@ -1611,16 +1611,16 @@ function ShotCard({ shot, characters, onCopy, onUpdate, onImageFile, onClearImag
 function Stat({ icon: Icon, k, v }) {
   return (
     <div className="flex items-center gap-1.5 min-w-0">
-      {Icon && <Icon className="w-3 h-3 text-[#94a3b8] flex-shrink-0" />}
-      <span className="text-[#94a3b8] font-bold uppercase tracking-wider text-[10px]">{k}</span>
-      <span className="text-[#334155] truncate" title={v}>{v}</span>
+      {Icon && <Icon className="w-3 h-3 text-[#a8a4b2] flex-shrink-0" />}
+      <span className="text-[#a8a4b2] font-bold uppercase tracking-wider text-[10px]">{k}</span>
+      <span className="text-[#f5f4f7] truncate" title={v}>{v}</span>
     </div>
   );
 }
 
 function Tag({ children }) {
   return (
-    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#475569] text-[11px] font-bold whitespace-nowrap">
+    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#f5f4f7] text-[11px] font-bold whitespace-nowrap">
       {children}
     </span>
   );

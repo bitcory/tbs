@@ -275,8 +275,8 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
       const el = sceneRefs.current[sceneId];
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.classList.add('ring-2', 'ring-violet-500/60');
-        setTimeout(() => el.classList.remove('ring-2', 'ring-violet-500/60'), 2000);
+        el.classList.add('ring-2', 'ring-orange-500/60');
+        setTimeout(() => el.classList.remove('ring-2', 'ring-orange-500/60'), 2000);
       }
     }
   };
@@ -287,8 +287,8 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
     const el = sceneRefs.current[pendingScrollId];
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      el.classList.add('ring-2', 'ring-violet-500/60');
-      setTimeout(() => el.classList.remove('ring-2', 'ring-violet-500/60'), 2000);
+      el.classList.add('ring-2', 'ring-orange-500/60');
+      setTimeout(() => el.classList.remove('ring-2', 'ring-orange-500/60'), 2000);
     }
     setPendingScrollId(null);
   }, [activeType, pendingScrollId]);
@@ -298,12 +298,12 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
   const allVideoPrompts = storyboard ? storyboard.scenes.filter(s => s.prompts.video).map(s => s.prompts.video.prompt).join('\n\n') : '';
 
   return (
-    <div className="min-h-screen md:h-screen md:flex md:flex-col md:overflow-hidden bg-[#f8fafc] text-[#0f172a]">
+    <div className="min-h-screen md:h-screen md:flex md:flex-col md:overflow-hidden bg-[#15141a] text-[#f5f4f7]">
       <style jsx global>{`
         .tb-hero {
           position: relative;
           padding: 16px 20px 36px;
-          background: linear-gradient(135deg, #016837 0%, #00996D 45%, #00B380 100%);
+          background: linear-gradient(135deg, #7c2d12 0%, #f97316 45%, #fb923c 100%);
           color: #fff;
           text-align: center;
           overflow: hidden;
@@ -332,7 +332,7 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
           content: '';
           position: absolute; left: -10%; right: -10%; bottom: -1px;
           height: 24px;
-          background: #f8fafc;
+          background: #15141a;
           border-radius: 50% 50% 0 0 / 100% 100% 0 0;
         }
         .tb-hero-glow {
@@ -372,63 +372,63 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
           margin: -22px 16px 0;
           padding: 10px 14px;
           display: flex; align-items: center; gap: 10px;
-          background: rgba(255,255,255,0.7);
-          border: 1px solid rgba(255,255,255,0.9);
+          background: rgba(31,29,38,0.7);
+          border: 1px solid rgba(255,255,255,0.12);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
           border-radius: 100px;
-          box-shadow: 0 18px 40px rgba(15, 23, 42, 0.1);
+          box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
         }
         .tb-pill-primary {
-          background: rgba(255,255,255,0.4);
-          color: #00774f;
-          border: 1.5px solid rgba(0,153,109,0.35);
+          background: rgba(249,115,22,0.18);
+          color: #fb923c;
+          border: 1.5px solid rgba(249,115,22,0.45);
           backdrop-filter: blur(18px) saturate(180%);
           -webkit-backdrop-filter: blur(18px) saturate(180%);
           box-shadow:
-            0 10px 24px rgba(0,153,109,0.22),
-            inset 2px 2px 1px 0 rgba(255,255,255,0.85),
-            inset -1px -1px 1px 1px rgba(255,255,255,0.5);
+            0 10px 24px rgba(249,115,22,0.22),
+            inset 2px 2px 1px 0 rgba(255,255,255,0.12),
+            inset -1px -1px 1px 1px rgba(255,255,255,0.06);
           transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,2.2), box-shadow 0.3s, background 0.3s;
         }
         .tb-pill-primary:hover {
-          background: rgba(255,255,255,0.55);
+          background: rgba(249,115,22,0.28);
           transform: translateY(-1px) scale(1.03);
           box-shadow:
-            0 16px 32px rgba(0,153,109,0.3),
-            inset 2px 2px 1px 0 rgba(255,255,255,0.95),
-            inset -1px -1px 1px 1px rgba(255,255,255,0.6);
+            0 16px 32px rgba(249,115,22,0.3),
+            inset 2px 2px 1px 0 rgba(255,255,255,0.16),
+            inset -1px -1px 1px 1px rgba(255,255,255,0.08);
         }
         .tb-pill-primary:active {
           transform: translateY(1px) scale(0.94);
           box-shadow:
-            0 4px 10px rgba(0,153,109,0.18),
-            inset 2px 2px 2px 0 rgba(0,0,0,0.08),
-            inset -1px -1px 1px 1px rgba(255,255,255,0.3);
+            0 4px 10px rgba(249,115,22,0.18),
+            inset 2px 2px 2px 0 rgba(0,0,0,0.3),
+            inset -1px -1px 1px 1px rgba(255,255,255,0.06);
           transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
         }
         .tb-pill-ghost {
-          background: rgba(255,255,255,0.55);
-          color: #334155;
-          border: 1px solid rgba(255,255,255,0.7);
+          background: rgba(38,36,46,0.55);
+          color: #f5f4f7;
+          border: 1px solid rgba(255,255,255,0.12);
           backdrop-filter: blur(14px) saturate(140%);
           -webkit-backdrop-filter: blur(14px) saturate(140%);
           box-shadow:
-            0 6px 16px rgba(15,23,42,0.08),
-            inset 1.5px 1.5px 0.5px 0 rgba(255,255,255,0.85),
-            inset -1px -1px 0.5px 1px rgba(255,255,255,0.45);
+            0 6px 16px rgba(0,0,0,0.3),
+            inset 1.5px 1.5px 0.5px 0 rgba(255,255,255,0.1),
+            inset -1px -1px 0.5px 1px rgba(255,255,255,0.05);
           transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,2.2), box-shadow 0.3s, background 0.3s;
         }
         .tb-pill-ghost:hover {
-          background: rgba(255,255,255,0.75);
+          background: rgba(38,36,46,0.75);
           transform: translateY(-1px) scale(1.03);
         }
         .tb-pill-ghost:active {
           transform: translateY(1px) scale(0.94);
           box-shadow:
-            0 3px 8px rgba(15,23,42,0.1),
-            inset 1.5px 1.5px 2px 0 rgba(0,0,0,0.08),
-            inset -1px -1px 0.5px 1px rgba(255,255,255,0.3);
+            0 3px 8px rgba(0,0,0,0.4),
+            inset 1.5px 1.5px 2px 0 rgba(0,0,0,0.3),
+            inset -1px -1px 0.5px 1px rgba(255,255,255,0.05);
           transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
         }
       `}</style>
@@ -448,7 +448,7 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
           <ArrowLeft className="w-3.5 h-3.5" />
           홈
         </Link>
-        <span className="text-[11px] font-bold tracking-[0.18em] text-[#00996D] uppercase hidden sm:inline">TOOLB LAB</span>
+        <span className="text-[11px] font-bold tracking-[0.18em] text-[#f97316] uppercase hidden sm:inline">TOOLB LAB</span>
         <div className="ml-auto flex items-center gap-2">
           <button
             onClick={() => { setUploadOpen(true); setUploadError(''); setJsonInput(''); }}
@@ -462,42 +462,42 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
 
       <div className="flex flex-col md:flex-row md:flex-1 md:min-h-0 w-full px-4 pt-6 pb-4 gap-4 2xl:px-6">
         {/* Sidebar */}
-        <aside className="w-full md:w-[300px] flex-shrink-0 bg-white border border-[#e2e8f0] rounded-2xl shadow-[0_8px_24px_rgba(15,23,42,0.06)] md:overflow-y-auto">
+        <aside className="w-full md:w-[300px] flex-shrink-0 bg-[#1f1d26] border border-[#34323d] rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.4)] md:overflow-y-auto">
           {/* Storyboard meta */}
-          <div className="p-4 border-b border-[#e2e8f0]">
-            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#64748b]">
+          <div className="p-4 border-b border-[#34323d]">
+            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#a8a4b2]">
               <Clapperboard className="w-3.5 h-3.5" />
               인트로영상 정보
             </div>
             {storyboard ? (
               <div className="space-y-1.5">
                 <div className="flex items-start gap-2">
-                  <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">제목</span>
-                  <span className="text-sm text-[#0f172a] font-bold flex-1 break-all">{storyboard.title}</span>
+                  <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">제목</span>
+                  <span className="text-sm text-[#f5f4f7] font-bold flex-1 break-all">{storyboard.title}</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">씬 수</span>
-                  <span className="text-sm text-[#0f172a] font-bold flex-1">{storyboard.meta.total_scenes}개</span>
+                  <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">씬 수</span>
+                  <span className="text-sm text-[#f5f4f7] font-bold flex-1">{storyboard.meta.total_scenes}개</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">비율</span>
-                  <span className="text-sm text-[#0f172a] font-bold flex-1">{storyboard.meta.aspect_ratio}</span>
+                  <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">비율</span>
+                  <span className="text-sm text-[#f5f4f7] font-bold flex-1">{storyboard.meta.aspect_ratio}</span>
                 </div>
                 {storyboard.meta.genre && (
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-[#64748b] font-medium w-14 pt-0.5">장르</span>
-                    <span className="text-sm text-[#0f172a] font-bold flex-1">{storyboard.meta.genre}</span>
+                    <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">장르</span>
+                    <span className="text-sm text-[#f5f4f7] font-bold flex-1">{storyboard.meta.genre}</span>
                   </div>
                 )}
               </div>
             ) : (
-              <p className="text-[13px] text-[#64748b]">JSON을 업로드하면 표시됩니다.</p>
+              <p className="text-[13px] text-[#a8a4b2]">JSON을 업로드하면 표시됩니다.</p>
             )}
           </div>
 
           {/* Tools */}
-          <div className="p-4 border-b border-[#e2e8f0]">
-            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#64748b]">
+          <div className="p-4 border-b border-[#34323d]">
+            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#a8a4b2]">
               <Wrench className="w-3.5 h-3.5" />
               도구
             </div>
@@ -506,7 +506,7 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
                 href="https://translate.google.co.kr/?sl=ko&tl=en&op=translate"
                 target="_blank"
                 rel="noreferrer"
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#1e40af] bg-[#eff6ff] hover:bg-[#dbeafe] tb-press-soft"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#93c5fd] bg-[#172554] hover:bg-[#1e3a8a] tb-press-soft"
               >
                 <Languages className="w-4 h-4" />
                 구글번역기
@@ -516,7 +516,7 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition ${
                   toolView === 'frame-extractor'
                     ? 'tb-pill-primary'
-                    : 'text-[#92400e] bg-[#fef3c7] hover:bg-[#fde68a] tb-press-soft'
+                    : 'text-[#fbbf24] bg-[#451a03] hover:bg-[#78350f] tb-press-soft'
                 }`}
               >
                 <Film className="w-4 h-4" />
@@ -527,7 +527,7 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition ${
                   toolView === 'watermark-remover'
                     ? 'tb-pill-primary'
-                    : 'text-[#155e75] bg-[#cffafe] hover:bg-[#a5f3fc] tb-press-soft'
+                    : 'text-[#67e8f9] bg-[#083344] hover:bg-[#155e75] tb-press-soft'
                 }`}
               >
                 <Droplets className="w-4 h-4" />
@@ -537,7 +537,7 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
                 href="https://tbnc.aitoolb.com/"
                 target="_blank"
                 rel="noreferrer"
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#6b21a8] bg-[#f3e8ff] hover:bg-[#e9d5ff] tb-press-soft"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#fb7185] bg-[#4c0519] hover:bg-[#881337] tb-press-soft"
               >
                 <FileText className="w-4 h-4" />
                 파일명변경
@@ -547,7 +547,7 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
 
           {/* Gem guide */}
           <div className="p-4 space-y-2">
-            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#64748b]">
+            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#a8a4b2]">
               <Gem className="w-3.5 h-3.5" />
               젬 가이드
             </div>
@@ -562,7 +562,7 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
             </a>
             <button
               onClick={() => setCharacterSheetOpen(true)}
-              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#7c3aed] hover:opacity-90 text-white text-sm font-bold tb-press"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#f43f5e] hover:opacity-90 text-white text-sm font-bold tb-press"
             >
               <UserSquare className="w-3.5 h-3.5" />
               캐릭터시트
@@ -620,18 +620,18 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
         </aside>
 
         {/* Main */}
-        <main className="flex-1 min-w-0 flex flex-col md:overflow-hidden bg-white border border-[#e2e8f0] rounded-2xl shadow-[0_8px_24px_rgba(15,23,42,0.06)]">
+        <main className="flex-1 min-w-0 flex flex-col md:overflow-hidden bg-[#1f1d26] border border-[#34323d] rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.4)]">
           {toolView === 'frame-extractor' ? (
-            <FrameExtractor accentColor="#00996D" />
+            <FrameExtractor accentColor="#f97316" />
           ) : toolView === 'watermark-remover' ? (
-            <WatermarkRemover accentColor="#00996D" />
+            <WatermarkRemover accentColor="#f97316" />
           ) : !storyboard ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-10">
-              <div className="w-20 h-20 mb-5 rounded-full flex items-center justify-center bg-[#ecfdf5] border border-[#e2e8f0]">
-                <Clapperboard className="w-10 h-10 text-[#00996D]" />
+              <div className="w-20 h-20 mb-5 rounded-full flex items-center justify-center bg-[#7c2d12] border border-[#34323d]">
+                <Clapperboard className="w-10 h-10 text-[#f97316]" />
               </div>
-              <h3 className="text-lg font-bold text-[#0f172a] mb-2">인트로영상 데이터가 없습니다</h3>
-              <p className="text-sm text-[#64748b] mb-5 leading-relaxed">
+              <h3 className="text-lg font-bold text-[#f5f4f7] mb-2">인트로영상 데이터가 없습니다</h3>
+              <p className="text-sm text-[#a8a4b2] mb-5 leading-relaxed">
                 인트로영상 JSON을 업로드하여<br />
                 이미지/영상 프롬프트를 확인하세요.
               </p>
@@ -646,14 +646,14 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
           ) : (
             <>
               {/* Top bulk-copy bar */}
-              <div className="flex-shrink-0 px-4 py-3 border-b border-[#e2e8f0] bg-[#ecfdf5]/40 rounded-t-2xl flex items-center justify-between gap-3">
+              <div className="flex-shrink-0 px-4 py-3 border-b border-[#34323d] bg-[#7c2d12]/40 rounded-t-2xl flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 min-w-0">
-                  <Clapperboard className="w-4 h-4 text-[#00996D] flex-shrink-0" />
-                  <h2 className="text-base font-black text-[#0f172a] uppercase truncate">{storyboard.title}</h2>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#64748b] flex-shrink-0">
+                  <Clapperboard className="w-4 h-4 text-[#f97316] flex-shrink-0" />
+                  <h2 className="text-base font-black text-[#f5f4f7] uppercase truncate">{storyboard.title}</h2>
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#a8a4b2] flex-shrink-0">
                     {storyboard.meta.total_scenes}씬
                   </span>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#e2e8f0] text-[#64748b] flex-shrink-0">
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#a8a4b2] flex-shrink-0">
                     {storyboard.meta.aspect_ratio}
                   </span>
                 </div>
@@ -667,7 +667,7 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
                   </button>
                   <button
                     onClick={() => copyText(allVideoPrompts)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[#334155] text-sm font-bold tb-press-soft"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[#f5f4f7] text-sm font-bold tb-press-soft"
                   >
                     <Film className="w-3.5 h-3.5" />
                     영상 전체
@@ -676,7 +676,7 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
               </div>
 
               {/* Type tab bar */}
-              <div className="flex-shrink-0 flex gap-1.5 p-3 border-b border-[#e2e8f0] bg-white overflow-x-auto">
+              <div className="flex-shrink-0 flex gap-1.5 p-3 border-b border-[#34323d] bg-[#1f1d26] overflow-x-auto">
                 {TYPES.map((t, i) => {
                   const tc = TYPE_COLORS[i];
                   const count = scenesByType[i].length;
@@ -687,7 +687,7 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
                       onClick={() => setActiveType(i)}
                       className={`flex items-center gap-2 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${isActive
                         ? 'tb-pill-primary'
-                        : 'text-[#64748b] bg-[#f1f5f9] hover:bg-[#e2e8f0] tb-press-soft'
+                        : 'text-[#a8a4b2] bg-[#26242e] hover:bg-[#34323d] tb-press-soft'
                         }`}
                     >
                       <span
@@ -711,7 +711,7 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
               {/* Scene cards */}
               <div className="flex-1 overflow-y-auto p-5 space-y-5">
                 {scenesByType[activeType].length === 0 ? (
-                  <div className="text-center py-10 text-[#64748b] text-sm">
+                  <div className="text-center py-10 text-[#a8a4b2] text-sm">
                     이 구간에 해당하는 씬이 없습니다.
                   </div>
                 ) : (
@@ -721,11 +721,11 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
                       <div
                         key={scene.id}
                         ref={(el) => { sceneRefs.current[scene.id] = el; }}
-                        className="rounded-2xl overflow-hidden border border-[#e2e8f0] bg-white shadow-[0_2px_8px_rgba(15,23,42,0.04)] transition-all"
+                        className="rounded-2xl overflow-hidden border border-[#34323d] bg-[#1f1d26] shadow-[0_2px_8px_rgba(0,0,0,0.4)] transition-all"
                       >
                         {/* Scene header */}
                         <div
-                          className="px-4 py-3 border-b border-[#e2e8f0] flex items-center justify-between gap-3"
+                          className="px-4 py-3 border-b border-[#34323d] flex items-center justify-between gap-3"
                           style={{ background: `${tc.dot}10` }}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
@@ -735,16 +735,16 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
                             >
                               #{String(scene.scene_number).padStart(2, '0')}
                             </span>
-                            <span className="text-base font-bold text-[#0f172a] truncate">{scene.title}</span>
+                            <span className="text-base font-bold text-[#f5f4f7] truncate">{scene.title}</span>
                           </div>
                           <div className="flex items-center gap-1.5 flex-shrink-0">
                             {scene.camera?.shot_type && (
-                              <span className="text-[11px] uppercase font-bold px-2 py-0.5 rounded-full border border-[#e2e8f0] bg-white text-[#334155]">
+                              <span className="text-[11px] uppercase font-bold px-2 py-0.5 rounded-full border border-[#34323d] bg-[#26242e] text-[#f5f4f7]">
                                 {scene.camera.shot_type}
                               </span>
                             )}
                             {scene.camera?.movement && (
-                              <span className="text-[11px] uppercase font-bold px-2 py-0.5 rounded-full border border-[#e2e8f0] bg-white text-[#334155]">
+                              <span className="text-[11px] uppercase font-bold px-2 py-0.5 rounded-full border border-[#34323d] bg-[#26242e] text-[#f5f4f7]">
                                 {scene.camera.movement}
                               </span>
                             )}
@@ -753,24 +753,24 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
 
                         {/* Scene info */}
                         {(scene.description || scene.emotion || scene.key_visual || scene.camera?.lighting) && (
-                          <div className="px-4 py-3 border-b border-[#e2e8f0] space-y-2">
+                          <div className="px-4 py-3 border-b border-[#34323d] space-y-2">
                             {scene.description && (
-                              <p className="text-sm text-[#334155] leading-relaxed">{scene.description}</p>
+                              <p className="text-sm text-[#f5f4f7] leading-relaxed">{scene.description}</p>
                             )}
                             <div className="flex flex-wrap gap-1.5">
                               {scene.emotion && (
-                                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#f1f5f9] border border-[#e2e8f0] text-[#64748b]">
-                                  감정: <span className="text-[#0f172a]">{scene.emotion}</span>
+                                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#a8a4b2]">
+                                  감정: <span className="text-[#f5f4f7]">{scene.emotion}</span>
                                 </span>
                               )}
                               {scene.key_visual && (
-                                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#f1f5f9] border border-[#e2e8f0] text-[#64748b]">
-                                  핵심: <span className="text-[#0f172a]">{scene.key_visual}</span>
+                                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#a8a4b2]">
+                                  핵심: <span className="text-[#f5f4f7]">{scene.key_visual}</span>
                                 </span>
                               )}
                               {scene.camera?.lighting && (
-                                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#f1f5f9] border border-[#e2e8f0] text-[#64748b]">
-                                  조명: <span className="text-[#0f172a]">{scene.camera.lighting.slice(0, 50)}{scene.camera.lighting.length > 50 ? '…' : ''}</span>
+                                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#a8a4b2]">
+                                  조명: <span className="text-[#f5f4f7]">{scene.camera.lighting.slice(0, 50)}{scene.camera.lighting.length > 50 ? '…' : ''}</span>
                                 </span>
                               )}
                             </div>
@@ -780,18 +780,18 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
                         {/* Image / Video prompts side by side */}
                         <div className="flex flex-col md:flex-row">
                           {/* Image prompt */}
-                          <div className={`flex-1 p-4 min-w-0 ${scene.prompts.video ? 'border-b md:border-b-0 md:border-r border-[#e2e8f0]' : ''}`}>
+                          <div className={`flex-1 p-4 min-w-0 ${scene.prompts.video ? 'border-b md:border-b-0 md:border-r border-[#34323d]' : ''}`}>
                             <div className="flex items-center justify-between mb-2">
                               <div className="flex items-center gap-1.5 min-w-0">
-                                <ImageIcon className="w-3.5 h-3.5 text-[#00996D] flex-shrink-0" />
-                                <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">이미지 프롬프트</span>
-                                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#ecfdf5] text-[#00996D] font-bold">
+                                <ImageIcon className="w-3.5 h-3.5 text-[#f97316] flex-shrink-0" />
+                                <span className="text-[11px] uppercase tracking-wider text-[#a8a4b2] font-bold">이미지 프롬프트</span>
+                                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#7c2d12] text-[#f97316] font-bold">
                                   {scene.prompts.image.tool}
                                 </span>
                               </div>
                               <button
                                 onClick={() => copyText(scene.prompts.image.prompt)}
-                                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] tb-press-soft flex-shrink-0"
+                                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[11px] font-bold text-[#a8a4b2] tb-press-soft flex-shrink-0"
                               >
                                 <Copy className="w-3 h-3" />
                                 복사
@@ -801,29 +801,29 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
                               value={scene.prompts.image.prompt}
                               onChange={(e) => updateImagePrompt(scene.id, e.target.value)}
                               rows={5}
-                              className="w-full min-h-[100px] resize-y bg-white border border-[#e2e8f0] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
+                              className="w-full min-h-[100px] resize-y bg-[#26242e] border border-[#34323d] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#f5f4f7] focus:outline-none focus:border-[#fb923c] focus:ring-[3px] focus:ring-[#fb923c]/20"
                             />
                           </div>
 
                           {/* Video prompt */}
                           {scene.prompts.video && (
-                            <div className="flex-1 p-4 bg-[#f8fafc] min-w-0">
+                            <div className="flex-1 p-4 bg-[#26242e] min-w-0">
                               <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
                                   <Film className="w-3.5 h-3.5 text-[#f43f5e] flex-shrink-0" />
-                                  <span className="text-[11px] uppercase tracking-wider text-[#64748b] font-bold">영상 프롬프트</span>
-                                  <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#fee2e2] text-[#b91c1c] font-bold">
+                                  <span className="text-[11px] uppercase tracking-wider text-[#a8a4b2] font-bold">영상 프롬프트</span>
+                                  <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#450a0a] text-[#fca5a5] font-bold">
                                     {scene.prompts.video.tool} · {scene.prompts.video.duration}s
                                   </span>
                                   {scene.prompts.video.motion_type && (
-                                    <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#ede9fe] text-[#6d28d9] font-bold">
+                                    <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#4c0519] text-[#fb7185] font-bold">
                                       {scene.prompts.video.motion_type}
                                     </span>
                                   )}
                                 </div>
                                 <button
                                   onClick={() => copyText(scene.prompts.video.prompt)}
-                                  className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#f1f5f9] border border-[#e2e8f0] text-[11px] font-bold text-[#64748b] tb-press-soft flex-shrink-0"
+                                  className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[11px] font-bold text-[#a8a4b2] tb-press-soft flex-shrink-0"
                                 >
                                   <Copy className="w-3 h-3" />
                                   복사
@@ -833,7 +833,7 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
                                 value={scene.prompts.video.prompt}
                                 onChange={(e) => updateVideoPrompt(scene.id, e.target.value)}
                                 rows={5}
-                                className="w-full min-h-[100px] resize-y bg-white border border-[#e2e8f0] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
+                                className="w-full min-h-[100px] resize-y bg-[#26242e] border border-[#34323d] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#f5f4f7] focus:outline-none focus:border-[#fb923c] focus:ring-[3px] focus:ring-[#fb923c]/20"
                               />
                             </div>
                           )}
@@ -855,27 +855,27 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
           onClick={() => setUploadOpen(false)}
         >
           <div
-            className="bg-white rounded-2xl border border-[#e2e8f0] shadow-[0_24px_60px_rgba(15,23,42,0.25)] w-[640px] max-w-[95vw] max-h-[80vh] flex flex-col"
+            className="bg-[#1f1d26] rounded-2xl border border-[#34323d] shadow-[0_24px_60px_rgba(0,0,0,0.5)] w-[640px] max-w-[95vw] max-h-[80vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#e2e8f0]">
-              <span className="text-base font-bold text-[#0f172a] uppercase tracking-wider">인트로영상 JSON 업로드</span>
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#34323d]">
+              <span className="text-base font-bold text-[#f5f4f7] uppercase tracking-wider">인트로영상 JSON 업로드</span>
               <button
                 onClick={() => setUploadOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#475569] tb-press-soft"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#26242e] hover:bg-[#34323d] text-[#a8a4b2] tb-press-soft"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-5 space-y-3 min-h-0">
-              <p className="text-sm text-[#64748b] leading-relaxed">
-                인트로영상 JSON을 붙여넣으세요. <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">scenes</code> 배열이 포함되어야 합니다.
-                마크다운 코드블록(```) 래핑과 <code className="bg-[#ecfdf5] px-1.5 py-0.5 rounded text-[#00996D] font-mono text-[12px]">{`{ "opening_sequence": ... }`}</code> 래퍼도 자동 처리됩니다.
+              <p className="text-sm text-[#a8a4b2] leading-relaxed">
+                인트로영상 JSON을 붙여넣으세요. <code className="bg-[#7c2d12] px-1.5 py-0.5 rounded text-[#f97316] font-mono text-[12px]">scenes</code> 배열이 포함되어야 합니다.
+                마크다운 코드블록(```) 래핑과 <code className="bg-[#7c2d12] px-1.5 py-0.5 rounded text-[#f97316] font-mono text-[12px]">{`{ "opening_sequence": ... }`}</code> 래퍼도 자동 처리됩니다.
               </p>
               <textarea
                 value={jsonInput}
                 onChange={(e) => setJsonInput(e.target.value)}
-                className="w-full h-[260px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] focus:outline-none focus:border-[#00B380] focus:ring-[3px] focus:ring-[#00B380]/20"
+                className="w-full h-[260px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#26242e] border border-[#34323d] text-[#f5f4f7] focus:outline-none focus:border-[#fb923c] focus:ring-[3px] focus:ring-[#fb923c]/20"
                 placeholder='{"opening_sequence": {"title": "...", "meta": {...}, "scenes": [...]}}'
               />
               {uploadError && (
@@ -884,7 +884,7 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
                 </div>
               )}
             </div>
-            <div className="flex justify-end gap-2 px-5 py-3 border-t border-[#e2e8f0]">
+            <div className="flex justify-end gap-2 px-5 py-3 border-t border-[#34323d]">
               <button
                 onClick={() => setUploadOpen(false)}
                 className="px-4 py-1.5 rounded-full tb-pill-ghost text-sm font-bold transition"
@@ -909,32 +909,32 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
           onClick={() => setCharacterSheetOpen(false)}
         >
           <div
-            className="bg-white rounded-2xl border border-[#e2e8f0] shadow-[0_24px_60px_rgba(15,23,42,0.25)] w-[720px] max-w-[95vw] max-h-[85vh] flex flex-col"
+            className="bg-[#1f1d26] rounded-2xl border border-[#34323d] shadow-[0_24px_60px_rgba(0,0,0,0.5)] w-[720px] max-w-[95vw] max-h-[85vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#e2e8f0]">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#34323d]">
               <div className="flex items-center gap-2 min-w-0">
-                <UserSquare className="w-4 h-4 text-[#7c3aed] flex-shrink-0" />
-                <span className="text-base font-bold text-[#0f172a] uppercase tracking-wider">캐릭터시트 프롬프트</span>
+                <UserSquare className="w-4 h-4 text-[#f43f5e] flex-shrink-0" />
+                <span className="text-base font-bold text-[#f5f4f7] uppercase tracking-wider">캐릭터시트 프롬프트</span>
               </div>
               <button
                 onClick={() => setCharacterSheetOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#f1f5f9] hover:bg-[#e2e8f0] text-[#475569] tb-press-soft"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#26242e] hover:bg-[#34323d] text-[#a8a4b2] tb-press-soft"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-5 space-y-3 min-h-0">
-              <p className="text-sm text-[#64748b] leading-relaxed">
+              <p className="text-sm text-[#a8a4b2] leading-relaxed">
                 레퍼런스 이미지를 첨부한 뒤 아래 프롬프트를 사용해 캐릭터 4면 시트를 생성하세요.
               </p>
               <textarea
                 value={CHARACTER_SHEET_PROMPT}
                 readOnly
-                className="w-full h-[360px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] focus:outline-none focus:border-[#7c3aed] focus:ring-[3px] focus:ring-[#7c3aed]/20"
+                className="w-full h-[360px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#26242e] border border-[#34323d] text-[#f5f4f7] focus:outline-none focus:border-[#f43f5e] focus:ring-[3px] focus:ring-[#f43f5e]/20"
               />
             </div>
-            <div className="flex justify-end gap-2 px-5 py-3 border-t border-[#e2e8f0]">
+            <div className="flex justify-end gap-2 px-5 py-3 border-t border-[#34323d]">
               <button
                 onClick={() => setCharacterSheetOpen(false)}
                 className="px-4 py-1.5 rounded-full tb-pill-ghost text-sm font-bold transition"
@@ -943,7 +943,7 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
               </button>
               <button
                 onClick={() => copyText(CHARACTER_SHEET_PROMPT)}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#7c3aed] hover:opacity-90 text-white text-sm font-bold tb-press"
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#f43f5e] hover:opacity-90 text-white text-sm font-bold tb-press"
               >
                 <Copy className="w-3.5 h-3.5" />
                 프롬프트 복사

@@ -1,0 +1,31 @@
+<svg width="360" height="96" viewBox="0 0 360 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="markBg" x1="10" y1="10" x2="86" y2="86" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#22C55E"/>
+      <stop offset="1" stop-color="#008C63"/>
+    </linearGradient>
+    <linearGradient id="word" x1="104" y1="28" x2="295" y2="70" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#009F6B"/>
+      <stop offset="1" stop-color="#007A55"/>
+    </linearGradient>
+    <filter id="markShadow" x="0" y="0" width="100" height="100" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#006B4A" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#markShadow)">
+    <rect x="12" y="12" width="72" height="72" rx="18" fill="url(#markBg)"/>
+    <rect x="16" y="16" width="64" height="64" rx="15" stroke="white" stroke-opacity="0.18" stroke-width="8"/>
+  </g>
+
+  <path d="M27 31H60V43H50V66H37V43H27V31Z" fill="white"/>
+  <path d="M56 31H64C74 31 80 36 80 45C80 50 78 54 74 56C79 59 82 64 82 70C82 79 75 84 65 84H56V31ZM68 43V53H70C73 53 75 51 75 48C75 45 73 43 70 43H68ZM68 64V73H71C74 73 76 71 76 68C76 65 74 64 71 64H68Z" fill="white"/>
+  <path d="M55 52L72 61L55 70V52Z" fill="#BBF7D0"/>
+
+  <text x="104" y="64"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="35"
+        font-weight="800"
+        letter-spacing="0"
+        fill="url(#word)">TB STUDY</text>
+</svg>

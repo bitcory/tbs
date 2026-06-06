@@ -55,13 +55,14 @@ export default async function Home({ searchParams }) {
   const initial = (me?.nickname ?? me?.name ?? "?").slice(0, 1).toUpperCase();
 
   return (
-    <main className="fixed inset-0 w-screen h-screen bg-[#050505] overflow-hidden">
+    <main className="fixed inset-0 w-screen h-screen bg-[#15141a] overflow-hidden">
       <iframe
         src={iframeSrc}
         title="TB STUDY"
         className="w-full h-full border-0 block"
       />
-      <div style={{ position: "fixed", top: 16, right: 20, zIndex: 999 }}>
+      {/* Vertically centered against the iframe's ~58px sticky header */}
+      <div style={{ position: "fixed", top: 8, right: 20, zIndex: 999 }}>
         {me ? (
           <Link href="/mypage" className="glass-hoverable" style={avatarWrap} title={me.nickname ?? ""}>
             {me.image ? (
