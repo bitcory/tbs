@@ -16,11 +16,11 @@ export default function RoleSelect({ userId, role }) {
       style={{
         padding: "6px 10px",
         borderRadius: 8,
-        border: "1px solid #cbd5e1",
-        background: "#fff",
+        border: "1px solid #34323d",
+        background: "#26242e",
         fontSize: 13,
         fontFamily: "inherit",
-        color: "#0f172a",
+        color: "#f5f4f7",
         cursor: pending ? "wait" : "pointer",
       }}
     >

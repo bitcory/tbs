@@ -35,7 +35,7 @@ export default async function SuggestionsPage() {
         </div>
       </section>
 
-      <div style={{ ...S.pageWrap, maxWidth: 760, padding: "28px 20px 80px", marginTop: -48, position: "relative" }}>
+      <div style={{ ...S.pageWrap, maxWidth: 760, padding: "28px 20px 80px", marginTop: 0, position: "relative" }}>
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginBottom: 16 }}>
           <Link href="/mypage" className="glass-hoverable" style={S.ghostBtn}>
             ← 마이페이지

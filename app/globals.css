@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #050505;
+  --background: #15141a;
   --foreground: #f4f4f5;
-  --accent: #10b981;
-  --accent-light: #34d399;
+  --accent: #f97316;
+  --accent-light: #fb923c;
 }
 
 html,
@@ -29,8 +29,8 @@ body {
 }
 
 body:has(.auth-scroll) {
-  color: #0f172a;
-  background: #f8fafc;
+  color: #f5f4f7;
+  background: #15141a;
 }
 
 /* Prevent iOS auto-zoom on input focus (triggers when font-size < 16px) */

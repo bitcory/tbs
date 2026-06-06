@@ -18,7 +18,7 @@ export default async function NoAccessPage({ searchParams }) {
         </div>
       </section>
 
-      <div style={{ ...S.pageWrap, maxWidth: 420, marginTop: -48, position: "relative" }}>
+      <div style={{ ...S.pageWrap, maxWidth: 420, marginTop: 0, position: "relative" }}>
         <div style={{ ...S.card, textAlign: "center" }}>
           <p style={{ color: "#475569", lineHeight: 1.7, marginBottom: 20 }}>
             마이페이지에서 권한 현황을 확인할 수 있습니다.

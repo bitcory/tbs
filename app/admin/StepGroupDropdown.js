@@ -9,7 +9,7 @@ export default function StepGroupDropdown({
   options,
   currentSteps,
   canEdit = true,
-  accent = "#00996D",
+  accent = "#f97316",
 }) {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -67,20 +67,20 @@ export default function StepGroupDropdown({
   }, [open]);
 
   const badgeBg = allOn
-    ? "#dcfce7"
+    ? "rgba(249,115,22,0.18)"
     : noneOn
-    ? "#f1f5f9"
-    : "#fef3c7";
+    ? "#26242e"
+    : "rgba(245,158,11,0.18)";
   const badgeColor = allOn
-    ? "#166534"
+    ? "#fb923c"
     : noneOn
-    ? "#64748b"
-    : "#92400e";
-  const badgeBorder = allOn
-    ? "#86efac"
-    : noneOn
-    ? "#cbd5e1"
+    ? "#a8a4b2"
     : "#fcd34d";
+  const badgeBorder = allOn
+    ? "rgba(249,115,22,0.45)"
+    : noneOn
+    ? "#34323d"
+    : "rgba(245,158,11,0.45)";
 
   const onToggle = (step, nextEnabled) => {
     startTransition(() => toggleStepAccess(userId, step, nextEnabled));
@@ -135,10 +135,10 @@ export default function StepGroupDropdown({
             minWidth: 220,
             maxHeight: menuPos.maxHeight,
             overflowY: "auto",
-            background: "#fff",
-            border: "1px solid #e2e8f0",
+            background: "#1f1d26",
+            border: "1px solid #34323d",
             borderRadius: 12,
-            boxShadow: "0 14px 36px rgba(15,23,42,0.18)",
+            boxShadow: "0 14px 36px rgba(0,0,0,0.45)",
             padding: 6,
           }}
         >
@@ -155,11 +155,11 @@ export default function StepGroupDropdown({
                   borderRadius: 8,
                   cursor: pending ? "wait" : "pointer",
                   fontSize: 13,
-                  color: "#0f172a",
-                  background: checked ? "#ecfdf5" : "transparent",
+                  color: "#f5f4f7",
+                  background: checked ? "rgba(249,115,22,0.12)" : "transparent",
                 }}
                 onMouseEnter={(e) => {
-                  if (!checked) e.currentTarget.style.background = "#f8fafc";
+                  if (!checked) e.currentTarget.style.background = "#26242e";
                 }}
                 onMouseLeave={(e) => {
                   if (!checked) e.currentTarget.style.background = "transparent";

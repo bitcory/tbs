@@ -68,7 +68,7 @@ export default function PricingClient({ initial }) {
           gap: 6,
           padding: 4,
           marginBottom: 18,
-          background: "#f1f5f9",
+          background: "#26242e",
           borderRadius: 12,
         }}
       >
@@ -93,8 +93,8 @@ export default function PricingClient({ initial }) {
                 fontWeight: 800,
                 letterSpacing: "0.04em",
                 background: active ? c.bg : "transparent",
-                color: active ? c.fg : "#64748b",
-                boxShadow: active ? "0 1px 3px rgba(15,23,42,0.08)" : "none",
+                color: active ? c.fg : "#a8a4b2",
+                boxShadow: active ? "0 1px 3px rgba(0,0,0,0.35)" : "none",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -126,7 +126,7 @@ export default function PricingClient({ initial }) {
           const sumOk = Math.abs(sum - 1) < 0.001;
           return (
             <div key={`${r.classType}_${r.stepLevel}`} style={{
-              border: "1px solid #e2e8f0", borderRadius: 12, padding: 16,
+              border: "1px solid #34323d", borderRadius: 12, padding: 16,
             }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                 <span style={{
@@ -135,7 +135,7 @@ export default function PricingClient({ initial }) {
                 }}>
                   {formatClassLabel(r.classType, r.stepLevel)}
                 </span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: sumOk ? "#16a34a" : "#dc2626" }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: sumOk ? "#fb923c" : "#f87171" }}>
                   요율 합계 {asPct(sum)}%
                 </span>
               </div>
@@ -193,8 +193,8 @@ export default function PricingClient({ initial }) {
       {msg && (
         <div style={{
           marginTop: 14, padding: "10px 14px", borderRadius: 10,
-          background: msg.type === "ok" ? "#dcfce7" : "#fee2e2",
-          color:      msg.type === "ok" ? "#166534" : "#b91c1c",
+          background: msg.type === "ok" ? "rgba(249,115,22,0.16)" : "rgba(239,68,68,0.15)",
+          color:      msg.type === "ok" ? "#fb923c" : "#f87171",
           fontSize: 13, fontWeight: 600,
         }}>{msg.text}</div>
       )}
@@ -206,7 +206,7 @@ export default function PricingClient({ initial }) {
           className="tb-press"
           style={{
             padding: "10px 22px", borderRadius: 999, fontSize: 14, fontWeight: 700,
-            color: "#fff", background: "#016837", border: "none", cursor: "pointer",
+            color: "#1a1206", background: "linear-gradient(135deg, #fb923c, #f97316)", border: "none", cursor: "pointer",
           }}
         >
           {pending ? "저장중..." : "저장"}

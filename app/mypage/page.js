@@ -33,16 +33,15 @@ export default async function MyPage() {
   const isAdmin = me.role === "STAFF" || me.role === "SUPER_ADMIN";
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f8fafc", color: "#0f172a" }} className="auth-scroll">
+    <div style={{ minHeight: "100vh", background: "#15141a", color: "#f5f4f7" }} className="auth-scroll">
       <section style={S.hero}>
         <div style={{ position: "relative", zIndex: 2 }}>
-          <span style={S.heroEyebrow}>MY PAGE</span>
           <h1 style={S.heroTitle}>{me.nickname}님의 마이페이지</h1>
           <p style={S.heroSubtitle}>권한 현황과 회원 정보를 관리하세요.</p>
         </div>
       </section>
 
-      <div style={{ ...S.pageWrap, maxWidth: "100%", padding: "28px 20px 80px", marginTop: -48, position: "relative" }}>
+      <div style={{ ...S.pageWrap, maxWidth: "100%", padding: "20px 20px 80px", marginTop: 0, position: "relative" }}>
         <div className="mypage-nav" style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginBottom: 16, flexWrap: "wrap" }}>
           <Link href="/" className="glass-hoverable mypage-nav-btn" style={S.ghostBtn}>
             홈
@@ -78,14 +77,27 @@ export default async function MyPage() {
           @media (max-width: 360px) {
             .mypage-nav-btn { padding: 6px 10px !important; font-size: 11px !important; }
           }
+          /* 내권한(좁게) · 유용한툴(넓게) · 오픈채팅방(좁게) */
+          .mypage-cards {
+            display: grid;
+            grid-template-columns: 0.8fr 1.5fr 0.8fr;
+            gap: 18px;
+            align-items: stretch;
+            margin-bottom: 18px;
+          }
+          @media (max-width: 980px) {
+            .mypage-cards { grid-template-columns: 1fr; }
+          }
         `}</style>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr))", gap: 18, marginBottom: 18 }}>
+        <div className="mypage-cards">
           <div style={S.card}>
-          <div style={S.sectionTitle}>내 권한</div>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
-            <span style={S.badge(ROLE_BADGE[me.role])}>{ROLE_LABEL[me.role]}</span>
-            <span style={{ color: "#64748b", fontSize: 13 }}>가입일 {new Date(me.createdAt).toLocaleDateString("ko-KR")}</span>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 18, flexWrap: "wrap" }}>
+            <div style={{ ...S.sectionTitle, marginBottom: 0 }}>내 권한</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={S.badge(ROLE_BADGE[me.role])}>{ROLE_LABEL[me.role]}</span>
+              <span style={{ color: "#a8a4b2", fontSize: 13 }}>가입일 {new Date(me.createdAt).toLocaleDateString("ko-KR")}</span>
+            </div>
           </div>
 
           <Link
@@ -96,8 +108,10 @@ export default async function MyPage() {
               alignItems: "center",
               justifyContent: "center",
               gap: 10,
-              width: "100%",
-              padding: "18px 22px",
+              width: "fit-content",
+              maxWidth: "100%",
+              margin: "0 auto",
+              padding: "14px 22px",
               borderRadius: 14,
               background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
               color: "#fff",
@@ -115,7 +129,7 @@ export default async function MyPage() {
 
           <div style={S.card}>
             <div style={S.sectionTitle}>유용한툴</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 10 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
               {[
                 { label: "툴비캡쳐",        desc: "화면 캡쳐",   url: "https://drive.google.com/file/d/1P0Ybn1D4W8eu8SpzHqyrjd_94DAj8Gil/view?usp=sharing", c: "59,130,246",  Icon: Camera },
                 { label: "툴비검색기",      desc: "파일 검색",    url: "https://drive.google.com/file/d/1v6fQcMyaao9OZjfHhK3ZR-vSAJ4lqdB0/view?usp=sharing", c: "245,158,11", Icon: Search },
@@ -132,15 +146,14 @@ export default async function MyPage() {
                     style={{
                       position: "relative",
                       display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                      gap: 12,
-                      padding: "16px 16px 14px",
-                      minHeight: 132,
-                      borderRadius: 16,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 9,
+                      padding: "10px 11px",
+                      borderRadius: 14,
                       background: `linear-gradient(135deg, rgba(${u.c}, 1) 0%, rgba(${u.c}, 0.82) 100%)`,
                       border: "1px solid rgba(255,255,255,0.45)",
-                      boxShadow: `0 10px 22px rgba(${u.c}, 0.32), inset 1.5px 1.5px 0.5px 0 rgba(255,255,255,0.5), inset -1px -1px 0.5px 1px rgba(255,255,255,0.18)`,
+                      boxShadow: `0 8px 18px rgba(${u.c}, 0.3), inset 1.5px 1.5px 0.5px 0 rgba(255,255,255,0.5), inset -1px -1px 0.5px 1px rgba(255,255,255,0.18)`,
                       textDecoration: "none",
                       color: "#fff",
                       overflow: "hidden",
@@ -148,82 +161,83 @@ export default async function MyPage() {
                   >
                     {/* subtle decorative blob */}
                     <span aria-hidden="true" style={{
-                      position: "absolute", top: -28, right: -22, width: 100, height: 100, borderRadius: "50%",
+                      position: "absolute", top: -24, right: -20, width: 88, height: 88, borderRadius: "50%",
                       background: "rgba(255,255,255,0.18)", filter: "blur(2px)",
                     }} />
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", zIndex: 1 }}>
-                      <span style={{
-                        width: 36, height: 36, borderRadius: 10,
-                        background: "rgba(255,255,255,0.22)",
-                        border: "1px solid rgba(255,255,255,0.35)",
-                        display: "inline-flex", alignItems: "center", justifyContent: "center",
-                        backdropFilter: "blur(8px)",
-                      }}>
-                        <Icon size={18} strokeWidth={2.4} color="#fff" />
-                      </span>
-                      <ArrowUpRight size={16} strokeWidth={2.4} color="rgba(255,255,255,0.85)" />
+                    <span style={{
+                      width: 32, height: 32, borderRadius: 9, flexShrink: 0,
+                      background: "rgba(255,255,255,0.22)",
+                      border: "1px solid rgba(255,255,255,0.35)",
+                      display: "inline-flex", alignItems: "center", justifyContent: "center",
+                      backdropFilter: "blur(8px)",
+                      position: "relative", zIndex: 1,
+                    }}>
+                      <Icon size={16} strokeWidth={2.4} color="#fff" />
+                    </span>
+                    <div style={{ flex: 1, minWidth: 0, position: "relative", zIndex: 1 }}>
+                      <div style={{ fontSize: 13.5, fontWeight: 800, color: "#fff", lineHeight: 1.2, letterSpacing: "-0.02em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{u.label}</div>
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.85)", marginTop: 1, fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{u.desc}</div>
                     </div>
-                    <div style={{ position: "relative", zIndex: 1 }}>
-                      <div style={{ fontSize: 15, fontWeight: 800, color: "#fff", lineHeight: 1.3, letterSpacing: "-0.01em" }}>{u.label}</div>
-                      <div style={{ fontSize: 12, color: "rgba(255,255,255,0.85)", marginTop: 2, fontWeight: 500 }}>{u.desc}</div>
-                    </div>
+                    <ArrowUpRight size={14} strokeWidth={2.4} color="rgba(255,255,255,0.85)" style={{ position: "relative", zIndex: 1, flexShrink: 0 }} />
                   </a>
                 );
               })}
             </div>
           </div>
+
+          {/* 오픈챗팅방 바로가기 */}
+          <div style={S.card}>
+            <div style={{ ...S.sectionTitle, marginBottom: 14 }}>오픈챗팅방 바로가기</div>
+            <a
+              href="https://open.kakao.com/o/gWR9vhXh"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="tb-press"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 10,
+                width: "fit-content",
+                maxWidth: "100%",
+                margin: "0 auto",
+                padding: "14px 22px",
+                borderRadius: 14,
+                background: "#FEE500",
+                color: "#191919",
+                fontSize: 15,
+                fontWeight: 800,
+                textDecoration: "none",
+                border: "1px solid rgba(0,0,0,0.08)",
+                boxShadow: "0 8px 18px rgba(254,229,0,0.45), inset 1.5px 1.5px 0.5px 0 rgba(255,255,255,0.7), inset -1px -1px 0.5px 1px rgba(0,0,0,0.05)",
+              }}
+            >
+              <MessagesSquare size={20} strokeWidth={2.4} color="#191919" />
+              카카오톡 오픈채팅방 입장
+            </a>
+          </div>
         </div>
 
-        {/* 오픈챗팅방 바로가기 */}
-        <div style={{ ...S.card, marginBottom: 18 }}>
-          <div style={{ ...S.sectionTitle, marginBottom: 6 }}>오픈챗팅방 바로가기</div>
-          <p style={{ fontSize: 13, color: "#64748b", marginBottom: 14, lineHeight: 1.55 }}>
-            궁금한 점이나 질문이 있으면 언제든 카카오톡 오픈채팅방으로 들어와 주세요.
-          </p>
-          <a
-            href="https://open.kakao.com/o/gWR9vhXh"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="tb-press"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 10,
-              width: "100%",
-              padding: "14px 22px",
-              borderRadius: 14,
-              background: "#FEE500",
-              color: "#191919",
-              fontSize: 15,
-              fontWeight: 800,
-              textDecoration: "none",
-              border: "1px solid rgba(0,0,0,0.08)",
-              boxShadow: "0 8px 18px rgba(254,229,0,0.45), inset 1.5px 1.5px 0.5px 0 rgba(255,255,255,0.7), inset -1px -1px 0.5px 1px rgba(0,0,0,0.05)",
-            }}
-          >
-            <MessagesSquare size={20} strokeWidth={2.4} color="#191919" />
-            카카오톡 오픈채팅방 입장
-          </a>
-        </div>
-
-        <ProfileEditor
-          initialNickname={me.nickname}
-          initialEmail={me.email}
-          initialPhone={me.phone}
-          initialPrivacyAgreedAt={me.privacyAgreedAt}
-          initialMarketingOptIn={me.marketingOptIn}
-          updateProfile={updateProfile}
-        />
-
-        {isAdmin && (
-          <BankInfoEditor
-            initialBankName={me.bankName}
-            initialBankAccount={me.bankAccount}
-            initialAccountHolder={me.accountHolder}
-            updateBankInfo={updateBankInfo}
+        {/* 회원정보 + 정산정보 — 한 줄 2개 */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: 18, alignItems: "start" }}>
+          <ProfileEditor
+            initialNickname={me.nickname}
+            initialEmail={me.email}
+            initialPhone={me.phone}
+            initialPrivacyAgreedAt={me.privacyAgreedAt}
+            initialMarketingOptIn={me.marketingOptIn}
+            updateProfile={updateProfile}
           />
-        )}
+
+          {isAdmin && (
+            <BankInfoEditor
+              initialBankName={me.bankName}
+              initialBankAccount={me.bankAccount}
+              initialAccountHolder={me.accountHolder}
+              updateBankInfo={updateBankInfo}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

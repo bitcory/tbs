@@ -91,7 +91,7 @@ export default async function SchedulePage() {
   });
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f8fafc", color: "#0f172a" }} className="auth-scroll">
+    <div style={{ minHeight: "100vh", background: "#15141a", color: "#f5f4f7" }} className="auth-scroll">
       <section style={S.hero}>
         <div style={{ position: "relative", zIndex: 2 }}>
           <span style={S.heroEyebrow}>SCHEDULE</span>
@@ -102,7 +102,7 @@ export default async function SchedulePage() {
         </div>
       </section>
 
-      <div style={{ ...S.pageWrap, maxWidth: 1100, padding: "28px 16px 80px", marginTop: -48, position: "relative", color: "#0f172a" }}>
+      <div style={{ ...S.pageWrap, maxWidth: "100%", padding: "20px 24px 80px", marginTop: 0, position: "relative", color: "#f5f4f7" }}>
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginBottom: 16, flexWrap: "wrap" }}>
           <Link href="/" className="glass-hoverable" style={S.ghostBtn}>홈</Link>
           {me.role === "SUPER_ADMIN" && (

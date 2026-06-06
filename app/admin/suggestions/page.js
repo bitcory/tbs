@@ -60,7 +60,7 @@ export default async function AdminSuggestionsPage({ searchParams }) {
         </div>
       </section>
 
-      <div style={{ ...S.pageWrap, maxWidth: 960, padding: "28px 20px 80px", marginTop: -48, position: "relative" }}>
+      <div style={{ ...S.pageWrap, maxWidth: 960, padding: "28px 20px 80px", marginTop: 0, position: "relative" }}>
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginBottom: 16, flexWrap: "wrap" }}>
           <Link href="/admin" className="glass-hoverable" style={S.ghostBtn}>
             ← 관리자

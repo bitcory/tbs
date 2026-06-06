@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import * as S from "@/lib/uiStyles";
+import { CalendarDays, Wallet, StickyNote, Send, AlertTriangle } from "lucide-react";
 import {
   CLASS_TYPE_LABEL, CLASS_TYPE_COLOR, formatKRW,
   PRICING_SLOTS, SESSION_STEP_OPTIONS, formatClassLabel, pricingKey, lookupPricing,
@@ -102,6 +103,7 @@ export default function ScheduleClient({ me, sessions, staffUsers, memberUsers, 
   const [viewYear,  setViewYear]  = useState(() => today.getFullYear());
   const [viewMonth, setViewMonth] = useState(() => today.getMonth());
   const [selectedKey, setSelectedKey] = useState(() => todayKey);
+  const [tab, setTab] = useState("calendar"); // 'calendar' | 'summary'
   const [modal, setModal] = useState(null); // null | {mode:'new', date} | {mode:'edit', session}
   const [enrollPickerFor, setEnrollPickerFor] = useState(null); // sessionId
   const [pending, startTransition] = useTransition();
@@ -130,8 +132,46 @@ export default function ScheduleClient({ me, sessions, staffUsers, memberUsers, 
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       {me.role === "SUPER_ADMIN" && (
+        <div style={{ display: "flex", gap: 6, padding: 4, background: "#26242e", borderRadius: 12, alignSelf: "flex-start" }}>
+          {[
+            { key: "calendar", label: "캘린더", Icon: CalendarDays },
+            { key: "summary", label: "정산 요약", Icon: Wallet },
+          ].map((t) => {
+            const active = tab === t.key;
+            const TabIcon = t.Icon;
+            return (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => setTab(t.key)}
+                className="tb-press-soft"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "9px 18px",
+                  borderRadius: 9,
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                  fontSize: 13,
+                  fontWeight: 800,
+                  letterSpacing: "0.02em",
+                  background: active ? "linear-gradient(135deg, #fb923c, #f97316)" : "transparent",
+                  color: active ? "#1a1206" : "#a8a4b2",
+                }}
+              >
+                <TabIcon size={15} strokeWidth={2.4} />
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {me.role === "SUPER_ADMIN" && tab === "summary" ? (
         <PayoutSummary
           sessions={sessions}
           viewYear={viewYear}
@@ -139,8 +179,9 @@ export default function ScheduleClient({ me, sessions, staffUsers, memberUsers, 
           setViewYear={setViewYear}
           setViewMonth={setViewMonth}
         />
-      )}
-
+      ) : (
+        <div className="sched-cal-layout">
+          <div className="sched-cal-left">
       <CalendarHeader
         year={viewYear}
         month={viewMonth}
@@ -161,7 +202,8 @@ export default function ScheduleClient({ me, sessions, staffUsers, memberUsers, 
         selectedKey={selectedKey}
         onSelect={setSelectedKey}
       />
-
+          </div>
+          <div className="sched-cal-right">
       <DayDetail
         dateKey={selectedKey}
         sessions={selectedSessions}
@@ -236,6 +278,22 @@ export default function ScheduleClient({ me, sessions, staffUsers, memberUsers, 
         }}
         pending={pending}
       />
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        .sched-cal-layout {
+          display: grid;
+          grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.75fr);
+          gap: 16px;
+          align-items: start;
+        }
+        .sched-cal-left { display: flex; flex-direction: column; gap: 16px; }
+        @media (max-width: 980px) {
+          .sched-cal-layout { grid-template-columns: 1fr; }
+        }
+      `}</style>
 
       {modal && (
         <SessionModal
@@ -283,8 +341,8 @@ function CalendarHeader({ year, month, onPrev, onNext, onToday, onAdd }) {
     <div style={{
       display: "flex", alignItems: "center", justifyContent: "space-between",
       gap: 12, flexWrap: "wrap",
-      background: "#fff", borderRadius: 14, padding: "12px 16px",
-      border: "1px solid rgba(15,23,42,0.06)", boxShadow: "0 4px 14px rgba(15,23,42,0.05)",
+      background: "#1f1d26", borderRadius: 14, padding: "12px 16px",
+      border: "1px solid #34323d", boxShadow: "0 4px 14px rgba(0,0,0,0.3)",
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <button onClick={onPrev} className="tb-press-soft" style={navBtn}>‹</button>
@@ -300,35 +358,35 @@ function CalendarHeader({ year, month, onPrev, onNext, onToday, onAdd }) {
 }
 
 const navBtn = {
-  width: 36, height: 36, borderRadius: 10, border: "1px solid #e2e8f0",
-  background: "#fff", color: "#0f172a", fontSize: 18, fontWeight: 700, cursor: "pointer",
+  width: 36, height: 36, borderRadius: 10, border: "1px solid #34323d",
+  background: "#26242e", color: "#f5f4f7", fontSize: 18, fontWeight: 700, cursor: "pointer",
 };
 
 const addBtn = {
   padding: "10px 18px", borderRadius: 999, fontSize: 14, fontWeight: 700,
-  color: "#fff", background: "#016837", border: "none", cursor: "pointer",
+  color: "#fff", background: "#f97316", border: "none", cursor: "pointer",
 };
 
 function CalendarGrid({ grid, sessionsByDay, selectedKey, onSelect }) {
   return (
     <div className="tb-cal" style={{
-      background: "#fff", borderRadius: 14,
-      border: "1px solid rgba(15,23,42,0.06)", boxShadow: "0 4px 14px rgba(15,23,42,0.05)",
+      background: "#1f1d26", borderRadius: 14,
+      border: "1px solid #34323d", boxShadow: "0 4px 14px rgba(0,0,0,0.3)",
       overflow: "hidden",
     }}>
       <div style={{
-        display: "grid", gridTemplateColumns: "repeat(7,1fr)",
-        background: "#f8fafc", borderBottom: "1px solid #e2e8f0",
+        display: "grid", gridTemplateColumns: "repeat(7, minmax(0, 1fr))",
+        background: "#26242e", borderBottom: "1px solid #34323d",
       }}>
         {WEEKDAYS.map((w, i) => (
           <div key={w} style={{
             padding: "10px 0", textAlign: "center", fontSize: 12, fontWeight: 700,
-            color: i === 0 ? "#dc2626" : i === 6 ? "#2563eb" : "#475569",
+            color: i === 0 ? "#f87171" : i === 6 ? "#93c5fd" : "#a8a4b2",
           }}>{w}</div>
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, minmax(0, 1fr))" }}>
         {grid.map((cell, i) => {
           const items = sessionsByDay.get(cell.key) || [];
           const isSelected = cell.key === selectedKey;
@@ -341,20 +399,22 @@ function CalendarGrid({ grid, sessionsByDay, selectedKey, onSelect }) {
               style={{
                 position: "relative",
                 minHeight: 92,
+                minWidth: 0,
+                overflow: "hidden",
                 padding: 6,
                 textAlign: "left",
-                border: "1px solid #f1f5f9",
-                background: isSelected ? "#ecfdf5" : "#fff",
-                color: cell.inMonth ? "#0f172a" : "#cbd5e1",
+                border: "1px solid #34323d",
+                background: isSelected ? "rgba(249,115,22,0.12)" : "#1f1d26",
+                color: cell.inMonth ? "#f5f4f7" : "#6b6878",
                 cursor: "pointer",
                 fontFamily: "inherit",
-                outline: isSelected ? "2px solid #00996D" : "none",
+                outline: isSelected ? "2px solid #f97316" : "none",
                 outlineOffset: -2,
               }}
             >
               <div className="tb-cal-date" style={{
                 fontSize: 13, fontWeight: cell.isToday ? 800 : 600,
-                color: dow === 0 ? "#dc2626" : dow === 6 ? "#2563eb" : (cell.inMonth ? "#0f172a" : "#cbd5e1"),
+                color: dow === 0 ? "#f87171" : dow === 6 ? "#93c5fd" : (cell.inMonth ? "#f5f4f7" : "#6b6878"),
                 marginBottom: 4,
               }}>
                 {cell.date.getDate()}
@@ -372,7 +432,7 @@ function CalendarGrid({ grid, sessionsByDay, selectedKey, onSelect }) {
                   );
                 })}
                 {items.length > 3 && (
-                  <div className="tb-cal-more" style={{ fontSize: 11, color: "#64748b" }}>+{items.length - 3}</div>
+                  <div className="tb-cal-more" style={{ fontSize: 11, color: "#a8a4b2" }}>+{items.length - 3}</div>
                 )}
               </div>
             </button>
@@ -412,15 +472,15 @@ function CalendarGrid({ grid, sessionsByDay, selectedKey, onSelect }) {
 function DayDetail({ dateKey, sessions, me, onEdit, onAdd, onDelete, onOpenEnroll, onSetStatus, onRemoveEnroll, onSendMaterials, onSendMaterialsToInstructor, pending }) {
   return (
     <div style={{
-      background: "#fff", borderRadius: 14, padding: 20,
-      border: "1px solid rgba(15,23,42,0.06)", boxShadow: "0 4px 14px rgba(15,23,42,0.05)",
+      background: "#1f1d26", borderRadius: 14, padding: 20,
+      border: "1px solid #34323d", boxShadow: "0 4px 14px rgba(0,0,0,0.3)",
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
         <h2 style={{ fontSize: 18, fontWeight: 800 }}>{dateKey} 회차</h2>
         <button onClick={onAdd} className="tb-press-soft" style={subAddBtn}>+ 이 날짜에 회차 추가</button>
       </div>
       {sessions.length === 0 ? (
-        <div style={{ color: "#64748b", padding: "24px 0", textAlign: "center" }}>등록된 회차가 없습니다.</div>
+        <div style={{ color: "#a8a4b2", padding: "24px 0", textAlign: "center" }}>등록된 회차가 없습니다.</div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {sessions.map((s) => (
@@ -446,7 +506,7 @@ function DayDetail({ dateKey, sessions, me, onEdit, onAdd, onDelete, onOpenEnrol
 
 const subAddBtn = {
   padding: "8px 14px", borderRadius: 999, fontSize: 13, fontWeight: 600,
-  color: "#0f172a", background: "#fff", border: "1px solid #e2e8f0", cursor: "pointer",
+  color: "#f5f4f7", background: "#26242e", border: "1px solid #34323d", cursor: "pointer",
 };
 
 function SessionCard({ sess, me, onEdit, onDelete, onOpenEnroll, onSetStatus, onRemoveEnroll, onSendMaterials, onSendMaterialsToInstructor, pending }) {
@@ -457,7 +517,7 @@ function SessionCard({ sess, me, onEdit, onDelete, onOpenEnroll, onSetStatus, on
   const materialsReady = !!matStep && hasStepMaterials(matStep);
   return (
     <div style={{
-      border: "1px solid #e2e8f0", borderRadius: 12, padding: 16, background: "#fff",
+      border: "1px solid #34323d", borderRadius: 12, padding: 16, background: "#1f1d26",
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 10, marginBottom: 12 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
@@ -472,7 +532,7 @@ function SessionCard({ sess, me, onEdit, onDelete, onOpenEnroll, onSetStatus, on
             <button onClick={onEdit} className="tb-press-soft" style={miniBtn} disabled={pending}>편집</button>
           )}
           {showDelete && (
-            <button onClick={onDelete} className="tb-press-soft" style={{ ...miniBtn, color: "#dc2626" }} disabled={pending}>삭제</button>
+            <button onClick={onDelete} className="tb-press-soft" style={{ ...miniBtn, color: "#f87171" }} disabled={pending}>삭제</button>
           )}
         </div>
       </div>
@@ -511,18 +571,18 @@ function SessionCard({ sess, me, onEdit, onDelete, onOpenEnroll, onSetStatus, on
 
       {sess.note && sess.note.trim() && (
         <div style={{
-          background: "#fffbeb",
-          border: "1px solid #fde68a",
+          background: "rgba(251,191,36,0.12)",
+          border: "1px solid rgba(251,191,36,0.35)",
           borderRadius: 10,
           padding: "10px 12px",
           marginBottom: 10,
           fontSize: 13,
           lineHeight: 1.6,
-          color: "#78350f",
+          color: "#fde68a",
           whiteSpace: "pre-line",
           wordBreak: "break-word",
         }}>
-          <div style={{ fontSize: 11, fontWeight: 800, color: "#92400e", marginBottom: 4, letterSpacing: "0.04em" }}>📝 메모</div>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 800, color: "#fbbf24", marginBottom: 4, letterSpacing: "0.04em" }}><StickyNote size={12} strokeWidth={2.4} /> 메모</div>
           {sess.note}
         </div>
       )}
@@ -537,7 +597,7 @@ function SessionCard({ sess, me, onEdit, onDelete, onOpenEnroll, onSetStatus, on
           <button onClick={onOpenEnroll} className="tb-press-soft" style={miniBtn} disabled={pending}>+ 회원 추가</button>
         </div>
         {sess.enrollments.length === 0 ? (
-          <div style={{ color: "#94a3b8", fontSize: 13, padding: "8px 0" }}>아직 등록된 참가자가 없습니다.</div>
+          <div style={{ color: "#a8a4b2", fontSize: 13, padding: "8px 0" }}>아직 등록된 참가자가 없습니다.</div>
         ) : (
           <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column", gap: 6 }}>
             {sess.enrollments.map((e) => (
@@ -561,8 +621,8 @@ function SessionCard({ sess, me, onEdit, onDelete, onOpenEnroll, onSetStatus, on
 function Info({ label, value, highlight }) {
   return (
     <div>
-      <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>{label}</div>
-      <div style={{ fontSize: 14, fontWeight: highlight ? 800 : 600, color: highlight ? "#016837" : "#0f172a" }}>{value}</div>
+      <div style={{ fontSize: 11, fontWeight: 700, color: "#a8a4b2", textTransform: "uppercase", letterSpacing: "0.04em" }}>{label}</div>
+      <div style={{ fontSize: 14, fontWeight: highlight ? 800 : 600, color: highlight ? "#fb923c" : "#f5f4f7" }}>{value}</div>
     </div>
   );
 }
@@ -580,11 +640,11 @@ function InstructorInfo({ label, instructor, fallback = "—", materialsReady, o
 
   return (
     <div>
-      <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: "#a8a4b2", textTransform: "uppercase", letterSpacing: "0.04em" }}>
         {label}
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginTop: 2 }}>
-        <span style={{ fontSize: 14, fontWeight: 600, color: "#0f172a" }}>
+        <span style={{ fontSize: 14, fontWeight: 600, color: "#f5f4f7" }}>
           {hasInstructor ? userLabel(instructor) : fallback}
         </span>
         {hasInstructor && (
@@ -598,13 +658,13 @@ function InstructorInfo({ label, instructor, fallback = "—", materialsReady, o
               ...miniBtn,
               padding: "3px 9px",
               fontSize: 11,
-              color: canSend ? "#1d4ed8" : "#94a3b8",
-              background: canSend ? "#eff6ff" : "#fff",
-              borderColor: canSend ? "#bfdbfe" : "#e2e8f0",
+              color: canSend ? "#93c5fd" : "#a8a4b2",
+              background: canSend ? "rgba(59,130,246,0.15)" : "#26242e",
+              borderColor: canSend ? "rgba(59,130,246,0.35)" : "#34323d",
               fontWeight: canSend ? 700 : 500,
             }}
           >
-            {!materialsReady ? "📩 준비중" : "📩 자료발송"}
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><Send size={11} strokeWidth={2.4} /> {!materialsReady ? "준비중" : "자료발송"}</span>
           </button>
         )}
       </div>
@@ -614,23 +674,23 @@ function InstructorInfo({ label, instructor, fallback = "—", materialsReady, o
 
 function RevenueBox({ revenue, scope }) {
   const items = [
-    scope.canSeeTotal     && { k: "총합계",   v: revenue.total,     accent: "#0f172a" },
-    scope.canSeeToolb     && { k: "툴비",     v: revenue.toolb,     accent: "#016837" },
-    scope.canSeeMain      && { k: "주강사",   v: revenue.main,      accent: "#1d4ed8" },
-    scope.canSeeAssistant && { k: "보조강사", v: revenue.assistant, accent: "#7e22ce" },
-    scope.canSeeReserve   && { k: "충당금",   v: revenue.reserve,   accent: "#b45309" },
+    scope.canSeeTotal     && { k: "총합계",   v: revenue.total,     accent: "#f5f4f7" },
+    scope.canSeeToolb     && { k: "툴비",     v: revenue.toolb,     accent: "#fb923c" },
+    scope.canSeeMain      && { k: "주강사",   v: revenue.main,      accent: "#93c5fd" },
+    scope.canSeeAssistant && { k: "보조강사", v: revenue.assistant, accent: "#fb7185" },
+    scope.canSeeReserve   && { k: "충당금",   v: revenue.reserve,   accent: "#fbbf24" },
   ].filter(Boolean);
 
   if (items.length === 0) return null;
 
   return (
     <div style={{
-      background: "#f8fafc", borderRadius: 10, padding: 12,
+      background: "#26242e", borderRadius: 10, padding: 12,
       display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px,1fr))", gap: 10,
     }}>
       {items.map((it) => (
         <div key={it.k}>
-          <div style={{ fontSize: 11, color: "#64748b", fontWeight: 600 }}>{it.k}</div>
+          <div style={{ fontSize: 11, color: "#a8a4b2", fontWeight: 600 }}>{it.k}</div>
           <div style={{ fontSize: 15, fontWeight: 800, color: it.accent }}>{formatKRW(it.v)}</div>
         </div>
       ))}
@@ -640,13 +700,13 @@ function RevenueBox({ revenue, scope }) {
 
 const miniBtn = {
   padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 600,
-  color: "#0f172a", background: "#fff", border: "1px solid #e2e8f0", cursor: "pointer",
+  color: "#f5f4f7", background: "#26242e", border: "1px solid #34323d", cursor: "pointer",
 };
 
 const STATUS_STYLE = {
-  APPLIED:   { label: "신청", bg: "#dbeafe", fg: "#1d4ed8" },
-  ATTENDED:  { label: "참가", bg: "#dcfce7", fg: "#166534" },
-  CANCELLED: { label: "취소", bg: "#fee2e2", fg: "#b91c1c" },
+  APPLIED:   { label: "신청", bg: "rgba(59,130,246,0.15)", fg: "#93c5fd" },
+  ATTENDED:  { label: "참가", bg: "rgba(249,115,22,0.18)", fg: "#fb923c" },
+  CANCELLED: { label: "취소", bg: "rgba(239,68,68,0.15)", fg: "#f87171" },
 };
 
 function EnrollmentRow({ e, session, onSetStatus, onRemove, onSendMaterials, pending }) {
@@ -663,7 +723,7 @@ function EnrollmentRow({ e, session, onSetStatus, onRemove, onSendMaterials, pen
   return (
     <li style={{
       display: "flex", justifyContent: "space-between", alignItems: "center",
-      padding: "8px 12px", border: "1px solid #f1f5f9", borderRadius: 8, background: "#fafafa",
+      padding: "8px 12px", border: "1px solid #34323d", borderRadius: 8, background: "#26242e",
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
         <span style={{ fontWeight: 600, fontSize: 14 }}>{userLabel(e.user)}</span>
@@ -683,13 +743,13 @@ function EnrollmentRow({ e, session, onSetStatus, onRemove, onSendMaterials, pen
           style={{
             ...miniBtn,
             padding: "4px 10px", fontSize: 11,
-            color: canSendMaterials ? "#1d4ed8" : "#94a3b8",
-            background: canSendMaterials ? "#eff6ff" : "#fff",
-            borderColor: canSendMaterials ? "#bfdbfe" : "#e2e8f0",
+            color: canSendMaterials ? "#93c5fd" : "#a8a4b2",
+            background: canSendMaterials ? "rgba(59,130,246,0.15)" : "#26242e",
+            borderColor: canSendMaterials ? "rgba(59,130,246,0.35)" : "#34323d",
             fontWeight: canSendMaterials ? 700 : 500,
           }}
         >
-          {!materialsReady ? "📩 준비중" : "📩 자료발송"}
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><Send size={11} strokeWidth={2.4} /> {!materialsReady ? "준비중" : "자료발송"}</span>
         </button>
         {["APPLIED", "ATTENDED", "CANCELLED"].map((st) => (
           <button
@@ -700,8 +760,8 @@ function EnrollmentRow({ e, session, onSetStatus, onRemove, onSendMaterials, pen
             style={{
               ...miniBtn,
               padding: "4px 8px", fontSize: 11,
-              background: e.status === st ? STATUS_STYLE[st].bg : "#fff",
-              color: e.status === st ? STATUS_STYLE[st].fg : "#0f172a",
+              background: e.status === st ? STATUS_STYLE[st].bg : "#26242e",
+              color: e.status === st ? STATUS_STYLE[st].fg : "#f5f4f7",
               fontWeight: e.status === st ? 800 : 500,
               opacity: e.status === st ? 1 : 0.85,
             }}
@@ -709,7 +769,7 @@ function EnrollmentRow({ e, session, onSetStatus, onRemove, onSendMaterials, pen
             {STATUS_STYLE[st].label}
           </button>
         ))}
-        <button onClick={onRemove} disabled={pending} className="tb-press-soft" style={{ ...miniBtn, padding: "4px 8px", fontSize: 11, color: "#64748b" }}>
+        <button onClick={onRemove} disabled={pending} className="tb-press-soft" style={{ ...miniBtn, padding: "4px 8px", fontSize: 11, color: "#a8a4b2" }}>
           제외
         </button>
       </div>
@@ -825,7 +885,7 @@ function SessionModal({ mode, initialDate, session, staffUsers, pricing, onClose
         <button
           onClick={() => onSave(buildPayload())}
           className="tb-press"
-          style={{ ...miniBtn, background: "#016837", color: "#fff", border: "none", padding: "8px 18px", fontSize: 13 }}
+          style={{ ...miniBtn, background: "#f97316", color: "#fff", border: "none", padding: "8px 18px", fontSize: 13 }}
           disabled={pending || !form.date || !form.startTime}
         >
           {pending ? "저장중..." : "저장"}
@@ -966,9 +1026,9 @@ function DatePicker({ value, onChange }) {
               style={{
                 padding: "5px 11px",
                 borderRadius: 999,
-                border: `1px solid ${active ? "#016837" : "#cbd5e1"}`,
-                background: active ? "#dcfce7" : "#fff",
-                color: active ? "#166534" : "#475569",
+                border: `1px solid ${active ? "#f97316" : "#34323d"}`,
+                background: active ? "rgba(249,115,22,0.18)" : "#26242e",
+                color: active ? "#fb923c" : "#a8a4b2",
                 fontSize: 12,
                 fontWeight: 700,
                 cursor: "pointer",
@@ -1056,19 +1116,19 @@ function EnrollPicker({ session, memberUsers, onClose, onAdd, pending }) {
         placeholder="이름·닉네임·이메일·전화번호 검색"
         style={{ ...S.input, marginBottom: 12 }}
       />
-      <div style={{ maxHeight: 360, overflow: "auto", border: "1px solid #e2e8f0", borderRadius: 10 }}>
+      <div style={{ maxHeight: 360, overflow: "auto", border: "1px solid #34323d", borderRadius: 10 }}>
         {filtered.length === 0 ? (
-          <div style={{ padding: 20, textAlign: "center", color: "#94a3b8", fontSize: 13 }}>
+          <div style={{ padding: 20, textAlign: "center", color: "#a8a4b2", fontSize: 13 }}>
             결과가 없습니다.
           </div>
         ) : filtered.map((u) => (
           <div key={u.id} style={{
             display: "flex", justifyContent: "space-between", alignItems: "center",
-            padding: "10px 14px", borderBottom: "1px solid #f1f5f9",
+            padding: "10px 14px", borderBottom: "1px solid #34323d",
           }}>
             <div>
               <div style={{ fontWeight: 600, fontSize: 14 }}>{userLabel(u)}</div>
-              <div style={{ fontSize: 12, color: "#94a3b8" }}>
+              <div style={{ fontSize: 12, color: "#a8a4b2" }}>
                 {u.email || u.phone || ""}
               </div>
             </div>
@@ -1163,16 +1223,16 @@ function PayoutSummary({ sessions, viewYear, viewMonth, setViewYear, setViewMont
 
   return (
     <div style={{
-      background: "#fff", borderRadius: 14, padding: 20,
-      border: "1px solid rgba(15,23,42,0.06)", boxShadow: "0 4px 14px rgba(15,23,42,0.05)",
+      background: "#1f1d26", borderRadius: 14, padding: 20,
+      border: "1px solid #34323d", boxShadow: "0 4px 14px rgba(0,0,0,0.3)",
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 800 }}>💰 정산 요약</h2>
+        <h2 style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 18, fontWeight: 800 }}><Wallet size={18} strokeWidth={2.4} /> 정산 요약</h2>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
           {period === "month" && (
             <div style={{
               display: "flex", alignItems: "center", gap: 4,
-              padding: 4, background: "#f1f5f9", borderRadius: 999,
+              padding: 4, background: "#26242e", borderRadius: 999,
             }}>
               <button
                 type="button"
@@ -1181,9 +1241,9 @@ function PayoutSummary({ sessions, viewYear, viewMonth, setViewYear, setViewMont
                 aria-label="이전 달"
                 style={{
                   width: 28, height: 28, borderRadius: 999,
-                  border: "none", cursor: "pointer", background: "#fff",
-                  color: "#475569", fontSize: 14, fontWeight: 800,
-                  boxShadow: "0 1px 3px rgba(15,23,42,0.06)",
+                  border: "none", cursor: "pointer", background: "#1f1d26",
+                  color: "#a8a4b2", fontSize: 14, fontWeight: 800,
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
                 }}
               >
                 ‹
@@ -1197,7 +1257,7 @@ function PayoutSummary({ sessions, viewYear, viewMonth, setViewYear, setViewMont
                   padding: "6px 12px", borderRadius: 999, border: "none",
                   cursor: "pointer", fontSize: 13, fontWeight: 800,
                   background: "transparent",
-                  color: isCurrentMonth ? "#016837" : "#0f172a",
+                  color: isCurrentMonth ? "#fb923c" : "#f5f4f7",
                   minWidth: 110, textAlign: "center",
                 }}
               >
@@ -1210,16 +1270,16 @@ function PayoutSummary({ sessions, viewYear, viewMonth, setViewYear, setViewMont
                 aria-label="다음 달"
                 style={{
                   width: 28, height: 28, borderRadius: 999,
-                  border: "none", cursor: "pointer", background: "#fff",
-                  color: "#475569", fontSize: 14, fontWeight: 800,
-                  boxShadow: "0 1px 3px rgba(15,23,42,0.06)",
+                  border: "none", cursor: "pointer", background: "#1f1d26",
+                  color: "#a8a4b2", fontSize: 14, fontWeight: 800,
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
                 }}
               >
                 ›
               </button>
             </div>
           )}
-          <div style={{ display: "flex", gap: 4, padding: 4, background: "#f1f5f9", borderRadius: 999 }}>
+          <div style={{ display: "flex", gap: 4, padding: 4, background: "#26242e", borderRadius: 999 }}>
             {[{ k: "month", label: "월별" }, { k: "all", label: "전체" }].map((opt) => (
               <button
                 key={opt.k}
@@ -1228,9 +1288,9 @@ function PayoutSummary({ sessions, viewYear, viewMonth, setViewYear, setViewMont
                 style={{
                   padding: "6px 14px", borderRadius: 999, fontSize: 12, fontWeight: 700,
                   border: "none", cursor: "pointer",
-                  background: period === opt.k ? "#fff" : "transparent",
-                  color:      period === opt.k ? "#016837" : "#64748b",
-                  boxShadow:  period === opt.k ? "0 2px 6px rgba(0,0,0,0.06)" : "none",
+                  background: period === opt.k ? "#1f1d26" : "transparent",
+                  color:      period === opt.k ? "#fb923c" : "#a8a4b2",
+                  boxShadow:  period === opt.k ? "0 2px 6px rgba(0,0,0,0.3)" : "none",
                 }}
               >
                 {opt.label}
@@ -1244,9 +1304,9 @@ function PayoutSummary({ sessions, viewYear, viewMonth, setViewYear, setViewMont
         display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
         gap: 12, marginBottom: 18,
       }}>
-        <SummaryStat label="총매출" value={totalRevenue} accent="#0f172a" />
-        <SummaryStat label="툴비 합계 (40%)" value={totalToolb} accent="#016837" highlight />
-        <SummaryStat label="충당금 합계 (20%)" value={totalReserve} accent="#b45309" />
+        <SummaryStat label="총매출" value={totalRevenue} accent="#f5f4f7" />
+        <SummaryStat label="툴비 합계 (40%)" value={totalToolb} accent="#fb923c" highlight />
+        <SummaryStat label="충당금 합계 (20%)" value={totalReserve} accent="#fbbf24" />
       </div>
 
       <InstructorPayoutTable
@@ -1263,19 +1323,19 @@ function InstructorPayoutTable({ rows, mainTotal, assistantTotal }) {
 
   if (rows.length === 0) {
     return (
-      <div style={{ marginTop: 14, color: "#94a3b8", fontSize: 13, padding: "10px 0" }}>
+      <div style={{ marginTop: 14, color: "#a8a4b2", fontSize: 13, padding: "10px 0" }}>
         해당 기간에 강사 정산 내역이 없습니다.
       </div>
     );
   }
 
   const cellHead = {
-    padding: "10px 12px", fontSize: 12, fontWeight: 700, color: "#64748b",
-    textAlign: "left", borderBottom: "1px solid #e2e8f0", whiteSpace: "nowrap",
+    padding: "10px 12px", fontSize: 12, fontWeight: 700, color: "#a8a4b2",
+    textAlign: "left", borderBottom: "1px solid #34323d", whiteSpace: "nowrap",
   };
   const cellHeadRight = { ...cellHead, textAlign: "right" };
   const cell = {
-    padding: "12px", fontSize: 13, color: "#0f172a", borderBottom: "1px solid #f1f5f9",
+    padding: "12px", fontSize: 13, color: "#f5f4f7", borderBottom: "1px solid #34323d",
     verticalAlign: "top",
   };
   const cellRight = { ...cell, textAlign: "right", whiteSpace: "nowrap", fontWeight: 700 };
@@ -1284,11 +1344,11 @@ function InstructorPayoutTable({ rows, mainTotal, assistantTotal }) {
     <div style={{ marginTop: 14, overflowX: "auto" }}>
       <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 560 }}>
         <thead>
-          <tr style={{ background: "#f8fafc" }}>
+          <tr style={{ background: "#26242e" }}>
             <th style={cellHead}>강사</th>
             <th style={cellHeadRight}>주강사 (28%)</th>
             <th style={cellHeadRight}>보조강사 (12%)</th>
-            <th style={{ ...cellHeadRight, color: "#0f172a" }}>합계</th>
+            <th style={{ ...cellHeadRight, color: "#f5f4f7" }}>합계</th>
           </tr>
         </thead>
         <tbody>
@@ -1297,13 +1357,13 @@ function InstructorPayoutTable({ rows, mainTotal, assistantTotal }) {
           ))}
         </tbody>
         <tfoot>
-          <tr style={{ background: "#f8fafc" }}>
-            <td style={{ ...cell, fontWeight: 800, color: "#0f172a" }}>
-              총합계 <span style={{ color: "#94a3b8", fontWeight: 500, fontSize: 12 }}>· {rows.length}명</span>
+          <tr style={{ background: "#26242e" }}>
+            <td style={{ ...cell, fontWeight: 800, color: "#f5f4f7" }}>
+              총합계 <span style={{ color: "#a8a4b2", fontWeight: 500, fontSize: 12 }}>· {rows.length}명</span>
             </td>
-            <td style={{ ...cellRight, color: "#1d4ed8", fontSize: 14 }}>{formatKRW(mainTotal)}</td>
-            <td style={{ ...cellRight, color: "#7e22ce", fontSize: 14 }}>{formatKRW(assistantTotal)}</td>
-            <td style={{ ...cellRight, color: "#0f172a", fontSize: 15, fontWeight: 900 }}>{formatKRW(grandTotal)}</td>
+            <td style={{ ...cellRight, color: "#93c5fd", fontSize: 14 }}>{formatKRW(mainTotal)}</td>
+            <td style={{ ...cellRight, color: "#fb7185", fontSize: 14 }}>{formatKRW(assistantTotal)}</td>
+            <td style={{ ...cellRight, color: "#f5f4f7", fontSize: 15, fontWeight: 900 }}>{formatKRW(grandTotal)}</td>
           </tr>
         </tfoot>
       </table>
@@ -1315,7 +1375,7 @@ function InstructorPayoutRow({ row }) {
   const { user, mainTotal, mainSessions, assistantTotal, assistantSessions, total } = row;
   const hasBank = user.bankName || user.bankAccount;
   const cell = {
-    padding: "12px", fontSize: 13, color: "#0f172a", borderBottom: "1px solid #f1f5f9",
+    padding: "12px", fontSize: 13, color: "#f5f4f7", borderBottom: "1px solid #34323d",
     verticalAlign: "top",
   };
   const cellRight = { ...cell, textAlign: "right", whiteSpace: "nowrap", fontWeight: 700 };
@@ -1323,35 +1383,35 @@ function InstructorPayoutRow({ row }) {
   return (
     <tr>
       <td style={cell}>
-        <div style={{ fontWeight: 700, color: "#0f172a" }}>{userLabel(user)}</div>
-        <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
+        <div style={{ fontWeight: 700, color: "#f5f4f7" }}>{userLabel(user)}</div>
+        <div style={{ fontSize: 12, color: "#a8a4b2", marginTop: 2 }}>
           {hasBank ? (
             <>
               {user.bankName || "은행 미입력"} {user.bankAccount || "계좌 미입력"}
               {user.accountHolder ? ` · 예금주 ${user.accountHolder}` : ""}
             </>
           ) : (
-            <span style={{ color: "#dc2626" }}>⚠️ 계좌정보 미등록</span>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "#f87171" }}><AlertTriangle size={13} strokeWidth={2.4} /> 계좌정보 미등록</span>
           )}
         </div>
       </td>
-      <td style={{ ...cellRight, color: mainTotal > 0 ? "#1d4ed8" : "#cbd5e1" }}>
+      <td style={{ ...cellRight, color: mainTotal > 0 ? "#93c5fd" : "#6b6878" }}>
         {mainTotal > 0 ? (
           <>
             {formatKRW(mainTotal)}
-            <div style={{ fontSize: 11, fontWeight: 500, color: "#94a3b8", marginTop: 2 }}>{mainSessions}회</div>
+            <div style={{ fontSize: 11, fontWeight: 500, color: "#a8a4b2", marginTop: 2 }}>{mainSessions}회</div>
           </>
         ) : "—"}
       </td>
-      <td style={{ ...cellRight, color: assistantTotal > 0 ? "#7e22ce" : "#cbd5e1" }}>
+      <td style={{ ...cellRight, color: assistantTotal > 0 ? "#fb7185" : "#6b6878" }}>
         {assistantTotal > 0 ? (
           <>
             {formatKRW(assistantTotal)}
-            <div style={{ fontSize: 11, fontWeight: 500, color: "#94a3b8", marginTop: 2 }}>{assistantSessions}회</div>
+            <div style={{ fontSize: 11, fontWeight: 500, color: "#a8a4b2", marginTop: 2 }}>{assistantSessions}회</div>
           </>
         ) : "—"}
       </td>
-      <td style={{ ...cellRight, color: "#0f172a", fontSize: 14, fontWeight: 900 }}>
+      <td style={{ ...cellRight, color: "#f5f4f7", fontSize: 14, fontWeight: 900 }}>
         {formatKRW(total)}
       </td>
     </tr>
@@ -1361,11 +1421,11 @@ function InstructorPayoutRow({ row }) {
 function SummaryStat({ label, value, accent, highlight }) {
   return (
     <div style={{
-      background: highlight ? "#ecfdf5" : "#f8fafc",
+      background: highlight ? "rgba(249,115,22,0.12)" : "#26242e",
       borderRadius: 10, padding: 12,
-      border: highlight ? "1px solid #a7f3d0" : "1px solid #e2e8f0",
+      border: highlight ? "1px solid rgba(249,115,22,0.35)" : "1px solid #34323d",
     }}>
-      <div style={{ fontSize: 11, color: "#64748b", fontWeight: 700, marginBottom: 4 }}>{label}</div>
+      <div style={{ fontSize: 11, color: "#a8a4b2", fontWeight: 700, marginBottom: 4 }}>{label}</div>
       <div style={{ fontSize: 18, fontWeight: 900, color: accent }}>{formatKRW(value)}</div>
     </div>
   );
@@ -1376,16 +1436,16 @@ function ModalShell({ title, onClose, children }) {
     <div
       onClick={onClose}
       style={{
-        position: "fixed", inset: 0, background: "rgba(15,23,42,0.55)",
+        position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)",
         display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, padding: 16,
       }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          background: "#fff", borderRadius: 16, padding: 24,
+          background: "#1f1d26", borderRadius: 16, padding: 24,
           maxWidth: 520, width: "100%", maxHeight: "90vh", overflow: "auto",
-          boxShadow: "0 24px 60px rgba(15,23,42,0.25)",
+          boxShadow: "0 24px 60px rgba(0,0,0,0.5)",
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>

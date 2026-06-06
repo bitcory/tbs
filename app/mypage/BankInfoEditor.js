@@ -49,12 +49,12 @@ export default function BankInfoEditor({
 
   const inputStyle = (on) => ({
     ...S.input,
-    background: on ? "#fff" : "#f8fafc",
+    background: on ? "#26242e" : "#201f27",
     cursor: on ? "text" : "default",
   });
 
   return (
-    <form onSubmit={onSave} style={{ ...S.card, marginTop: 18 }}>
+    <form onSubmit={onSave} style={{ ...S.card, padding: 18 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
         <div style={S.sectionTitle}>정산 정보 (강사 계좌)</div>
         {!editing && (
@@ -106,7 +106,7 @@ export default function BankInfoEditor({
       </div>
 
       {errorMsg && (
-        <div style={{ color: "#dc2626", fontSize: 13, marginBottom: 10 }}>{errorMsg}</div>
+        <div style={{ color: "#f87171", fontSize: 13, marginBottom: 10 }}>{errorMsg}</div>
       )}
 
       {editing && (

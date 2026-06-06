@@ -63,8 +63,8 @@ export default function ProfileEditor({
   }
 
   return (
-    <form onSubmit={onSave} style={S.card}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+    <form onSubmit={onSave} style={{ ...S.card, padding: 18 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <div style={S.sectionTitle}>회원 정보</div>
         {!editing && (
           <button
@@ -77,7 +77,7 @@ export default function ProfileEditor({
         )}
       </div>
 
-      <div style={{ marginBottom: 16 }}>
+      <div style={{ marginBottom: 10 }}>
         <label style={S.label}>닉네임</label>
         <input
           value={nickname}
@@ -86,11 +86,11 @@ export default function ProfileEditor({
           required
           minLength={2}
           maxLength={20}
-          style={{ ...S.input, background: editing ? "#fff" : "#f8fafc", cursor: editing ? "text" : "default" }}
+          style={{ ...S.input, padding: "9px 12px", fontSize: 14, background: editing ? "#26242e" : "#201f27", cursor: editing ? "text" : "default" }}
         />
       </div>
 
-      <div style={{ marginBottom: 16 }}>
+      <div style={{ marginBottom: 10 }}>
         <label style={S.label}>이메일</label>
         <input
           type="email"
@@ -98,11 +98,11 @@ export default function ProfileEditor({
           onChange={(e) => setEmail(e.target.value)}
           disabled={!editing}
           required
-          style={{ ...S.input, background: editing ? "#fff" : "#f8fafc", cursor: editing ? "text" : "default" }}
+          style={{ ...S.input, padding: "9px 12px", fontSize: 14, background: editing ? "#26242e" : "#201f27", cursor: editing ? "text" : "default" }}
         />
       </div>
 
-      <div style={{ marginBottom: 18 }}>
+      <div style={{ marginBottom: 12 }}>
         <label style={S.label}>핸드폰 번호</label>
         <input
           type="tel"
@@ -113,7 +113,7 @@ export default function ProfileEditor({
           inputMode="tel"
           pattern="[0-9+\-\s]*"
           maxLength={20}
-          style={{ ...S.input, background: editing ? "#fff" : "#f8fafc", cursor: editing ? "text" : "default" }}
+          style={{ ...S.input, padding: "9px 12px", fontSize: 14, background: editing ? "#26242e" : "#201f27", cursor: editing ? "text" : "default" }}
         />
       </div>
 
@@ -127,11 +127,11 @@ export default function ProfileEditor({
       />
 
       {errorMsg && (
-        <div style={{ color: "#dc2626", fontSize: 13, marginTop: 12 }}>{errorMsg}</div>
+        <div style={{ color: "#f87171", fontSize: 13, marginTop: 12 }}>{errorMsg}</div>
       )}
 
       {editing && (
-        <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
+        <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
           <button
             type="submit"
             disabled={pending} className="glass-hoverable"
@@ -152,14 +152,14 @@ export default function ProfileEditor({
 
       <div
         style={{
-          marginTop: 18,
-          padding: "12px 14px",
-          background: "#ecfdf5",
-          border: "1px solid #a7f3d0",
+          marginTop: 12,
+          padding: "9px 12px",
+          background: "rgba(249,115,22,0.12)",
+          border: "1px solid rgba(249,115,22,0.35)",
           borderRadius: 10,
-          fontSize: 12.5,
-          color: "#065f46",
-          lineHeight: 1.55,
+          fontSize: 12,
+          color: "#fb923c",
+          lineHeight: 1.5,
         }}
       >
         📧 <strong>강의자료 안내</strong> — 강의자료는 <strong>이메일 또는 전화번호가 등록된 회원</strong>에게만 발송됩니다. 정확한 수신을 위해 회원정보를 최신 상태로 유지해 주세요.
@@ -181,8 +181,8 @@ function ConsentBlock({
 
   const wrap = {
     marginTop: 8,
-    background: "#f8fafc",
-    border: "1px solid #e2e8f0",
+    background: "#1f1d26",
+    border: "1px solid #34323d",
     borderRadius: 12,
     overflow: "hidden",
   };
@@ -190,25 +190,25 @@ function ConsentBlock({
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: "12px 16px",
+    padding: "9px 14px",
     cursor: "pointer",
     background: "transparent",
     border: "none",
     width: "100%",
     textAlign: "left",
     fontFamily: "inherit",
-    color: "#334155",
+    color: "#f5f4f7",
   };
   const body = {
     padding: "0 16px 14px",
     display: "flex",
     flexDirection: "column",
     gap: 10,
-    borderTop: "1px solid #e2e8f0",
+    borderTop: "1px solid #34323d",
     paddingTop: 14,
   };
-  const row = { display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13, lineHeight: 1.55, color: "#334155" };
-  const cb = { marginTop: 3, width: 16, height: 16, accentColor: "#00996D", cursor: editing ? "pointer" : "default" };
+  const row = { display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13, lineHeight: 1.55, color: "#f5f4f7" };
+  const cb = { marginTop: 3, width: 16, height: 16, accentColor: "#f97316", cursor: editing ? "pointer" : "default" };
   const miniBadge = (ok) => ({
     display: "inline-flex",
     alignItems: "center",
@@ -217,8 +217,8 @@ function ConsentBlock({
     borderRadius: 100,
     fontSize: 11,
     fontWeight: 700,
-    background: ok ? "#dcfce7" : "#f1f5f9",
-    color: ok ? "#166534" : "#94a3b8",
+    background: ok ? "rgba(249,115,22,0.18)" : "#26242e",
+    color: ok ? "#fb923c" : "#a8a4b2",
   });
 
   return (
@@ -229,7 +229,7 @@ function ConsentBlock({
         style={summary}
       >
         <span style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "#f5f4f7" }}>
             동의 내역
           </span>
           <span style={miniBadge(hasAgreedPrivacy)}>
@@ -242,7 +242,7 @@ function ConsentBlock({
         <span
           style={{
             fontSize: 12,
-            color: "#64748b",
+            color: "#a8a4b2",
             transition: "transform 0.2s",
             transform: open ? "rotate(180deg)" : "rotate(0deg)",
             display: "inline-block",
@@ -262,8 +262,8 @@ function ConsentBlock({
                   width: 18,
                   height: 18,
                   borderRadius: 5,
-                  background: "linear-gradient(135deg, #68D970, #00996D)",
-                  color: "#fff",
+                  background: "linear-gradient(135deg, #fb923c, #f97316)",
+                  color: "#f5f4f7",
                   display: "inline-flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -275,9 +275,9 @@ function ConsentBlock({
                 ✓
               </span>
               <span>
-                <strong style={{ color: "#0f172a" }}>개인정보 수집·이용 동의 완료</strong>
+                <strong style={{ color: "#f5f4f7" }}>개인정보 수집·이용 동의 완료</strong>
                 <br />
-                <span style={{ color: "#64748b", fontSize: 12 }}>
+                <span style={{ color: "#a8a4b2", fontSize: 12 }}>
                   동의일자: {new Date(privacyAgreedAt).toLocaleDateString("ko-KR")} · 수집 항목: 닉네임, 이메일, 핸드폰번호 · 보관 기간: 회원 탈퇴 시까지
                   <br />
                   동의 철회는 회원 탈퇴를 통해서만 가능합니다.
@@ -294,9 +294,9 @@ function ConsentBlock({
                 style={cb}
               />
               <span>
-                <strong style={{ color: "#0f172a" }}>[필수]</strong> 개인정보 수집·이용에 동의합니다.
+                <strong style={{ color: "#f5f4f7" }}>[필수]</strong> 개인정보 수집·이용에 동의합니다.
                 <br />
-                <span style={{ color: "#64748b", fontSize: 12 }}>
+                <span style={{ color: "#a8a4b2", fontSize: 12 }}>
                   수집 항목: 닉네임, 이메일, 핸드폰번호 · 이용 목적: 강의 제공 및 회원 관리 · 보관 기간: 회원 탈퇴 시까지
                 </span>
               </span>
@@ -312,9 +312,9 @@ function ConsentBlock({
               style={cb}
             />
             <span>
-              <strong style={{ color: "#0f172a" }}>[선택]</strong> TOOLB의 강의 일정, AI 정보 등 마케팅 정보 수신에 동의합니다.
+              <strong style={{ color: "#f5f4f7" }}>[선택]</strong> TOOLB의 강의 일정, AI 정보 등 마케팅 정보 수신에 동의합니다.
               <br />
-              <span style={{ color: "#64748b", fontSize: 12 }}>
+              <span style={{ color: "#a8a4b2", fontSize: 12 }}>
                 이메일·문자로 발송되며 언제든지 수신 거부할 수 있습니다.
               </span>
             </span>

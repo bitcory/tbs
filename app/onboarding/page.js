@@ -80,7 +80,7 @@ export default async function OnboardingPage() {
         </div>
       </section>
 
-      <div style={{ ...S.pageWrap, maxWidth: 520, marginTop: -48, position: "relative" }}>
+      <div style={{ ...S.pageWrap, maxWidth: 520, marginTop: 0, position: "relative" }}>
         <form action={save} style={S.card}>
           <div style={{ marginBottom: 18 }}>
             <label style={S.label}>닉네임</label>

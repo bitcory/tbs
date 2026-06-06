@@ -25,7 +25,7 @@ export default async function PricingPage() {
   });
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f8fafc", color: "#0f172a" }} className="auth-scroll">
+    <div style={{ minHeight: "100vh", background: "#15141a", color: "#f5f4f7" }} className="auth-scroll">
       <section style={S.hero}>
         <div style={{ position: "relative", zIndex: 2 }}>
           <span style={S.heroEyebrow}>PRICING</span>
@@ -34,7 +34,7 @@ export default async function PricingPage() {
         </div>
       </section>
 
-      <div style={{ ...S.pageWrap, maxWidth: 800, padding: "28px 16px 80px", marginTop: -48, position: "relative" }}>
+      <div style={{ ...S.pageWrap, maxWidth: 800, padding: "28px 16px 80px", marginTop: 0, position: "relative" }}>
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginBottom: 16 }}>
           <Link href="/admin/schedule" className="glass-hoverable" style={S.ghostBtn}>강의 일정</Link>
           <Link href="/admin" className="glass-hoverable" style={S.ghostBtn}>← 관리자</Link>

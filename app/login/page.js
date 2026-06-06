@@ -20,7 +20,7 @@ export default async function LoginPage() {
         </div>
       </section>
 
-      <div style={{ ...S.pageWrap, maxWidth: 420, marginTop: -48, position: "relative" }}>
+      <div style={{ ...S.pageWrap, maxWidth: 420, marginTop: 0, position: "relative" }}>
         <div style={S.card}>
           <form
             action={async () => {
