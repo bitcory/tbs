@@ -48,8 +48,8 @@ export default function CapsrtConnectCard({ hasAccess, initialCode, issueAction,
   }
 
   return (
-    <div style={S.card}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 14, flexWrap: "wrap" }}>
+    <div style={{ ...S.card, padding: 22, display: "flex", flexDirection: "column" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 18, flexWrap: "wrap" }}>
         <div style={{ ...S.sectionTitle, marginBottom: 0 }}>캡컷SRT 앱 연결</div>
         <span style={S.badge(hasAccess ? { background: "rgba(34,211,238,0.18)", color: CYAN } : S.badgeGray)}>
           {hasAccess ? "사용 가능" : "권한 없음"}
@@ -62,29 +62,24 @@ export default function CapsrtConnectCard({ hasAccess, initialCode, issueAction,
           관리자에게 사용 승인을 요청하면 이곳에서 연결코드를 발급할 수 있어요.
         </p>
       ) : (
-        <>
-          <p style={{ color: "#a8a4b2", fontSize: 13, lineHeight: 1.6, marginTop: 0, marginBottom: 14 }}>
-            아래 연결코드를 복사해 캡컷SRT 앱의 로그인 화면에 붙여넣으면 사용이 시작됩니다.
-            코드는 외부에 공유하지 마세요. 분실하거나 유출되면 <b>재발급</b>하면 됩니다.
-          </p>
-
+        <div style={{ marginTop: "auto" }}>
           {code ? (
             <>
               <div
                 style={{
-                  display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap",
-                  padding: "14px 16px", borderRadius: 12,
+                  display: "flex", alignItems: "center", gap: 10,
+                  height: 50, padding: "0 8px 0 16px", borderRadius: 14,
                   background: "#1f1d26", border: `1px solid ${CYAN}33`,
                 }}
               >
-                <code style={{ flex: 1, minWidth: 180, fontSize: 16, fontWeight: 700, letterSpacing: "0.04em", color: "#f5f4f7", fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace" }}>
+                <code style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: 700, letterSpacing: "0.03em", color: "#f5f4f7", fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   {code}
                 </code>
                 <button onClick={copy} className="tb-press-soft" style={btn(CYAN, "#15141a")}>
                   {copied ? "✓ 복사됨" : "복사"}
                 </button>
               </div>
-              <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
+              <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
                 <button onClick={issue} disabled={pending} className="tb-press-soft" style={btnGhost}>
                   {pending ? "처리 중…" : "재발급"}
                 </button>
@@ -94,13 +89,13 @@ export default function CapsrtConnectCard({ hasAccess, initialCode, issueAction,
               </div>
             </>
           ) : (
-            <button onClick={issue} disabled={pending} className="tb-press-soft" style={{ ...btn(CYAN, "#15141a"), width: "100%", padding: "14px" }}>
+            <button onClick={issue} disabled={pending} className="tb-press-soft" style={{ ...btn(CYAN, "#15141a"), width: "100%", height: 50 }}>
               {pending ? "발급 중…" : "연결코드 발급"}
             </button>
           )}
 
           {msg && <p style={{ color: "#fb7185", fontSize: 12.5, marginTop: 10, marginBottom: 0 }}>{msg}</p>}
-        </>
+        </div>
       )}
     </div>
   );

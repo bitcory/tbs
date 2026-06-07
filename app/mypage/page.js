@@ -86,63 +86,72 @@ export default async function MyPage() {
           @media (max-width: 360px) {
             .mypage-nav-btn { padding: 6px 10px !important; font-size: 11px !important; }
           }
-          /* 내권한(좁게) · 유용한툴(넓게) · 오픈채팅방(좁게) */
+          /* 한 줄 4개: 내권한 · 유용한툴 · 오픈채팅방 · 캡컷SRT */
           .mypage-cards {
             display: grid;
-            grid-template-columns: 0.8fr 1.5fr 0.8fr;
+            grid-template-columns: repeat(4, 1fr);
             gap: 18px;
             align-items: stretch;
             margin-bottom: 18px;
           }
-          @media (max-width: 980px) {
+          @media (max-width: 1100px) {
+            .mypage-cards { grid-template-columns: repeat(2, 1fr); }
+          }
+          @media (max-width: 640px) {
             .mypage-cards { grid-template-columns: 1fr; }
           }
         `}</style>
 
         <div className="mypage-cards">
-          <div style={S.card}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 18, flexWrap: "wrap" }}>
-            <div style={{ ...S.sectionTitle, marginBottom: 0 }}>내 권한</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ ...S.card, padding: 22, display: "flex", flexDirection: "column" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: 4, flexWrap: "wrap" }}>
+              <div style={{ ...S.sectionTitle, marginBottom: 0 }}>내 권한</div>
               <span style={S.badge(ROLE_BADGE[me.role])}>{ROLE_LABEL[me.role]}</span>
-              <span style={{ color: "#a8a4b2", fontSize: 13 }}>가입일 {new Date(me.createdAt).toLocaleDateString("ko-KR")}</span>
             </div>
+            <div style={{ color: "#8c8898", fontSize: 12.5, marginBottom: 18 }}>
+              가입일 {new Date(me.createdAt).toLocaleDateString("ko-KR")}
+            </div>
+
+            <Link
+              href="/mypage/suggestions"
+              className="tb-press"
+              style={{
+                marginTop: "auto",
+                display: "flex",
+                alignItems: "center",
+                gap: 11,
+                width: "100%",
+                height: 78,
+                padding: "0 16px",
+                borderRadius: 14,
+                background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+                color: "#fff",
+                fontSize: 14.5,
+                fontWeight: 800,
+                textDecoration: "none",
+                border: "1px solid rgba(255,255,255,0.35)",
+                boxShadow: "0 10px 22px rgba(99,102,241,0.32), inset 1.5px 1.5px 0.5px 0 rgba(255,255,255,0.5), inset -1px -1px 0.5px 1px rgba(255,255,255,0.18)",
+              }}
+            >
+              <span style={{
+                width: 34, height: 34, borderRadius: 10, flexShrink: 0,
+                background: "rgba(255,255,255,0.22)", border: "1px solid rgba(255,255,255,0.3)",
+                display: "inline-flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <MessageSquarePlus size={18} strokeWidth={2.4} />
+              </span>
+              <span style={{ flex: 1, minWidth: 0 }}>운영건의함</span>
+              <ArrowUpRight size={16} strokeWidth={2.4} color="rgba(255,255,255,0.8)" />
+            </Link>
           </div>
 
-          <Link
-            href="/mypage/suggestions"
-            className="tb-press"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 10,
-              width: "fit-content",
-              maxWidth: "100%",
-              margin: "0 auto",
-              padding: "14px 22px",
-              borderRadius: 14,
-              background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-              color: "#fff",
-              fontSize: 15,
-              fontWeight: 800,
-              textDecoration: "none",
-              border: "1px solid rgba(255,255,255,0.35)",
-              boxShadow: "0 10px 22px rgba(99,102,241,0.32), inset 1.5px 1.5px 0.5px 0 rgba(255,255,255,0.5), inset -1px -1px 0.5px 1px rgba(255,255,255,0.18)",
-            }}
-          >
-            <MessageSquarePlus size={20} strokeWidth={2.4} />
-            운영건의함 — 운영진에게 의견 보내기
-          </Link>
-        </div>
-
-          <div style={S.card}>
-            <div style={S.sectionTitle}>유용한툴</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
+          <div style={{ ...S.card, padding: 22, display: "flex", flexDirection: "column" }}>
+            <div style={{ ...S.sectionTitle, marginBottom: 18 }}>유용한툴</div>
+            <div style={{ marginTop: "auto", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
               {[
-                { label: "툴비캡쳐",        desc: "화면 캡쳐",   url: "https://drive.google.com/file/d/1P0Ybn1D4W8eu8SpzHqyrjd_94DAj8Gil/view?usp=sharing", c: "59,130,246",  Icon: Camera },
-                { label: "툴비검색기",      desc: "파일 검색",    url: "https://drive.google.com/file/d/1v6fQcMyaao9OZjfHhK3ZR-vSAJ4lqdB0/view?usp=sharing", c: "245,158,11", Icon: Search },
-                { label: "무료 캡컷",      desc: "영상 편집",     url: "https://aitoolb.com/61",           c: "236,72,153", Icon: Film },
+                { label: "툴비캡쳐",        url: "https://drive.google.com/file/d/1P0Ybn1D4W8eu8SpzHqyrjd_94DAj8Gil/view?usp=sharing", c: "59,130,246",  Icon: Camera },
+                { label: "툴비검색기",      url: "https://drive.google.com/file/d/1v6fQcMyaao9OZjfHhK3ZR-vSAJ4lqdB0/view?usp=sharing", c: "245,158,11", Icon: Search },
+                { label: "무료 캡컷",      url: "https://aitoolb.com/61",           c: "236,72,153", Icon: Film },
               ].map((u) => {
                 const Icon = u.Icon;
                 return (
@@ -155,14 +164,16 @@ export default async function MyPage() {
                     style={{
                       position: "relative",
                       display: "flex",
-                      flexDirection: "row",
+                      flexDirection: "column",
                       alignItems: "center",
-                      gap: 9,
-                      padding: "10px 11px",
-                      borderRadius: 14,
+                      justifyContent: "center",
+                      gap: 7,
+                      height: 78,
+                      padding: "0 6px",
+                      borderRadius: 13,
                       background: `linear-gradient(135deg, rgba(${u.c}, 1) 0%, rgba(${u.c}, 0.82) 100%)`,
                       border: "1px solid rgba(255,255,255,0.45)",
-                      boxShadow: `0 8px 18px rgba(${u.c}, 0.3), inset 1.5px 1.5px 0.5px 0 rgba(255,255,255,0.5), inset -1px -1px 0.5px 1px rgba(255,255,255,0.18)`,
+                      boxShadow: `0 6px 14px rgba(${u.c}, 0.28), inset 1.5px 1.5px 0.5px 0 rgba(255,255,255,0.5), inset -1px -1px 0.5px 1px rgba(255,255,255,0.18)`,
                       textDecoration: "none",
                       color: "#fff",
                       overflow: "hidden",
@@ -170,24 +181,20 @@ export default async function MyPage() {
                   >
                     {/* subtle decorative blob */}
                     <span aria-hidden="true" style={{
-                      position: "absolute", top: -24, right: -20, width: 88, height: 88, borderRadius: "50%",
+                      position: "absolute", top: -24, right: -20, width: 72, height: 72, borderRadius: "50%",
                       background: "rgba(255,255,255,0.18)", filter: "blur(2px)",
                     }} />
                     <span style={{
-                      width: 32, height: 32, borderRadius: 9, flexShrink: 0,
+                      width: 34, height: 34, borderRadius: 10, flexShrink: 0,
                       background: "rgba(255,255,255,0.22)",
                       border: "1px solid rgba(255,255,255,0.35)",
                       display: "inline-flex", alignItems: "center", justifyContent: "center",
                       backdropFilter: "blur(8px)",
                       position: "relative", zIndex: 1,
                     }}>
-                      <Icon size={16} strokeWidth={2.4} color="#fff" />
+                      <Icon size={17} strokeWidth={2.4} color="#fff" />
                     </span>
-                    <div style={{ flex: 1, minWidth: 0, position: "relative", zIndex: 1 }}>
-                      <div style={{ fontSize: 13.5, fontWeight: 800, color: "#fff", lineHeight: 1.2, letterSpacing: "-0.02em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{u.label}</div>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.85)", marginTop: 1, fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{u.desc}</div>
-                    </div>
-                    <ArrowUpRight size={14} strokeWidth={2.4} color="rgba(255,255,255,0.85)" style={{ position: "relative", zIndex: 1, flexShrink: 0 }} />
+                    <span style={{ fontSize: 12, fontWeight: 800, color: "#fff", lineHeight: 1.2, letterSpacing: "-0.03em", whiteSpace: "nowrap", position: "relative", zIndex: 1 }}>{u.label}</span>
                   </a>
                 );
               })}
@@ -195,34 +202,40 @@ export default async function MyPage() {
           </div>
 
           {/* 오픈챗팅방 바로가기 */}
-          <div style={S.card}>
-            <div style={{ ...S.sectionTitle, marginBottom: 14 }}>오픈챗팅방 바로가기</div>
+          <div style={{ ...S.card, padding: 22, display: "flex", flexDirection: "column" }}>
+            <div style={{ ...S.sectionTitle, marginBottom: 18 }}>오픈챗팅방 바로가기</div>
             <a
               href="https://open.kakao.com/o/gWR9vhXh"
               target="_blank"
               rel="noopener noreferrer"
               className="tb-press"
               style={{
+                marginTop: "auto",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
-                gap: 10,
-                width: "fit-content",
-                maxWidth: "100%",
-                margin: "0 auto",
-                padding: "14px 22px",
+                gap: 11,
+                width: "100%",
+                height: 78,
+                padding: "0 16px",
                 borderRadius: 14,
                 background: "#FEE500",
                 color: "#191919",
-                fontSize: 15,
+                fontSize: 14.5,
                 fontWeight: 800,
                 textDecoration: "none",
                 border: "1px solid rgba(0,0,0,0.08)",
                 boxShadow: "0 8px 18px rgba(254,229,0,0.45), inset 1.5px 1.5px 0.5px 0 rgba(255,255,255,0.7), inset -1px -1px 0.5px 1px rgba(0,0,0,0.05)",
               }}
             >
-              <MessagesSquare size={20} strokeWidth={2.4} color="#191919" />
-              카카오톡 오픈채팅방 입장
+              <span style={{
+                width: 34, height: 34, borderRadius: 10, flexShrink: 0,
+                background: "rgba(0,0,0,0.08)", border: "1px solid rgba(0,0,0,0.06)",
+                display: "inline-flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <MessagesSquare size={18} strokeWidth={2.4} color="#191919" />
+              </span>
+              <span style={{ flex: 1, minWidth: 0 }}>카카오톡 입장</span>
+              <ArrowUpRight size={16} strokeWidth={2.4} color="rgba(0,0,0,0.45)" />
             </a>
           </div>
 
