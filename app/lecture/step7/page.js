@@ -354,7 +354,7 @@ export default function Step7Page() {
 
       <div className="flex flex-col md:flex-row md:flex-1 md:min-h-0 w-full px-4 pt-6 pb-4 gap-4 2xl:px-6">
         {/* Sidebar */}
-        <aside className="w-full md:w-[300px] flex-shrink-0 bg-[var(--tb-surface)] border border-[var(--tb-border)] rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.3)] md:overflow-y-auto">
+        <aside className="w-full md:w-[300px] flex-shrink-0 bg-[var(--tb-surface)] border border-[var(--tb-border)] rounded-2xl shadow-[0_10px_30px_-14px_rgba(0,0,0,0.16)] md:overflow-y-auto">
           <div className="p-4 border-b border-[var(--tb-border)]">
             <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[var(--tb-text-muted)]">
               <Clapperboard className="w-3.5 h-3.5" />
@@ -536,7 +536,7 @@ export default function Step7Page() {
         </aside>
 
         {/* Main */}
-        <main className="flex-1 min-w-0 flex flex-col md:overflow-hidden bg-[var(--tb-surface)] border border-[var(--tb-border)] rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.3)]">
+        <main className="flex-1 min-w-0 flex flex-col md:overflow-hidden bg-[var(--tb-surface)] border border-[var(--tb-border)] rounded-2xl shadow-[0_10px_30px_-14px_rgba(0,0,0,0.16)]">
           {toolView === 'frame-extractor' ? (
             <FrameExtractor accentColor="#f97316" />
           ) : toolView === 'watermark-remover' ? (
@@ -592,7 +592,7 @@ export default function Step7Page() {
                 <button
                   onClick={() => setActiveTab('overview')}
                   className={`flex items-center gap-2 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${
-                    activeTab === 'overview' ? 'tb-pill-primary' : 'text-[var(--tb-text-muted)] bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] tb-press-soft'
+                    activeTab === 'overview' ? 'tb-pill-primary' : 'text-[var(--tb-text-muted)] hover:bg-[var(--tb-surface-2)] tb-press-soft'
                   }`}
                 >
                   <Layers className="w-3.5 h-3.5" />
@@ -607,12 +607,12 @@ export default function Step7Page() {
                       key={tabId}
                       onClick={() => setActiveTab(tabId)}
                       className={`flex items-center gap-2 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${
-                        isActive ? 'tb-pill-primary' : 'text-[var(--tb-text-muted)] bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] tb-press-soft'
+                        isActive ? 'tb-pill-primary' : 'text-[var(--tb-text-muted)] hover:bg-[var(--tb-surface-2)] tb-press-soft'
                       }`}
                     >
                       <span
                         className="w-1.5 h-1.5 rounded-full"
-                        style={{ background: isActive ? '#fff' : dot, opacity: isActive ? 1 : 0.7 }}
+                        style={{ background: dot, opacity: isActive ? 1 : 0.7 }}
                       />
                       <span>Board {b.label}</span>
                       <span className="text-[10px] font-semibold opacity-60">
@@ -884,7 +884,7 @@ function BoardView({ board, boardIndex, data, onCopy, onUpdateBoard, onUpdatePan
       </div>
 
       {/* Main frame */}
-      <div className="rounded-2xl overflow-hidden border border-[var(--tb-border)] bg-[var(--tb-surface)] shadow-[0_2px_8px_rgba(0,0,0,0.3)]">
+      <div className="rounded-2xl overflow-hidden border border-[var(--tb-border)] bg-[var(--tb-surface)] shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
         <div className="px-4 py-3 border-b border-[var(--tb-border)] flex items-center justify-between gap-3" style={{ background: `${dot}10` }}>
           <div className="flex items-center gap-2.5 min-w-0">
             <span className="text-[12px] font-black px-2 py-0.5 rounded-full" style={{ background: `${dot}25`, color: dot }}>
@@ -968,7 +968,7 @@ function PanelCard({ panel, boardDot, onCopy, onUpdate }) {
   const fnLabel = panel.function ? (FUNCTION_LABEL[panel.function] || panel.function) : '';
 
   return (
-    <div className="rounded-2xl overflow-hidden border border-[var(--tb-border)] bg-[var(--tb-surface)] shadow-[0_2px_8px_rgba(0,0,0,0.3)]">
+    <div className="rounded-2xl overflow-hidden border border-[var(--tb-border)] bg-[var(--tb-surface)] shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
       <div
         className="px-4 py-3 border-b border-[var(--tb-border)] flex items-center justify-between gap-3 flex-wrap"
         style={{ background: `${boardDot}08` }}
@@ -992,7 +992,7 @@ function PanelCard({ panel, boardDot, onCopy, onUpdate }) {
             </span>
           )}
           {panel.is_bridge && (
-            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[color-mix(in_srgb,#22d3ee_10%,#1f1d26)] border border-[#22d3ee]/30 text-[#22d3ee]">
+            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[var(--tb-surface-2)] border border-[var(--tb-border)] text-[var(--tb-text-muted)]">
               BRIDGE
             </span>
           )}

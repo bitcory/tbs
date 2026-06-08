@@ -467,7 +467,7 @@ export default function Step2Page() {
 
       <div className="flex flex-col md:flex-row md:flex-1 md:min-h-0 w-full px-4 pt-6 pb-4 gap-4 2xl:px-6">
         {/* Sidebar */}
-        <aside className="w-full md:w-[300px] flex-shrink-0 bg-[var(--tb-surface)] border border-[var(--tb-border)] rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.4)] md:overflow-y-auto">
+        <aside className="w-full md:w-[300px] flex-shrink-0 bg-[var(--tb-surface)] border border-[var(--tb-border)] rounded-2xl shadow-[0_10px_30px_-14px_rgba(0,0,0,0.16)] md:overflow-y-auto">
           {/* Storyboard meta */}
           <div className="p-4 border-b border-[var(--tb-border)]">
             <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[var(--tb-text-muted)]">
@@ -627,7 +627,7 @@ export default function Step2Page() {
         </aside>
 
         {/* Main */}
-        <main className="flex-1 min-w-0 flex flex-col md:overflow-hidden bg-[var(--tb-surface)] border border-[var(--tb-border)] rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.4)]">
+        <main className="flex-1 min-w-0 flex flex-col md:overflow-hidden bg-[var(--tb-surface)] border border-[var(--tb-border)] rounded-2xl shadow-[0_10px_30px_-14px_rgba(0,0,0,0.16)]">
           {toolView === 'frame-extractor' ? (
             <FrameExtractor accentColor="#f97316" />
           ) : toolView === 'watermark-remover' ? (
@@ -653,7 +653,7 @@ export default function Step2Page() {
           ) : (
             <>
               {/* Top bulk-copy bar */}
-              <div className="flex-shrink-0 px-4 py-3 border-b border-[var(--tb-border)] bg-[#7c2d12]/20 rounded-t-2xl flex items-center justify-between gap-3">
+              <div className="flex-shrink-0 px-4 py-3 border-b border-[var(--tb-border)] bg-[var(--tb-surface-2)] rounded-t-2xl flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 min-w-0">
                   <Clapperboard className="w-4 h-4 text-[#f97316] flex-shrink-0" />
                   <h2 className="text-base font-black text-[var(--tb-text)] uppercase truncate">{storyboard.title}</h2>
@@ -701,18 +701,18 @@ export default function Step2Page() {
                       onClick={() => setActiveAct(i)}
                       className={`flex items-center gap-2 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${isActive
                         ? 'tb-pill-primary'
-                        : 'text-[var(--tb-text-muted)] bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] tb-press-soft'
+                        : 'text-[var(--tb-text-muted)] hover:bg-[var(--tb-surface-2)] tb-press-soft'
                         }`}
                     >
                       <span
                         className="w-1.5 h-1.5 rounded-full"
-                        style={{ background: isActive ? '#fff' : tc.dot, opacity: isActive ? 1 : 0.6 }}
+                        style={{ background: tc.dot, opacity: isActive ? 1 : 0.55 }}
                       />
                       {act}
                       {count > 0 && (
                         <span
                           className="text-[11px] font-bold px-1.5 py-0.5 rounded-full"
-                          style={isActive ? { background: 'rgba(255,255,255,0.25)', color: '#fff' } : { background: `${tc.dot}25`, color: tc.dot }}
+                          style={{ background: `${tc.dot}22`, color: tc.dot }}
                         >
                           {count}
                         </span>
@@ -735,7 +735,7 @@ export default function Step2Page() {
                       <div
                         key={scene.id}
                         ref={(el) => { sceneRefs.current[scene.id] = el; }}
-                        className="rounded-2xl overflow-hidden border border-[var(--tb-border)] bg-[var(--tb-surface-2)] shadow-[0_2px_8px_rgba(0,0,0,0.3)] transition-all"
+                        className="rounded-2xl overflow-hidden border border-[var(--tb-border)] bg-[var(--tb-surface-2)] shadow-[0_1px_3px_rgba(0,0,0,0.05)] transition-all"
                       >
                         {/* Scene header */}
                         <div
@@ -795,7 +795,7 @@ export default function Step2Page() {
                               <div className="flex items-center gap-1.5 min-w-0">
                                 <ImageIcon className="w-3.5 h-3.5 text-[#f97316] flex-shrink-0" />
                                 <span className="text-[11px] uppercase tracking-wider text-[var(--tb-text-muted)] font-bold">이미지 프롬프트</span>
-                                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[color-mix(in_srgb,#7c2d12_30%,#1f1d26)] text-[#f97316] font-bold">
+                                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[var(--tb-surface-2)] border border-[var(--tb-border)] text-[var(--tb-text-muted)] font-bold">
                                   {scene.prompts.image.tool}
                                 </span>
                               </div>
@@ -821,11 +821,11 @@ export default function Step2Page() {
                               <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
                                 <Film className="w-3.5 h-3.5 text-[#f43f5e] flex-shrink-0" />
                                 <span className="text-[11px] uppercase tracking-wider text-[var(--tb-text-muted)] font-bold">영상 프롬프트</span>
-                                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[color-mix(in_srgb,#881337_30%,#1f1d26)] text-[#fb7185] font-bold">
+                                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[var(--tb-surface-2)] border border-[var(--tb-border)] text-[var(--tb-text-muted)] font-bold">
                                   {scene.prompts.video.tool} · {scene.prompts.video.duration}s
                                 </span>
                                 {scene.prompts.video.motion_type && (
-                                  <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[color-mix(in_srgb,#881337_30%,#1f1d26)] text-[#fda4af] font-bold">
+                                  <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[var(--tb-surface-2)] border border-[var(--tb-border)] text-[var(--tb-text-muted)] font-bold">
                                     {scene.prompts.video.motion_type}
                                   </span>
                                 )}
@@ -877,8 +877,8 @@ export default function Step2Page() {
             </div>
             <div className="flex-1 overflow-y-auto p-5 space-y-3 min-h-0">
               <p className="text-sm text-[var(--tb-text-muted)] leading-relaxed">
-                스토리보드 JSON을 붙여넣으세요. <code className="bg-[color-mix(in_srgb,#7c2d12_30%,#1f1d26)] px-1.5 py-0.5 rounded text-[#f97316] font-mono text-[12px]">scenes</code> 배열이 포함되어야 합니다.
-                마크다운 코드블록(```) 래핑과 <code className="bg-[color-mix(in_srgb,#7c2d12_30%,#1f1d26)] px-1.5 py-0.5 rounded text-[#f97316] font-mono text-[12px]">{`{ "storyboard": ... }`}</code> 래퍼도 자동 처리됩니다.
+                스토리보드 JSON을 붙여넣으세요. <code className="bg-[var(--tb-surface-2)] border border-[var(--tb-border)] px-1.5 py-0.5 rounded text-[var(--tb-text-muted)] font-mono text-[12px]">scenes</code> 배열이 포함되어야 합니다.
+                마크다운 코드블록(```) 래핑과 <code className="bg-[var(--tb-surface-2)] border border-[var(--tb-border)] px-1.5 py-0.5 rounded text-[var(--tb-text-muted)] font-mono text-[12px]">{`{ "storyboard": ... }`}</code> 래퍼도 자동 처리됩니다.
               </p>
               <textarea
                 value={jsonInput}

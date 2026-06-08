@@ -1102,7 +1102,7 @@ export default function Step6Page() {
                       key={who}
                       onClick={() => setActiveTab(who)}
                       className={`flex items-center gap-2 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${
-                        isActive ? 'tb-pill-primary' : 'text-[var(--tb-text-muted)] bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] tb-press-soft'
+                        isActive ? 'tb-pill-primary' : 'text-[var(--tb-text-muted)] hover:bg-[var(--tb-surface-2)] tb-press-soft'
                       }`}
                     >
                       <User className="w-3.5 h-3.5" style={{ opacity: isActive ? 1 : 0.7 }} />
@@ -1121,12 +1121,12 @@ export default function Step6Page() {
                       key={s.shot_id}
                       onClick={() => setActiveTab(s.shot_id)}
                       className={`flex items-center gap-2 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${
-                        isActive ? 'tb-pill-primary' : 'text-[var(--tb-text-muted)] bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] tb-press-soft'
+                        isActive ? 'tb-pill-primary' : 'text-[var(--tb-text-muted)] hover:bg-[var(--tb-surface-2)] tb-press-soft'
                       }`}
                     >
                       <span
                         className="w-1.5 h-1.5 rounded-full"
-                        style={{ background: isActive ? '#fff' : dot, opacity: isActive ? 1 : 0.7 }}
+                        style={{ background: dot, opacity: isActive ? 1 : 0.7 }}
                       />
                       <span>{s.shot_id}</span>
                       <span className="text-[10px] font-semibold opacity-60 hidden md:inline">
@@ -1247,7 +1247,7 @@ function CharacterCard({ who, character, onCopy, onUpdatePrompt, onImageFile, on
       {/* Header */}
       <div className="px-4 py-3 border-b border-[var(--tb-border)] flex items-center justify-between gap-3 bg-[color-mix(in_srgb,var(--tb-surface-2)_60%,transparent)]">
         <div className="flex items-center gap-2.5 min-w-0">
-          <span className="text-[12px] font-black px-2 py-0.5 rounded-full bg-[color-mix(in_srgb,#f97316_15%,#1f1d26)] text-[#f97316] flex items-center gap-1">
+          <span className="text-[12px] font-black px-2 py-0.5 rounded-full bg-[var(--tb-surface-2)] text-[var(--tb-text-muted)] flex items-center gap-1">
             <User className="w-3 h-3" />
             CHAR {who}
           </span>

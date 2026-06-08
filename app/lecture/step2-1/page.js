@@ -462,7 +462,7 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
 
       <div className="flex flex-col md:flex-row md:flex-1 md:min-h-0 w-full px-4 pt-6 pb-4 gap-4 2xl:px-6">
         {/* Sidebar */}
-        <aside className="w-full md:w-[300px] flex-shrink-0 bg-[var(--tb-surface)] border border-[var(--tb-border)] rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.4)] md:overflow-y-auto">
+        <aside className="w-full md:w-[300px] flex-shrink-0 bg-[var(--tb-surface)] border border-[var(--tb-border)] rounded-2xl shadow-[0_10px_30px_-14px_rgba(0,0,0,0.16)] md:overflow-y-auto">
           {/* Storyboard meta */}
           <div className="p-4 border-b border-[var(--tb-border)]">
             <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[var(--tb-text-muted)]">
@@ -620,7 +620,7 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
         </aside>
 
         {/* Main */}
-        <main className="flex-1 min-w-0 flex flex-col md:overflow-hidden bg-[var(--tb-surface)] border border-[var(--tb-border)] rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.4)]">
+        <main className="flex-1 min-w-0 flex flex-col md:overflow-hidden bg-[var(--tb-surface)] border border-[var(--tb-border)] rounded-2xl shadow-[0_10px_30px_-14px_rgba(0,0,0,0.16)]">
           {toolView === 'frame-extractor' ? (
             <FrameExtractor accentColor="#f97316" />
           ) : toolView === 'watermark-remover' ? (
@@ -687,18 +687,18 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
                       onClick={() => setActiveType(i)}
                       className={`flex items-center gap-2 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${isActive
                         ? 'tb-pill-primary'
-                        : 'text-[var(--tb-text-muted)] bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] tb-press-soft'
+                        : 'text-[var(--tb-text-muted)] hover:bg-[var(--tb-surface-2)] tb-press-soft'
                         }`}
                     >
                       <span
                         className="w-1.5 h-1.5 rounded-full"
-                        style={{ background: isActive ? '#fff' : tc.dot, opacity: isActive ? 1 : 0.6 }}
+                        style={{ background: tc.dot, opacity: isActive ? 1 : 0.6 }}
                       />
                       {t}
                       {count > 0 && (
                         <span
                           className="text-[11px] font-bold px-1.5 py-0.5 rounded-full"
-                          style={isActive ? { background: 'rgba(255,255,255,0.25)', color: '#fff' } : { background: `${tc.dot}25`, color: tc.dot }}
+                          style={{ background: `${tc.dot}25`, color: tc.dot }}
                         >
                           {count}
                         </span>
@@ -721,7 +721,7 @@ No text, no labels, no watermarks, no panel borders, no background elements othe
                       <div
                         key={scene.id}
                         ref={(el) => { sceneRefs.current[scene.id] = el; }}
-                        className="rounded-2xl overflow-hidden border border-[var(--tb-border)] bg-[var(--tb-surface)] shadow-[0_2px_8px_rgba(0,0,0,0.4)] transition-all"
+                        className="rounded-2xl overflow-hidden border border-[var(--tb-border)] bg-[var(--tb-surface)] shadow-[0_1px_3px_rgba(0,0,0,0.05)] transition-all"
                       >
                         {/* Scene header */}
                         <div

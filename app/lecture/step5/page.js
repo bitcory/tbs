@@ -529,7 +529,7 @@ export default function Step5Page() {
         <span className="text-[11px] font-bold tracking-[0.18em] text-[#fb923c] uppercase hidden sm:inline">TOOLB LAB</span>
         <div className="ml-auto flex items-center gap-2">
           {data && isPartial && (
-            <span className="hidden md:inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[color-mix(in_srgb,#f97316_15%,#1f1d26)] border border-[#f97316]/30 text-[11px] font-bold text-[#fb923c]">
+            <span className="hidden md:inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[var(--tb-surface-2)] border border-[var(--tb-border)] text-[11px] font-bold text-[var(--tb-text-muted)]">
               <Sparkles className="w-3 h-3" />
               {sceneCount}/{totalScenes}컷 · part 2 대기
             </span>
@@ -755,7 +755,7 @@ export default function Step5Page() {
                     </span>
                   )}
                   {isPartial && (
-                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[color-mix(in_srgb,#f97316_15%,#1f1d26)] border border-[#f97316]/30 text-[#fb923c] flex-shrink-0">
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[var(--tb-surface-2)] border border-[var(--tb-border)] text-[var(--tb-text-muted)] flex-shrink-0">
                       part 2 필요
                     </span>
                   )}
@@ -783,7 +783,7 @@ export default function Step5Page() {
                 <button
                   onClick={() => setView('titles')}
                   className={`flex items-center gap-2 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${
-                    view === 'titles' ? 'tb-pill-primary' : 'text-[var(--tb-text-muted)] bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] tb-press-soft'
+                    view === 'titles' ? 'tb-pill-primary' : 'text-[var(--tb-text-muted)] hover:bg-[var(--tb-surface-2)] tb-press-soft'
                   }`}
                 >
                   <ListTree className="w-3.5 h-3.5" />
@@ -799,7 +799,7 @@ export default function Step5Page() {
                 <button
                   onClick={() => setView('master')}
                   className={`flex items-center gap-2 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${
-                    view === 'master' ? 'tb-pill-primary' : 'text-[var(--tb-text-muted)] bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] tb-press-soft'
+                    view === 'master' ? 'tb-pill-primary' : 'text-[var(--tb-text-muted)] hover:bg-[var(--tb-surface-2)] tb-press-soft'
                   }`}
                 >
                   <User className="w-3.5 h-3.5" />
@@ -808,7 +808,7 @@ export default function Step5Page() {
                 <button
                   onClick={() => setView('scenes')}
                   className={`flex items-center gap-2 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${
-                    view === 'scenes' ? 'tb-pill-primary' : 'text-[var(--tb-text-muted)] bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] tb-press-soft'
+                    view === 'scenes' ? 'tb-pill-primary' : 'text-[var(--tb-text-muted)] hover:bg-[var(--tb-surface-2)] tb-press-soft'
                   }`}
                 >
                   <Music className="w-3.5 h-3.5" />
@@ -863,12 +863,10 @@ export default function Step5Page() {
                           >
                             <span
                               className="w-1.5 h-1.5 rounded-full"
-                              style={{ background: isActive ? '#fff' : color }}
+                              style={{ background: color }}
                             />
                             <span>{PHASE_LABEL[p]}</span>
-                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                              isActive ? 'bg-[color-mix(in_srgb,var(--tb-surface-2)_25%,transparent)] text-white' : 'bg-[var(--tb-surface-2)] border border-[var(--tb-border)] text-[var(--tb-text-muted)]'
-                            }`}>
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[var(--tb-surface-2)] border border-[var(--tb-border)] text-[var(--tb-text-muted)]">
                               {count}
                             </span>
                           </button>
@@ -938,20 +936,20 @@ export default function Step5Page() {
             <div className="flex-1 overflow-y-auto p-5 space-y-3 min-h-0">
               <p className="text-sm text-[var(--tb-text-muted)] leading-relaxed">
                 Gemini 젬에서 받은 JSON을 붙여넣으세요. 26컷 이상은 part 1 →
-                <code className="bg-[color-mix(in_srgb,#f97316_10%,#1f1d26)] px-1.5 py-0.5 rounded text-[#fb923c] font-mono text-[12px] mx-1">part 2</code>
+                <code className="bg-[var(--tb-surface-2)] px-1.5 py-0.5 rounded text-[var(--tb-text-muted)] font-mono text-[12px] mx-1">part 2</code>
                 순서로 두 번 불러오면 자동으로 병합됩니다.
               </p>
               <div className="text-[12px] text-[var(--tb-text-muted)] flex flex-wrap gap-1.5">
                 <span className="font-bold text-[var(--tb-text)]">필수 필드:</span>
-                <code className="bg-[color-mix(in_srgb,#f97316_15%,#1f1d26)] px-1.5 py-0.5 rounded text-[#fb923c] font-mono">part</code>
-                <code className="bg-[color-mix(in_srgb,#f97316_15%,#1f1d26)] px-1.5 py-0.5 rounded text-[#fb923c] font-mono">scenes[]</code>
+                <code className="bg-[var(--tb-surface-2)] px-1.5 py-0.5 rounded text-[var(--tb-text-muted)] font-mono">part</code>
+                <code className="bg-[var(--tb-surface-2)] px-1.5 py-0.5 rounded text-[var(--tb-text-muted)] font-mono">scenes[]</code>
                 <span className="text-[var(--tb-text-muted)]">·</span>
                 <span className="text-[var(--tb-text-muted)]">part 1은 추가로</span>
-                <code className="bg-[color-mix(in_srgb,#f97316_15%,#1f1d26)] px-1.5 py-0.5 rounded text-[#fb923c] font-mono">meta</code>
-                <code className="bg-[color-mix(in_srgb,#f97316_15%,#1f1d26)] px-1.5 py-0.5 rounded text-[#fb923c] font-mono">master_characters[]</code>
+                <code className="bg-[var(--tb-surface-2)] px-1.5 py-0.5 rounded text-[var(--tb-text-muted)] font-mono">meta</code>
+                <code className="bg-[var(--tb-surface-2)] px-1.5 py-0.5 rounded text-[var(--tb-text-muted)] font-mono">master_characters[]</code>
               </div>
               {data && (
-                <div className="text-[12px] bg-[color-mix(in_srgb,#f97316_10%,#1f1d26)] border border-[#f97316]/30 rounded-xl px-3 py-2 text-[#fb923c] font-semibold">
+                <div className="text-[12px] bg-[var(--tb-surface-2)] border border-[var(--tb-border)] rounded-xl px-3 py-2 text-[var(--tb-text-muted)] font-semibold">
                   현재 {sceneCount}/{totalScenes}컷 로드됨. {isPartial ? 'part 2를 붙여넣으면 병합됩니다.' : 'part 1을 다시 붙여넣으면 교체됩니다.'}
                 </div>
               )}
@@ -1003,7 +1001,7 @@ function MasterCard({ master, index = 0, total = 1, onCopy, onUpdatePrompt, onUp
     <div className="rounded-2xl overflow-hidden border border-[var(--tb-border)] bg-[var(--tb-surface)] shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
       <div className="px-4 py-3 border-b border-[var(--tb-border)] flex items-center justify-between gap-3 bg-[#f97316]/10">
         <div className="flex items-center gap-2.5 min-w-0">
-          <span className="text-[12px] font-black px-2 py-0.5 rounded-full bg-[color-mix(in_srgb,#f97316_15%,#1f1d26)] text-[#fb923c] flex items-center gap-1">
+          <span className="text-[12px] font-black px-2 py-0.5 rounded-full bg-[var(--tb-surface-2)] text-[var(--tb-text-muted)] flex items-center gap-1">
             <User className="w-3 h-3" />
             MASTER{labelNum}
           </span>
@@ -1120,7 +1118,7 @@ function SceneCard({ scene, onCopy, onUpdate, onImageFile, onClearImage }) {
           return (
             <span
               key={charId}
-              className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[color-mix(in_srgb,#f97316_15%,#1f1d26)] text-[#fb923c] border border-[#f97316]/30 inline-flex items-center gap-0.5"
+              className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[var(--tb-surface-2)] text-[var(--tb-text-muted)] border border-[var(--tb-border)] inline-flex items-center gap-0.5"
               title={`마스터 ${num} 등장`}
             >
               <User className="w-2.5 h-2.5" />
@@ -1217,7 +1215,7 @@ function TitlesCard({ titles, onCopy }) {
     <div className="rounded-2xl overflow-hidden border border-[var(--tb-border)] bg-[var(--tb-surface)] shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
       <div className="px-4 py-3 border-b border-[var(--tb-border)] flex items-center justify-between gap-3 bg-[#f97316]/10">
         <div className="flex items-center gap-2.5">
-          <span className="text-[12px] font-black px-2 py-0.5 rounded-full bg-[color-mix(in_srgb,#f97316_15%,#1f1d26)] text-[#fb923c] flex items-center gap-1">
+          <span className="text-[12px] font-black px-2 py-0.5 rounded-full bg-[var(--tb-surface-2)] text-[var(--tb-text-muted)] flex items-center gap-1">
             <ListTree className="w-3 h-3" />
             TITLES
           </span>
@@ -1243,7 +1241,7 @@ function TitlesCard({ titles, onCopy }) {
       <div className="divide-y divide-[var(--tb-border)]">
         {titles.map((t, i) => (
           <div key={i} className="px-4 py-3 flex items-center gap-3 group hover:bg-[#f97316]/10 transition-colors">
-            <span className="text-[11px] font-black w-6 h-6 rounded-full bg-[color-mix(in_srgb,#f97316_15%,#1f1d26)] text-[#fb923c] flex items-center justify-center flex-shrink-0">
+            <span className="text-[11px] font-black w-6 h-6 rounded-full bg-[var(--tb-surface-2)] text-[var(--tb-text-muted)] flex items-center justify-center flex-shrink-0">
               {i + 1}
             </span>
             <div className="flex-1 min-w-0">
