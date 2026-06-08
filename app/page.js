@@ -55,7 +55,7 @@ export default async function Home({ searchParams }) {
   const initial = (me?.nickname ?? me?.name ?? "?").slice(0, 1).toUpperCase();
 
   return (
-    <main className="fixed inset-0 w-screen h-screen bg-[#15141a] overflow-hidden">
+    <main className="fixed inset-0 w-screen h-screen bg-[var(--tb-bg)] overflow-hidden">
       <iframe
         src={iframeSrc}
         title="TB STUDY"

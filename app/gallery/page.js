@@ -20,12 +20,12 @@ export default function GalleryPage() {
   const play = (key) => setPlaying((p) => ({ ...p, [key]: true }));
 
   return (
-    <div className="min-h-screen bg-[#15141a] text-[#f5f4f7]">
+    <div className="min-h-screen bg-[var(--tb-bg)] text-[var(--tb-text)]">
       {/* Header */}
-      <header className="sticky top-0 z-50 flex items-center justify-between gap-3 px-5 py-3 bg-[#15141a]/85 backdrop-blur-md border-b border-white/10">
+      <header className="sticky top-0 z-50 flex items-center justify-between gap-3 px-5 py-3 bg-[color-mix(in_srgb,var(--tb-bg)_85%,transparent)] backdrop-blur-md border-b border-white/10">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[#cbc8d2] text-sm font-bold tb-press-soft hover:border-[#f97316] hover:text-[#fb923c]"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[var(--tb-text-2)] text-sm font-bold tb-press-soft hover:border-[#f97316] hover:text-[#fb923c]"
         >
           <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none">
             <path d="M10 4L6 8L10 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -51,7 +51,7 @@ export default function GalleryPage() {
                   ? isMaster
                     ? "text-[#1a1206] bg-gradient-to-br from-[#fb923c] to-[#f43f5e] shadow-[0_8px_18px_rgba(244,63,94,0.32)]"
                     : "text-[#1a1206] bg-gradient-to-br from-[#fb923c] to-[#f97316] shadow-[0_8px_18px_rgba(249,115,22,0.32)]"
-                  : "text-[#a8a4b2] bg-white/5 border border-white/10 hover:bg-white/10 hover:text-[#fb923c]"
+                  : "text-[var(--tb-text-muted)] bg-white/5 border border-white/10 hover:bg-white/10 hover:text-[#fb923c]"
               }`}
             >
               {c.label}
@@ -115,7 +115,7 @@ function MediaTile({ media, playing, onPlay }) {
         href={media.src}
         target="_blank"
         rel="noopener noreferrer"
-        className="block rounded-2xl overflow-hidden border border-white/10 bg-[#1f1d26] shadow-[0_8px_22px_rgba(0,0,0,0.45)] aspect-video"
+        className="block rounded-2xl overflow-hidden border border-white/10 bg-[var(--tb-surface)] shadow-[0_8px_22px_rgba(0,0,0,0.45)] aspect-video"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={media.src} alt={media.alt || ""} className="w-full h-full object-cover" />

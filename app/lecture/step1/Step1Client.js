@@ -326,7 +326,7 @@ Subtitles, title, text is strictly prohibited.`,
   const currentSection = sections[activeTab];
 
   return (
-    <div className="min-h-screen md:h-screen md:flex md:flex-col md:overflow-hidden bg-[#15141a] text-[#f5f4f7]">
+    <div className="min-h-screen md:h-screen md:flex md:flex-col md:overflow-hidden bg-[var(--tb-bg)] text-[var(--tb-text)]">
       <style jsx global>{`
         .tb-hero {
           position: relative;
@@ -360,7 +360,7 @@ Subtitles, title, text is strictly prohibited.`,
           content: '';
           position: absolute; left: -10%; right: -10%; bottom: -1px;
           height: 24px;
-          background: #15141a;
+          background: var(--tb-bg);
           border-radius: 50% 50% 0 0 / 100% 100% 0 0;
         }
         .tb-hero-glow {
@@ -400,7 +400,7 @@ Subtitles, title, text is strictly prohibited.`,
           margin: -22px 16px 0;
           padding: 10px 14px;
           display: flex; align-items: center; gap: 10px;
-          background: rgba(31,29,38,0.7);
+          background: rgba(var(--tb-glass-bar-rgb),0.7);
           border: 1px solid rgba(255,255,255,0.12);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
@@ -436,8 +436,8 @@ Subtitles, title, text is strictly prohibited.`,
           transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
         }
         .tb-pill-ghost {
-          background: rgba(38,36,46,0.55);
-          color: #f5f4f7;
+          background: rgba(var(--tb-ghost-rgb),0.55);
+          color: var(--tb-text);
           border: 1px solid rgba(255,255,255,0.12);
           backdrop-filter: blur(14px) saturate(140%);
           -webkit-backdrop-filter: blur(14px) saturate(140%);
@@ -448,7 +448,7 @@ Subtitles, title, text is strictly prohibited.`,
           transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,2.2), box-shadow 0.3s, background 0.3s;
         }
         .tb-pill-ghost:hover {
-          background: rgba(38,36,46,0.75);
+          background: rgba(var(--tb-ghost-rgb),0.75);
           transform: translateY(-1px) scale(1.03);
         }
         .tb-pill-ghost:active {
@@ -490,29 +490,29 @@ Subtitles, title, text is strictly prohibited.`,
 
       <div className="flex flex-col md:flex-row md:flex-1 md:min-h-0 w-full px-4 pt-6 pb-4 gap-4 2xl:px-6">
         {/* Sidebar */}
-        <aside className="w-full md:w-[300px] flex-shrink-0 bg-[#1f1d26] border border-[#34323d] rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.4)] md:overflow-y-auto">
+        <aside className="w-full md:w-[300px] flex-shrink-0 bg-[var(--tb-surface)] border border-[var(--tb-border)] rounded-2xl shadow-[0_10px_30px_-14px_rgba(0,0,0,0.18)] md:overflow-y-auto">
           {/* Template info */}
-          <div className="p-4 border-b border-[#34323d]">
-            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#a8a4b2]">
+          <div className="p-4 border-b border-[var(--tb-border)]">
+            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[var(--tb-text-muted)]">
               <Info className="w-3 h-3" />
               템플릿 정보
             </div>
             <div className="space-y-1.5">
               <div className="flex items-start gap-2">
-                <span className="text-sm text-[#a8a4b2] font-medium w-12 pt-0.5">이름</span>
-                <span className="text-sm text-[#f5f4f7] font-bold flex-1 break-all">{template.meta_data?.template_name || '—'}</span>
+                <span className="text-sm text-[var(--tb-text-muted)] font-medium w-12 pt-0.5">이름</span>
+                <span className="text-sm text-[var(--tb-text)] font-bold flex-1 break-all">{template.meta_data?.template_name || '—'}</span>
               </div>
               <div className="flex items-start gap-2">
-                <span className="text-sm text-[#a8a4b2] font-medium w-12 pt-0.5">버전</span>
-                <span className="text-sm text-[#f5f4f7] font-bold flex-1">{template.meta_data?.version || '—'}</span>
+                <span className="text-sm text-[var(--tb-text-muted)] font-medium w-12 pt-0.5">버전</span>
+                <span className="text-sm text-[var(--tb-text)] font-bold flex-1">{template.meta_data?.version || '—'}</span>
               </div>
             </div>
           </div>
 
 
           {/* Tools */}
-          <div className="p-4 border-b border-[#34323d]">
-            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#a8a4b2]">
+          <div className="p-4 border-b border-[var(--tb-border)]">
+            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[var(--tb-text-muted)]">
               <Wrench className="w-3 h-3" />
               도구
             </div>
@@ -521,7 +521,7 @@ Subtitles, title, text is strictly prohibited.`,
                 href="https://translate.google.co.kr/?sl=ko&tl=en&op=translate"
                 target="_blank"
                 rel="noreferrer"
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#93c5fd] bg-[#172554] hover:bg-[#1e3a8a] tb-press-soft"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[var(--tb-text)] bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] tb-press-soft"
               >
                 <Languages className="w-4 h-4" />
                 구글번역기
@@ -530,7 +530,7 @@ Subtitles, title, text is strictly prohibited.`,
                 onClick={() => setToolView(toolView === 'frame-extractor' ? null : 'frame-extractor')}
                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition ${toolView === 'frame-extractor'
                   ? 'tb-pill-primary'
-                  : 'text-[#fbbf24] bg-[#422006] hover:bg-[#713f12] tb-press-soft'
+                  : 'text-[var(--tb-text)] bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] tb-press-soft'
                   }`}
               >
                 <Film className="w-4 h-4" />
@@ -540,7 +540,7 @@ Subtitles, title, text is strictly prohibited.`,
                 onClick={() => setToolView(toolView === 'watermark-remover' ? null : 'watermark-remover')}
                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition ${toolView === 'watermark-remover'
                   ? 'tb-pill-primary'
-                  : 'text-[#67e8f9] bg-[#083344] hover:bg-[#155e75] tb-press-soft'
+                  : 'text-[var(--tb-text)] bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] tb-press-soft'
                   }`}
               >
                 <Droplets className="w-4 h-4" />
@@ -550,7 +550,7 @@ Subtitles, title, text is strictly prohibited.`,
                 href="https://tbnc.aitoolb.com/"
                 target="_blank"
                 rel="noreferrer"
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#fda4af] bg-[#4c0519] hover:bg-[#881337] tb-press-soft"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[var(--tb-text)] bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] tb-press-soft"
               >
                 <FileText className="w-4 h-4" />
                 파일명변경
@@ -560,7 +560,7 @@ Subtitles, title, text is strictly prohibited.`,
 
           {/* Gem guide */}
           <div className="p-4 space-y-2">
-            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#a8a4b2]">
+            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[var(--tb-text-muted)]">
               <Gem className="w-3 h-3" />
               젬 가이드
             </div>
@@ -568,18 +568,18 @@ Subtitles, title, text is strictly prohibited.`,
               href="https://gemini.google.com/gem/13HOLZGAzOKloWSBnxejnMvWDOJHNvdyu?usp=sharing"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full tb-pill-primary text-sm font-bold transition"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[var(--tb-surface)] border border-[var(--tb-border)] hover:bg-[var(--tb-surface-2)] text-[var(--tb-text)] text-sm font-bold shadow-[0_1px_2px_rgba(0,0,0,0.04)] tb-press-soft"
             >
-              <ExternalLink className="w-3.5 h-3.5" />
+              <ExternalLink className="w-3.5 h-3.5 text-[#f97316]" />
               1단계 젬 가이드 열기
             </a>
             <a
               href="https://kr.pinterest.com/"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#E60023] hover:opacity-90 text-white text-sm font-bold tb-press"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[var(--tb-surface)] border border-[var(--tb-border)] hover:bg-[var(--tb-surface-2)] text-[var(--tb-text)] text-sm font-bold shadow-[0_1px_2px_rgba(0,0,0,0.04)] tb-press-soft"
             >
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <svg className="w-3.5 h-3.5 text-[#E60023]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z" />
               </svg>
               핀터레스트
@@ -588,9 +588,9 @@ Subtitles, title, text is strictly prohibited.`,
               href="https://gemini.google.com/"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#1a73e8] hover:opacity-90 text-white text-sm font-bold tb-press"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[var(--tb-surface)] border border-[var(--tb-border)] hover:bg-[var(--tb-surface-2)] text-[var(--tb-text)] text-sm font-bold shadow-[0_1px_2px_rgba(0,0,0,0.04)] tb-press-soft"
             >
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <svg className="w-3.5 h-3.5 text-[#1a73e8]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M11.04 19.32Q12 18.72 12.84 17.76Q13.68 16.8 14.04 15.6H11.04V19.32ZM9 19.68V15.6H5.58Q6.18 17.04 7.32 18.06Q8.46 19.08 9 19.68ZM5.1 14.4H9V10.2H4.62Q4.44 10.8 4.38 11.28Q4.32 11.76 4.32 12.24Q4.32 13.08 4.5 13.68Q4.68 14.28 5.1 14.4ZM10.2 14.4H13.8V10.2H10.2V14.4ZM14.4 9H19.08Q18.72 8.04 18.12 7.2Q17.52 6.36 16.74 5.7Q15.72 6.48 14.88 7.08Q14.04 7.68 14.4 9ZM9 9H13.44Q13.08 7.68 12.36 6.6Q11.64 5.52 10.68 4.68Q9.72 5.52 9 6.6Q8.28 7.68 9 9ZM4.92 9H9.36Q9 8.04 8.7 7.2Q8.4 6.36 7.98 5.64Q7.08 6.24 6.36 7.08Q5.64 7.92 4.92 9ZM12 21.6Q10.68 21.6 9.42 21.12Q8.16 20.64 7.14 19.86Q6.12 19.08 5.34 18.06Q4.56 17.04 4.08 15.78Q3.6 14.52 3.6 13.2Q3.6 10.68 5.04 8.64Q6.48 6.6 8.76 5.52Q8.16 4.56 7.68 3.48Q7.2 2.4 6.96 1.2H8.16Q8.4 2.16 8.76 3.06Q9.12 3.96 9.6 4.68Q10.32 4.2 11.16 3.96Q12 3.72 12 3.72Q12 3.72 12.84 3.96Q13.68 4.2 14.4 4.68Q14.88 3.96 15.24 3.06Q15.6 2.16 15.84 1.2H17.04Q16.8 2.4 16.32 3.48Q15.84 4.56 15.24 5.52Q17.52 6.6 18.96 8.64Q20.4 10.68 20.4 13.2Q20.4 14.52 19.92 15.78Q19.44 17.04 18.66 18.06Q17.88 19.08 16.86 19.86Q15.84 20.64 14.58 21.12Q13.32 21.6 12 21.6Z" />
               </svg>
               제미나이
@@ -599,15 +599,15 @@ Subtitles, title, text is strictly prohibited.`,
               href="https://grok.com/"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#26242e] hover:opacity-90 text-white text-sm font-bold tb-press"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[var(--tb-surface)] border border-[var(--tb-border)] hover:bg-[var(--tb-surface-2)] text-[var(--tb-text)] text-sm font-bold shadow-[0_1px_2px_rgba(0,0,0,0.04)] tb-press-soft"
             >
-              <ExternalLink className="w-3.5 h-3.5" />
+              <ExternalLink className="w-3.5 h-3.5 text-[var(--tb-text-muted)]" />
               Grok 바로가기
             </a>
           </div>
 
           {/* Variant prompt */}
-          <div className="p-4 border-t border-[#34323d]">
+          <div className="p-4 border-t border-[var(--tb-border)]">
             {currentVariant.promptUrl ? (
               <a
                 href={currentVariant.promptUrl}
@@ -639,7 +639,7 @@ Subtitles, title, text is strictly prohibited.`,
         </aside>
 
         {/* Main */}
-        <main className="flex-1 min-w-0 flex flex-col md:overflow-hidden bg-[#1f1d26] border border-[#34323d] rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.4)]">
+        <main className="flex-1 min-w-0 flex flex-col md:overflow-hidden bg-[var(--tb-surface)] border border-[var(--tb-border)] rounded-2xl shadow-[0_10px_30px_-14px_rgba(0,0,0,0.18)]">
           {toolView === 'frame-extractor' ? (
             <FrameExtractor accentColor="#f97316" />
           ) : toolView === 'watermark-remover' ? (
@@ -647,15 +647,15 @@ Subtitles, title, text is strictly prohibited.`,
           ) : (
             <>
               {sections.length > 0 && (
-                <div className="flex-shrink-0 px-4 py-3 border-b border-[#34323d] bg-[#7c2d12]/20 rounded-t-2xl">
+                <div className="flex-shrink-0 px-4 py-3 border-b border-[var(--tb-border)] bg-[var(--tb-surface)] rounded-t-2xl">
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[12px] font-bold uppercase tracking-wider text-[#a8a4b2] flex items-center gap-1.5">
+                    <span className="text-[12px] font-bold uppercase tracking-wider text-[var(--tb-text)] flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#f97316]" />
                       이미지 프롬프트
                     </span>
                     <button
                       onClick={() => copyText(promptString)}
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[12px] font-bold text-[#f5f4f7] tb-press-soft"
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] border border-[var(--tb-border)] text-[12px] font-bold text-[var(--tb-text)] tb-press-soft"
                     >
                       <Copy className="w-3 h-3" />
                       복사
@@ -666,15 +666,15 @@ Subtitles, title, text is strictly prohibited.`,
                     value={promptString}
                     readOnly
                     placeholder="템플릿을 로드하면 자동으로 생성됩니다..."
-                    className="w-full min-h-[60px] resize-none bg-[#26242e] border border-[#34323d] rounded-xl p-2.5 text-[13px] leading-relaxed text-[#f5f4f7] focus:outline-none focus:border-[#f97316] focus:ring-[3px] focus:ring-[#f97316]/20"
+                    className="w-full min-h-[60px] resize-none bg-[var(--tb-surface-2)] border border-[var(--tb-border)] rounded-xl p-2.5 text-[13px] leading-relaxed text-[var(--tb-text)] focus:outline-none focus:border-[#f97316] focus:ring-[3px] focus:ring-[#f97316]/20"
                   />
                 </div>
               )}
 
               {sections.length === 0 ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-center p-10">
-                  <h3 className="text-lg font-bold text-[#f5f4f7] mb-2">템플릿을 로드하세요</h3>
-                  <p className="text-sm text-[#a8a4b2] mb-5 leading-relaxed">
+                  <h3 className="text-lg font-bold text-[var(--tb-text)] mb-2">템플릿을 로드하세요</h3>
+                  <p className="text-sm text-[var(--tb-text-muted)] mb-5 leading-relaxed">
                     JSON 업로드 버튼을 클릭하여 템플릿을 불러오거나,<br />
                     기본 샘플이 자동으로 로드됩니다.
                   </p>
@@ -689,7 +689,7 @@ Subtitles, title, text is strictly prohibited.`,
               ) : (
                 <>
                   {/* Tab bar */}
-                  <div className="flex-shrink-0 flex gap-1.5 p-3 border-b border-[#34323d] bg-[#1f1d26] overflow-x-auto">
+                  <div className="flex-shrink-0 flex gap-1.5 p-3 border-b border-[var(--tb-border)] bg-[var(--tb-surface)] overflow-x-auto">
                     {sections.map((s, i) => {
                       const tc = TAB_COLORS[i % TAB_COLORS.length];
                       const isActive = i === activeTab;
@@ -699,12 +699,12 @@ Subtitles, title, text is strictly prohibited.`,
                           onClick={() => setActiveTab(i)}
                           className={`flex items-center gap-1.5 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${isActive
                             ? 'tb-pill-primary'
-                            : 'text-[#a8a4b2] bg-[#26242e] hover:bg-[#34323d] tb-press-soft'
+                            : 'text-[var(--tb-text-muted)] hover:bg-[var(--tb-surface-2)] tb-press-soft'
                             }`}
                         >
                           <span
                             className="w-1.5 h-1.5 rounded-full"
-                            style={{ background: isActive ? '#fff' : tc.dot, opacity: isActive ? 1 : 0.6 }}
+                            style={{ background: tc.dot, opacity: isActive ? 1 : 0.55 }}
                           />
                           {s.section_label_ko || s.section_id}
                         </button>
@@ -718,7 +718,7 @@ Subtitles, title, text is strictly prohibited.`,
                       const tc = TAB_COLORS[activeTab % TAB_COLORS.length];
                       return (
                         <div key={comp.component_id} className="space-y-2">
-                          <div className="flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-wider text-[#a8a4b2] px-1">
+                          <div className="flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-wider text-[var(--tb-text-muted)] px-1">
                             <Layers className="w-3 h-3" />
                             {comp.component_label_ko || comp.component_id}
                           </div>
@@ -732,11 +732,11 @@ Subtitles, title, text is strictly prohibited.`,
                               return (
                                 <div
                                   key={attr.attr_id}
-                                  className="bg-[#1f1d26] border border-[#34323d] rounded-2xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
+                                  className="bg-[var(--tb-surface)] border border-[var(--tb-border)] rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.05)]"
                                   style={{ opacity }}
                                 >
-                                  <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-[#34323d] bg-[#26242e]">
-                                    <div className="flex items-center gap-1.5 text-sm font-bold text-[#f5f4f7] min-w-0">
+                                  <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-[var(--tb-border)] bg-[var(--tb-surface)]">
+                                    <div className="flex items-center gap-1.5 text-sm font-bold text-[var(--tb-text)] min-w-0">
                                       <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: tc.dot }} />
                                       <span className="truncate">{attr.label_ko || attr.label || attr.attr_id}</span>
                                       {attr.is_locked && (
@@ -749,14 +749,14 @@ Subtitles, title, text is strictly prohibited.`,
                                     <div className="flex items-center gap-1 flex-shrink-0">
                                       <button
                                         onClick={() => copyText(engVal)}
-                                        className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[12px] font-bold text-[#a8a4b2] tb-press-soft"
+                                        className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] border border-[var(--tb-border)] text-[12px] font-bold text-[var(--tb-text-muted)] tb-press-soft"
                                       >
                                         <Copy className="w-3 h-3" />
                                         복사
                                       </button>
                                       <button
                                         onClick={() => pasteText(currentSection.section_id, comp.component_id, attr.attr_id)}
-                                        className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[12px] font-bold text-[#a8a4b2] tb-press-soft"
+                                        className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] border border-[var(--tb-border)] text-[12px] font-bold text-[var(--tb-text-muted)] tb-press-soft"
                                       >
                                         <Clipboard className="w-3 h-3" />
                                         붙여넣기
@@ -764,16 +764,16 @@ Subtitles, title, text is strictly prohibited.`,
                                     </div>
                                   </div>
                                   <div className="flex gap-2 p-3 items-stretch">
-                                    <div className="flex-1 min-w-0 text-sm font-semibold text-[#f5f4f7] leading-relaxed py-1.5 px-2.5 rounded-xl bg-[#26242e] border border-[#34323d]">
+                                    <div className="flex-1 min-w-0 text-sm font-semibold text-[var(--tb-text)] leading-relaxed py-1.5 px-2.5 rounded-xl bg-[var(--tb-surface-2)] border border-[var(--tb-border)]">
                                       {displayVal}
                                     </div>
-                                    <div className="w-px bg-[#34323d] self-stretch" />
+                                    <div className="w-px bg-[var(--tb-border)] self-stretch" />
                                     <textarea
                                       rows={2}
                                       value={engVal}
                                       placeholder="영문 값 입력..."
                                       onChange={(e) => updateAttr(currentSection.section_id, comp.component_id, attr.attr_id, e.target.value)}
-                                      className="flex-1 min-w-0 resize-none text-[13px] leading-relaxed text-[#f5f4f7] py-1.5 px-2.5 rounded-xl bg-[#26242e] border border-[#34323d] focus:outline-none focus:border-[#f97316] focus:ring-[3px] focus:ring-[#f97316]/20"
+                                      className="flex-1 min-w-0 resize-none text-[13px] leading-relaxed text-[var(--tb-text)] py-1.5 px-2.5 rounded-xl bg-[var(--tb-surface-2)] border border-[var(--tb-border)] focus:outline-none focus:border-[#f97316] focus:ring-[3px] focus:ring-[#f97316]/20"
                                     />
                                   </div>
                                 </div>
@@ -798,26 +798,26 @@ Subtitles, title, text is strictly prohibited.`,
           onClick={() => setUploadOpen(false)}
         >
           <div
-            className="bg-[#1f1d26] rounded-2xl border border-[#34323d] shadow-[0_24px_60px_rgba(0,0,0,0.6)] w-[560px] max-w-[95vw] max-h-[80vh] flex flex-col"
+            className="bg-[var(--tb-surface)] rounded-2xl border border-[var(--tb-border)] shadow-[0_24px_60px_rgba(0,0,0,0.6)] w-[560px] max-w-[95vw] max-h-[80vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#34323d]">
-              <span className="text-base font-bold text-[#f5f4f7] uppercase tracking-wider">JSON 템플릿 업로드</span>
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--tb-border)]">
+              <span className="text-base font-bold text-[var(--tb-text)] uppercase tracking-wider">JSON 템플릿 업로드</span>
               <button
                 onClick={() => setUploadOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#26242e] hover:bg-[#34323d] text-[#a8a4b2] tb-press-soft"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] text-[var(--tb-text-muted)] tb-press-soft"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-5 space-y-3 min-h-0">
-              <p className="text-sm text-[#a8a4b2] leading-relaxed">
-                TB_V5 Lite 형식의 JSON을 붙여넣으세요. <code className="bg-[#7c2d12]/30 px-1.5 py-0.5 rounded text-[#fb923c] font-mono text-[12px]">prompt_sections</code> 배열이 포함되어야 합니다.
+              <p className="text-sm text-[var(--tb-text-muted)] leading-relaxed">
+                TB_V5 Lite 형식의 JSON을 붙여넣으세요. <code className="bg-[color-mix(in_srgb,#7c2d12_30%,#1f1d26)] px-1.5 py-0.5 rounded text-[#fb923c] font-mono text-[12px]">prompt_sections</code> 배열이 포함되어야 합니다.
               </p>
               <textarea
                 value={jsonInput}
                 onChange={(e) => setJsonInput(e.target.value)}
-                className="w-full h-[220px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#26242e] border border-[#34323d] text-[#f5f4f7] focus:outline-none focus:border-[#f97316] focus:ring-[3px] focus:ring-[#f97316]/20"
+                className="w-full h-[220px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[var(--tb-surface-2)] border border-[var(--tb-border)] text-[var(--tb-text)] focus:outline-none focus:border-[#f97316] focus:ring-[3px] focus:ring-[#f97316]/20"
                 placeholder='{"meta_data": {...}, "prompt_sections": [...]}'
               />
               {uploadError && (
@@ -826,7 +826,7 @@ Subtitles, title, text is strictly prohibited.`,
                 </div>
               )}
             </div>
-            <div className="flex justify-end gap-2 px-5 py-3 border-t border-[#34323d]">
+            <div className="flex justify-end gap-2 px-5 py-3 border-t border-[var(--tb-border)]">
               <button
                 onClick={() => setUploadOpen(false)}
                 className="px-4 py-1.5 rounded-full tb-pill-ghost text-sm font-bold transition"
@@ -851,17 +851,17 @@ Subtitles, title, text is strictly prohibited.`,
           onClick={() => setSpeakPromptOpen(false)}
         >
           <div
-            className="bg-[#1f1d26] rounded-2xl border border-[#34323d] shadow-[0_24px_60px_rgba(0,0,0,0.6)] w-[640px] max-w-[95vw] max-h-[85vh] flex flex-col"
+            className="bg-[var(--tb-surface)] rounded-2xl border border-[var(--tb-border)] shadow-[0_24px_60px_rgba(0,0,0,0.6)] w-[640px] max-w-[95vw] max-h-[85vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#34323d]">
-              <span className="text-base font-bold text-[#f5f4f7] uppercase tracking-wider flex items-center gap-2">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--tb-border)]">
+              <span className="text-base font-bold text-[var(--tb-text)] uppercase tracking-wider flex items-center gap-2">
                 <Mic className="w-4 h-4 text-[#fb7185]" />
                 {currentVariant.label}
               </span>
               <button
                 onClick={() => setSpeakPromptOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#26242e] hover:bg-[#34323d] text-[#a8a4b2] tb-press-soft"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] text-[var(--tb-text-muted)] tb-press-soft"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -871,7 +871,7 @@ Subtitles, title, text is strictly prohibited.`,
                 currentVariant.prompts.map((p, i) => (
                   <div key={i} className="space-y-2">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-sm font-bold text-[#f5f4f7] flex items-center gap-1.5">
+                      <span className="text-sm font-bold text-[var(--tb-text)] flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#fb7185]" />
                         {p.title}
                       </span>
@@ -890,7 +890,7 @@ Subtitles, title, text is strictly prohibited.`,
                     <textarea
                       value={p.prompt}
                       readOnly
-                      className="w-full h-[180px] resize-none font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#26242e] border border-[#34323d] text-[#f5f4f7] focus:outline-none focus:border-[#f97316] focus:ring-[3px] focus:ring-[#f97316]/20"
+                      className="w-full h-[180px] resize-none font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[var(--tb-surface-2)] border border-[var(--tb-border)] text-[var(--tb-text)] focus:outline-none focus:border-[#f97316] focus:ring-[3px] focus:ring-[#f97316]/20"
                     />
                   </div>
                 ))
@@ -898,11 +898,11 @@ Subtitles, title, text is strictly prohibited.`,
                 <textarea
                   value={SPEAK_PROMPT}
                   readOnly
-                  className="w-full h-[420px] resize-none font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#26242e] border border-[#34323d] text-[#f5f4f7] focus:outline-none focus:border-[#f97316] focus:ring-[3px] focus:ring-[#f97316]/20"
+                  className="w-full h-[420px] resize-none font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[var(--tb-surface-2)] border border-[var(--tb-border)] text-[var(--tb-text)] focus:outline-none focus:border-[#f97316] focus:ring-[3px] focus:ring-[#f97316]/20"
                 />
               )}
             </div>
-            <div className="flex justify-end gap-2 px-5 py-3 border-t border-[#34323d]">
+            <div className="flex justify-end gap-2 px-5 py-3 border-t border-[var(--tb-border)]">
               <button
                 onClick={() => setSpeakPromptOpen(false)}
                 className="px-4 py-1.5 rounded-full tb-pill-ghost text-sm font-bold transition"

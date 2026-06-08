@@ -57,7 +57,7 @@ export default function CapsrtConnectCard({ hasAccess, initialCode, issueAction,
       </div>
 
       {!hasAccess ? (
-        <p style={{ color: "#a8a4b2", fontSize: 13.5, lineHeight: 1.6, margin: 0 }}>
+        <p style={{ color: "var(--tb-text-muted)", fontSize: 13.5, lineHeight: 1.6, margin: 0 }}>
           캡컷SRT 데스크톱 앱 사용 권한이 아직 없습니다.<br />
           관리자에게 사용 승인을 요청하면 이곳에서 연결코드를 발급할 수 있어요.
         </p>
@@ -69,13 +69,13 @@ export default function CapsrtConnectCard({ hasAccess, initialCode, issueAction,
                 style={{
                   display: "flex", alignItems: "center", gap: 10,
                   height: 50, padding: "0 8px 0 16px", borderRadius: 14,
-                  background: "#1f1d26", border: `1px solid ${CYAN}33`,
+                  background: "var(--tb-surface)", border: `1px solid ${CYAN}33`,
                 }}
               >
-                <code style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: 700, letterSpacing: "0.03em", color: "#f5f4f7", fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                <code style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: 700, letterSpacing: "0.03em", color: "var(--tb-text)", fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   {code}
                 </code>
-                <button onClick={copy} className="tb-press-soft" style={btn(CYAN, "#15141a")}>
+                <button onClick={copy} className="tb-press-soft" style={btn(CYAN, "var(--tb-bg)")}>
                   {copied ? "✓ 복사됨" : "복사"}
                 </button>
               </div>
@@ -89,7 +89,7 @@ export default function CapsrtConnectCard({ hasAccess, initialCode, issueAction,
               </div>
             </>
           ) : (
-            <button onClick={issue} disabled={pending} className="tb-press-soft" style={{ ...btn(CYAN, "#15141a"), width: "100%", height: 50 }}>
+            <button onClick={issue} disabled={pending} className="tb-press-soft" style={{ ...btn(CYAN, "var(--tb-bg)"), width: "100%", height: 50 }}>
               {pending ? "발급 중…" : "연결코드 발급"}
             </button>
           )}
@@ -111,6 +111,6 @@ function btn(bg, fg) {
 
 const btnGhost = {
   padding: "10px 16px", borderRadius: 10, cursor: "pointer",
-  background: "#26242e", color: "#a8a4b2", fontSize: 13, fontWeight: 700,
-  border: "1px solid #34323d", fontFamily: "inherit",
+  background: "var(--tb-surface-2)", color: "var(--tb-text-muted)", fontSize: 13, fontWeight: 700,
+  border: "1px solid var(--tb-border)", fontFamily: "inherit",
 };

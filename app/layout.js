@@ -1,6 +1,10 @@
 import localFont from "next/font/local";
 import "./globals.css";
 
+// Runs before first paint to avoid a theme flash (FOUC). Applies the saved
+// theme; defaults to dark when nothing is stored.
+const NO_FLASH_THEME = `(function(){try{var t=localStorage.getItem('tb-theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}catch(e){}})();`;
+
 const paperlogy = localFont({
   src: [
     { path: "./fonts/Paperlogy-1Thin.woff", weight: "100", style: "normal" },
@@ -98,13 +102,14 @@ export const viewport = {
   initialScale: 1,
   maximumScale: 1,
   themeColor: '#050505',
-  colorScheme: 'dark',
+  colorScheme: 'dark light',
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
       <body suppressHydrationWarning className={`${paperlogy.variable} antialiased`}>
+        <script dangerouslySetInnerHTML={{ __html: NO_FLASH_THEME }} />
         {children}
       </body>
     </html>

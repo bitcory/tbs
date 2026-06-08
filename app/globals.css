@@ -1,10 +1,48 @@
 @import "tailwindcss";
 
 :root {
-  --background: #15141a;
-  --foreground: #f4f4f5;
+  /* ─── Theme tokens (DARK = default) ─────────────────────────
+     These 7 neutral tokens drive the entire app chrome. Brand /
+     accent / status colors (orange, rose, brand blues …) stay
+     fixed across themes by design. Light overrides live in the
+     [data-theme="light"] block below. */
+  --tb-bg: #15141a;          /* page background        (#15141a) */
+  --tb-surface: #1f1d26;     /* cards / panels         (#1f1d26) */
+  --tb-surface-2: #26242e;   /* inputs / elevated      (#26242e) */
+  --tb-border: #34323d;      /* borders / dividers     (#34323d) */
+  --tb-text: #f5f4f7;        /* primary text           (#f5f4f7) */
+  --tb-text-muted: #a8a4b2;  /* muted text             (#a8a4b2) */
+  --tb-text-2: #c8c4d2;      /* secondary text         (#c8c4d2) */
+
+  /* glass surfaces (styled-jsx pills / bars) — channels kept separate so
+     per-element alpha is preserved: rgba(var(--tb-glass-bar-rgb), .7) */
+  --tb-glass-bar-rgb: 31, 29, 38;
+  --tb-ghost-rgb: 38, 36, 46;
+  --tb-tint-olive: #2a2616;  /* prompt-box tinted surface */
+
+  --background: var(--tb-bg);
+  --foreground: var(--tb-text);
   --accent: #f97316;
   --accent-light: #fb923c;
+
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  /* Apple-clean light: off-white page, pure-white cards, neutral hairlines */
+  --tb-bg: #f5f5f7;           /* page — subtle off-white */
+  --tb-surface: #ffffff;      /* cards — pure white, sit above the page */
+  --tb-surface-2: #f0f0f2;    /* fields / subtle fills inside cards */
+  --tb-border: #e4e4e7;       /* neutral hairline */
+  --tb-text: #1d1d1f;         /* Apple near-black */
+  --tb-text-muted: #56565b;   /* readable neutral secondary */
+  --tb-text-2: #3a3a3d;       /* near-black secondary */
+
+  --tb-glass-bar-rgb: 255, 255, 255;
+  --tb-ghost-rgb: 255, 255, 255;
+  --tb-tint-olive: #faf6e6;
+
+  color-scheme: light;
 }
 
 html,
@@ -29,8 +67,8 @@ body {
 }
 
 body:has(.auth-scroll) {
-  color: #f5f4f7;
-  background: #15141a;
+  color: var(--tb-text);
+  background: var(--tb-bg);
 }
 
 /* Prevent iOS auto-zoom on input focus (triggers when font-size < 16px) */
@@ -102,4 +140,23 @@ body:has(.auth-scroll) {
   transform: translateY(0.5px) scale(0.94);
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.12);
   transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
+}
+
+/* ─── Light-mode contrast fixes for styled-jsx glass pills ─────────────
+   The orange "primary" pill keeps a pale-orange glass background; in light
+   mode its light-orange label washes out, so darken the label. (These
+   plain class names also match the styled-jsx elements, and html[…light] +
+   .class out-specifies the component's .pill.jsx-hash rule.) */
+html[data-theme="light"] .tb-pill-primary {
+  background: #ffffff;
+  color: #c2410c;
+  border: 1px solid rgba(249, 115, 22, 0.35);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+html[data-theme="light"] .tb-pill-primary:hover {
+  background: #fff7ed;
+}
+html[data-theme="light"] .tb-pill-ghost {
+  color: var(--tb-text);
+  border-color: rgba(15, 23, 42, 0.12);
 }

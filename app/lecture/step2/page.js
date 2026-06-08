@@ -303,7 +303,7 @@ export default function Step2Page() {
   const allVideoPrompts = storyboard ? storyboard.scenes.map(s => s.prompts.video.prompt).join('\n\n') : '';
 
   return (
-    <div className="min-h-screen md:h-screen md:flex md:flex-col md:overflow-hidden bg-[#15141a] text-[#f5f4f7]">
+    <div className="min-h-screen md:h-screen md:flex md:flex-col md:overflow-hidden bg-[var(--tb-bg)] text-[var(--tb-text)]">
       <style jsx global>{`
         .tb-hero {
           position: relative;
@@ -337,7 +337,7 @@ export default function Step2Page() {
           content: '';
           position: absolute; left: -10%; right: -10%; bottom: -1px;
           height: 24px;
-          background: #15141a;
+          background: var(--tb-bg);
           border-radius: 50% 50% 0 0 / 100% 100% 0 0;
         }
         .tb-hero-glow {
@@ -377,7 +377,7 @@ export default function Step2Page() {
           margin: -22px 16px 0;
           padding: 10px 14px;
           display: flex; align-items: center; gap: 10px;
-          background: rgba(38,36,46,0.7);
+          background: rgba(var(--tb-ghost-rgb),0.7);
           border: 1px solid rgba(255,255,255,0.1);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
@@ -413,8 +413,8 @@ export default function Step2Page() {
           transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
         }
         .tb-pill-ghost {
-          background: rgba(38,36,46,0.55);
-          color: #f5f4f7;
+          background: rgba(var(--tb-ghost-rgb),0.55);
+          color: var(--tb-text);
           border: 1px solid rgba(255,255,255,0.12);
           backdrop-filter: blur(14px) saturate(140%);
           -webkit-backdrop-filter: blur(14px) saturate(140%);
@@ -425,7 +425,7 @@ export default function Step2Page() {
           transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,2.2), box-shadow 0.3s, background 0.3s;
         }
         .tb-pill-ghost:hover {
-          background: rgba(38,36,46,0.75);
+          background: rgba(var(--tb-ghost-rgb),0.75);
           transform: translateY(-1px) scale(1.03);
         }
         .tb-pill-ghost:active {
@@ -467,42 +467,42 @@ export default function Step2Page() {
 
       <div className="flex flex-col md:flex-row md:flex-1 md:min-h-0 w-full px-4 pt-6 pb-4 gap-4 2xl:px-6">
         {/* Sidebar */}
-        <aside className="w-full md:w-[300px] flex-shrink-0 bg-[#1f1d26] border border-[#34323d] rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.4)] md:overflow-y-auto">
+        <aside className="w-full md:w-[300px] flex-shrink-0 bg-[var(--tb-surface)] border border-[var(--tb-border)] rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.4)] md:overflow-y-auto">
           {/* Storyboard meta */}
-          <div className="p-4 border-b border-[#34323d]">
-            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#a8a4b2]">
+          <div className="p-4 border-b border-[var(--tb-border)]">
+            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[var(--tb-text-muted)]">
               <Clapperboard className="w-3.5 h-3.5" />
               스토리보드 정보
             </div>
             {storyboard ? (
               <div className="space-y-1.5">
                 <div className="flex items-start gap-2">
-                  <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">제목</span>
-                  <span className="text-sm text-[#f5f4f7] font-bold flex-1 break-all">{storyboard.title}</span>
+                  <span className="text-sm text-[var(--tb-text-muted)] font-medium w-14 pt-0.5">제목</span>
+                  <span className="text-sm text-[var(--tb-text)] font-bold flex-1 break-all">{storyboard.title}</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">씬 수</span>
-                  <span className="text-sm text-[#f5f4f7] font-bold flex-1">{storyboard.meta.total_scenes}개</span>
+                  <span className="text-sm text-[var(--tb-text-muted)] font-medium w-14 pt-0.5">씬 수</span>
+                  <span className="text-sm text-[var(--tb-text)] font-bold flex-1">{storyboard.meta.total_scenes}개</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">비율</span>
-                  <span className="text-sm text-[#f5f4f7] font-bold flex-1">{storyboard.meta.aspect_ratio}</span>
+                  <span className="text-sm text-[var(--tb-text-muted)] font-medium w-14 pt-0.5">비율</span>
+                  <span className="text-sm text-[var(--tb-text)] font-bold flex-1">{storyboard.meta.aspect_ratio}</span>
                 </div>
                 {storyboard.meta.subject_type && (
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-[#a8a4b2] font-medium w-14 pt-0.5">피사체</span>
-                    <span className="text-sm text-[#f5f4f7] font-bold flex-1">{storyboard.meta.subject_type}</span>
+                    <span className="text-sm text-[var(--tb-text-muted)] font-medium w-14 pt-0.5">피사체</span>
+                    <span className="text-sm text-[var(--tb-text)] font-bold flex-1">{storyboard.meta.subject_type}</span>
                   </div>
                 )}
               </div>
             ) : (
-              <p className="text-[13px] text-[#a8a4b2]">JSON을 업로드하면 표시됩니다.</p>
+              <p className="text-[13px] text-[var(--tb-text-muted)]">JSON을 업로드하면 표시됩니다.</p>
             )}
           </div>
 
           {/* Tools */}
-          <div className="p-4 border-b border-[#34323d]">
-            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#a8a4b2]">
+          <div className="p-4 border-b border-[var(--tb-border)]">
+            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[var(--tb-text-muted)]">
               <Wrench className="w-3.5 h-3.5" />
               도구
             </div>
@@ -511,7 +511,7 @@ export default function Step2Page() {
                 href="https://translate.google.co.kr/?sl=ko&tl=en&op=translate"
                 target="_blank"
                 rel="noreferrer"
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#93c5fd] bg-[#1e3a8a]/30 hover:bg-[#1e3a8a]/50 tb-press-soft"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[var(--tb-text)] bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] tb-press-soft"
               >
                 <Languages className="w-4 h-4" />
                 구글번역기
@@ -521,7 +521,7 @@ export default function Step2Page() {
                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition ${
                   toolView === 'frame-extractor'
                     ? 'tb-pill-primary'
-                    : 'text-[#fcd34d] bg-[#78350f]/30 hover:bg-[#78350f]/50 tb-press-soft'
+                    : 'text-[var(--tb-text)] bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] tb-press-soft'
                 }`}
               >
                 <Film className="w-4 h-4" />
@@ -532,7 +532,7 @@ export default function Step2Page() {
                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition ${
                   toolView === 'watermark-remover'
                     ? 'tb-pill-primary'
-                    : 'text-[#67e8f9] bg-[#164e63]/30 hover:bg-[#164e63]/50 tb-press-soft'
+                    : 'text-[var(--tb-text)] bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] tb-press-soft'
                 }`}
               >
                 <Droplets className="w-4 h-4" />
@@ -542,7 +542,7 @@ export default function Step2Page() {
                 href="https://tbnc.aitoolb.com/"
                 target="_blank"
                 rel="noreferrer"
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[#fda4af] bg-[#881337]/30 hover:bg-[#881337]/50 tb-press-soft"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-full text-sm font-bold transition text-[var(--tb-text)] bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] tb-press-soft"
               >
                 <FileText className="w-4 h-4" />
                 파일명변경
@@ -552,7 +552,7 @@ export default function Step2Page() {
 
           {/* Gem guide */}
           <div className="p-4 space-y-2">
-            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[#a8a4b2]">
+            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[var(--tb-text-muted)]">
               <Gem className="w-3.5 h-3.5" />
               젬 가이드
             </div>
@@ -569,9 +569,9 @@ export default function Step2Page() {
               href="https://kr.pinterest.com/"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#E60023] hover:opacity-90 text-white text-sm font-bold tb-press"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[var(--tb-surface)] border border-[var(--tb-border)] hover:bg-[var(--tb-surface-2)] text-[var(--tb-text)] shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-sm font-bold tb-press"
             >
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <svg className="w-3.5 h-3.5 text-[#E60023]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z" />
               </svg>
               핀터레스트
@@ -580,9 +580,9 @@ export default function Step2Page() {
               href="https://gemini.google.com/"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#1a73e8] hover:opacity-90 text-white text-sm font-bold tb-press"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[var(--tb-surface)] border border-[var(--tb-border)] hover:bg-[var(--tb-surface-2)] text-[var(--tb-text)] shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-sm font-bold tb-press"
             >
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <svg className="w-3.5 h-3.5 text-[#1a73e8]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M11.04 19.32Q12 18.72 12.84 17.76Q13.68 16.8 14.04 15.6H11.04V19.32ZM9 19.68V15.6H5.58Q6.18 17.04 7.32 18.06Q8.46 19.08 9 19.68ZM5.1 14.4H9V10.2H4.62Q4.44 10.8 4.38 11.28Q4.32 11.76 4.32 12.24Q4.32 13.08 4.5 13.68Q4.68 14.28 5.1 14.4ZM10.2 14.4H13.8V10.2H10.2V14.4ZM14.4 9H19.08Q18.72 8.04 18.12 7.2Q17.52 6.36 16.74 5.7Q15.72 6.48 14.88 7.08Q14.04 7.68 14.4 9ZM9 9H13.44Q13.08 7.68 12.36 6.6Q11.64 5.52 10.68 4.68Q9.72 5.52 9 6.6Q8.28 7.68 9 9ZM4.92 9H9.36Q9 8.04 8.7 7.2Q8.4 6.36 7.98 5.64Q7.08 6.24 6.36 7.08Q5.64 7.92 4.92 9ZM12 21.6Q10.68 21.6 9.42 21.12Q8.16 20.64 7.14 19.86Q6.12 19.08 5.34 18.06Q4.56 17.04 4.08 15.78Q3.6 14.52 3.6 13.2Q3.6 10.68 5.04 8.64Q6.48 6.6 8.76 5.52Q8.16 4.56 7.68 3.48Q7.2 2.4 6.96 1.2H8.16Q8.4 2.16 8.76 3.06Q9.12 3.96 9.6 4.68Q10.32 4.2 11.16 3.96Q12 3.72 12 3.72Q12 3.72 12.84 3.96Q13.68 4.2 14.4 4.68Q14.88 3.96 15.24 3.06Q15.6 2.16 15.84 1.2H17.04Q16.8 2.4 16.32 3.48Q15.84 4.56 15.24 5.52Q17.52 6.6 18.96 8.64Q20.4 10.68 20.4 13.2Q20.4 14.52 19.92 15.78Q19.44 17.04 18.66 18.06Q17.88 19.08 16.86 19.86Q15.84 20.64 14.58 21.12Q13.32 21.6 12 21.6Z" />
               </svg>
               제미나이
@@ -591,16 +591,16 @@ export default function Step2Page() {
               href="https://splitter.aitoolb.com/"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#0ea5e9] hover:opacity-90 text-white text-sm font-bold tb-press"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[var(--tb-surface)] border border-[var(--tb-border)] hover:bg-[var(--tb-surface-2)] text-[var(--tb-text)] shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-sm font-bold tb-press"
             >
-              <Scissors className="w-3.5 h-3.5" />
+              <Scissors className="w-3.5 h-3.5 text-[#0ea5e9]" />
               이미지분할기
             </a>
             <a
               href="https://grok.com/"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#26242e] border border-[#34323d] hover:opacity-90 text-white text-sm font-bold tb-press"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[var(--tb-surface)] border border-[var(--tb-border)] hover:bg-[var(--tb-surface-2)] text-[var(--tb-text)] shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-sm font-bold tb-press"
             >
               <ExternalLink className="w-3.5 h-3.5" />
               Grok 바로가기
@@ -609,36 +609,36 @@ export default function Step2Page() {
               href="https://gemini.google.com/gem/1Wy6XhDIfeb1rO9AiYYDMdc6-wDoixF60?usp=sharing"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#f43f5e] hover:opacity-90 text-white text-sm font-bold tb-press"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[var(--tb-surface)] border border-[var(--tb-border)] hover:bg-[var(--tb-surface-2)] text-[var(--tb-text)] shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-sm font-bold tb-press"
             >
-              <Music className="w-3.5 h-3.5" />
+              <Music className="w-3.5 h-3.5 text-[#f43f5e]" />
               음악만들기
             </a>
             <a
               href="https://suno.com/"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[#f97316] hover:opacity-90 text-white text-sm font-bold tb-press"
+              className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[var(--tb-surface)] border border-[var(--tb-border)] hover:bg-[var(--tb-surface-2)] text-[var(--tb-text)] shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-sm font-bold tb-press"
             >
-              <ExternalLink className="w-3.5 h-3.5" />
+              <ExternalLink className="w-3.5 h-3.5 text-[#f97316]" />
               SUNO 바로가기
             </a>
           </div>
         </aside>
 
         {/* Main */}
-        <main className="flex-1 min-w-0 flex flex-col md:overflow-hidden bg-[#1f1d26] border border-[#34323d] rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.4)]">
+        <main className="flex-1 min-w-0 flex flex-col md:overflow-hidden bg-[var(--tb-surface)] border border-[var(--tb-border)] rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.4)]">
           {toolView === 'frame-extractor' ? (
             <FrameExtractor accentColor="#f97316" />
           ) : toolView === 'watermark-remover' ? (
             <WatermarkRemover accentColor="#f97316" />
           ) : !storyboard ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-10">
-              <div className="w-20 h-20 mb-5 rounded-full flex items-center justify-center bg-[#7c2d12]/30 border border-[#34323d]">
+              <div className="w-20 h-20 mb-5 rounded-full flex items-center justify-center bg-[#7c2d12]/30 border border-[var(--tb-border)]">
                 <Clapperboard className="w-10 h-10 text-[#f97316]" />
               </div>
-              <h3 className="text-lg font-bold text-[#f5f4f7] mb-2">스토리보드가 없습니다</h3>
-              <p className="text-sm text-[#a8a4b2] mb-5 leading-relaxed">
+              <h3 className="text-lg font-bold text-[var(--tb-text)] mb-2">스토리보드가 없습니다</h3>
+              <p className="text-sm text-[var(--tb-text-muted)] mb-5 leading-relaxed">
                 스토리보드 JSON을 업로드하여<br />
                 이미지/영상 프롬프트를 확인하세요.
               </p>
@@ -653,14 +653,14 @@ export default function Step2Page() {
           ) : (
             <>
               {/* Top bulk-copy bar */}
-              <div className="flex-shrink-0 px-4 py-3 border-b border-[#34323d] bg-[#7c2d12]/20 rounded-t-2xl flex items-center justify-between gap-3">
+              <div className="flex-shrink-0 px-4 py-3 border-b border-[var(--tb-border)] bg-[#7c2d12]/20 rounded-t-2xl flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 min-w-0">
                   <Clapperboard className="w-4 h-4 text-[#f97316] flex-shrink-0" />
-                  <h2 className="text-base font-black text-[#f5f4f7] uppercase truncate">{storyboard.title}</h2>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#a8a4b2] flex-shrink-0">
+                  <h2 className="text-base font-black text-[var(--tb-text)] uppercase truncate">{storyboard.title}</h2>
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[var(--tb-surface-2)] border border-[var(--tb-border)] text-[var(--tb-text-muted)] flex-shrink-0">
                     {storyboard.meta.total_scenes}씬
                   </span>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#26242e] border border-[#34323d] text-[#a8a4b2] flex-shrink-0">
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[var(--tb-surface-2)] border border-[var(--tb-border)] text-[var(--tb-text-muted)] flex-shrink-0">
                     {storyboard.meta.aspect_ratio}
                   </span>
                 </div>
@@ -674,14 +674,14 @@ export default function Step2Page() {
                   </button>
                   <button
                     onClick={() => copyText(allImagePromptsGrok)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#26242e] hover:opacity-90 text-[#f5f4f7] text-sm font-bold tb-press"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--tb-surface-2)] hover:opacity-90 text-[var(--tb-text)] text-sm font-bold tb-press"
                   >
                     <ImageIcon className="w-3.5 h-3.5" />
                     이미지 프롬프트
                   </button>
                   <button
                     onClick={() => copyText(allVideoPrompts)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[#f5f4f7] text-sm font-bold tb-press-soft"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] border border-[var(--tb-border)] text-[var(--tb-text)] text-sm font-bold tb-press-soft"
                   >
                     <Film className="w-3.5 h-3.5" />
                     영상 프롬프트
@@ -690,7 +690,7 @@ export default function Step2Page() {
               </div>
 
               {/* Act tab bar */}
-              <div className="flex-shrink-0 flex gap-1.5 p-3 border-b border-[#34323d] bg-[#1f1d26] overflow-x-auto">
+              <div className="flex-shrink-0 flex gap-1.5 p-3 border-b border-[var(--tb-border)] bg-[var(--tb-surface)] overflow-x-auto">
                 {ACTS.map((act, i) => {
                   const tc = ACT_COLORS[i];
                   const count = scenesByAct[i].length;
@@ -701,7 +701,7 @@ export default function Step2Page() {
                       onClick={() => setActiveAct(i)}
                       className={`flex items-center gap-2 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${isActive
                         ? 'tb-pill-primary'
-                        : 'text-[#a8a4b2] bg-[#26242e] hover:bg-[#34323d] tb-press-soft'
+                        : 'text-[var(--tb-text-muted)] bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] tb-press-soft'
                         }`}
                     >
                       <span
@@ -725,7 +725,7 @@ export default function Step2Page() {
               {/* Scene cards */}
               <div className="flex-1 overflow-y-auto p-5 space-y-5">
                 {scenesByAct[activeAct].length === 0 ? (
-                  <div className="text-center py-10 text-[#a8a4b2] text-sm">
+                  <div className="text-center py-10 text-[var(--tb-text-muted)] text-sm">
                     이 구간에 해당하는 씬이 없습니다.
                   </div>
                 ) : (
@@ -735,11 +735,11 @@ export default function Step2Page() {
                       <div
                         key={scene.id}
                         ref={(el) => { sceneRefs.current[scene.id] = el; }}
-                        className="rounded-2xl overflow-hidden border border-[#34323d] bg-[#26242e] shadow-[0_2px_8px_rgba(0,0,0,0.3)] transition-all"
+                        className="rounded-2xl overflow-hidden border border-[var(--tb-border)] bg-[var(--tb-surface-2)] shadow-[0_2px_8px_rgba(0,0,0,0.3)] transition-all"
                       >
                         {/* Scene header */}
                         <div
-                          className="px-4 py-3 border-b border-[#34323d] flex items-center justify-between gap-3"
+                          className="px-4 py-3 border-b border-[var(--tb-border)] flex items-center justify-between gap-3"
                           style={{ background: `${tc.dot}10` }}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
@@ -749,16 +749,16 @@ export default function Step2Page() {
                             >
                               #{String(scene.scene_number).padStart(2, '0')}
                             </span>
-                            <span className="text-base font-bold text-[#f5f4f7] truncate">{scene.title}</span>
+                            <span className="text-base font-bold text-[var(--tb-text)] truncate">{scene.title}</span>
                           </div>
                           <div className="flex items-center gap-1.5 flex-shrink-0">
                             {scene.camera.shot_type && (
-                              <span className="text-[11px] uppercase font-bold px-2 py-0.5 rounded-full border border-[#34323d] bg-[#1f1d26] text-[#f5f4f7]">
+                              <span className="text-[11px] uppercase font-bold px-2 py-0.5 rounded-full border border-[var(--tb-border)] bg-[var(--tb-surface)] text-[var(--tb-text)]">
                                 {scene.camera.shot_type}
                               </span>
                             )}
                             {scene.camera.movement && (
-                              <span className="text-[11px] uppercase font-bold px-2 py-0.5 rounded-full border border-[#34323d] bg-[#1f1d26] text-[#f5f4f7]">
+                              <span className="text-[11px] uppercase font-bold px-2 py-0.5 rounded-full border border-[var(--tb-border)] bg-[var(--tb-surface)] text-[var(--tb-text)]">
                                 {scene.camera.movement}
                               </span>
                             )}
@@ -766,22 +766,22 @@ export default function Step2Page() {
                         </div>
 
                         {/* Scene info */}
-                        <div className="px-4 py-3 border-b border-[#34323d] space-y-2">
-                          <p className="text-sm text-[#f5f4f7] leading-relaxed">{scene.description}</p>
+                        <div className="px-4 py-3 border-b border-[var(--tb-border)] space-y-2">
+                          <p className="text-sm text-[var(--tb-text)] leading-relaxed">{scene.description}</p>
                           <div className="flex flex-wrap gap-1.5">
                             {scene.emotion && (
-                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#1f1d26] border border-[#34323d] text-[#a8a4b2]">
-                                감정: <span className="text-[#f5f4f7]">{scene.emotion}</span>
+                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[var(--tb-surface)] border border-[var(--tb-border)] text-[var(--tb-text-muted)]">
+                                감정: <span className="text-[var(--tb-text)]">{scene.emotion}</span>
                               </span>
                             )}
                             {scene.key_visual && (
-                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#1f1d26] border border-[#34323d] text-[#a8a4b2]">
-                                핵심: <span className="text-[#f5f4f7]">{scene.key_visual}</span>
+                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[var(--tb-surface)] border border-[var(--tb-border)] text-[var(--tb-text-muted)]">
+                                핵심: <span className="text-[var(--tb-text)]">{scene.key_visual}</span>
                               </span>
                             )}
                             {scene.camera.lighting && (
-                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#1f1d26] border border-[#34323d] text-[#a8a4b2]">
-                                조명: <span className="text-[#f5f4f7]">{scene.camera.lighting.slice(0, 50)}{scene.camera.lighting.length > 50 ? '…' : ''}</span>
+                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[var(--tb-surface)] border border-[var(--tb-border)] text-[var(--tb-text-muted)]">
+                                조명: <span className="text-[var(--tb-text)]">{scene.camera.lighting.slice(0, 50)}{scene.camera.lighting.length > 50 ? '…' : ''}</span>
                               </span>
                             )}
                           </div>
@@ -790,18 +790,18 @@ export default function Step2Page() {
                         {/* Image / Video prompts side by side */}
                         <div className="flex flex-col md:flex-row">
                           {/* Image prompt */}
-                          <div className="flex-1 p-4 border-b md:border-b-0 md:border-r border-[#34323d] min-w-0">
+                          <div className="flex-1 p-4 border-b md:border-b-0 md:border-r border-[var(--tb-border)] min-w-0">
                             <div className="flex items-center justify-between mb-2">
                               <div className="flex items-center gap-1.5 min-w-0">
                                 <ImageIcon className="w-3.5 h-3.5 text-[#f97316] flex-shrink-0" />
-                                <span className="text-[11px] uppercase tracking-wider text-[#a8a4b2] font-bold">이미지 프롬프트</span>
-                                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#7c2d12]/30 text-[#f97316] font-bold">
+                                <span className="text-[11px] uppercase tracking-wider text-[var(--tb-text-muted)] font-bold">이미지 프롬프트</span>
+                                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[color-mix(in_srgb,#7c2d12_30%,#1f1d26)] text-[#f97316] font-bold">
                                   {scene.prompts.image.tool}
                                 </span>
                               </div>
                               <button
                                 onClick={() => copyText(scene.prompts.image.prompt)}
-                                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#1f1d26] hover:bg-[#34323d] border border-[#34323d] text-[11px] font-bold text-[#a8a4b2] tb-press-soft flex-shrink-0"
+                                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--tb-surface)] hover:bg-[var(--tb-border)] border border-[var(--tb-border)] text-[11px] font-bold text-[var(--tb-text-muted)] tb-press-soft flex-shrink-0"
                               >
                                 <Copy className="w-3 h-3" />
                                 복사
@@ -811,28 +811,28 @@ export default function Step2Page() {
                               value={scene.prompts.image.prompt}
                               onChange={(e) => updateImagePrompt(scene.id, e.target.value)}
                               rows={5}
-                              className="w-full min-h-[100px] resize-y bg-[#1f1d26] border border-[#34323d] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#f5f4f7] focus:outline-none focus:border-[#fb923c] focus:ring-[3px] focus:ring-[#fb923c]/20"
+                              className="w-full min-h-[100px] resize-y bg-[var(--tb-surface)] border border-[var(--tb-border)] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[var(--tb-text)] focus:outline-none focus:border-[#fb923c] focus:ring-[3px] focus:ring-[#fb923c]/20"
                             />
                           </div>
 
                           {/* Video prompt */}
-                          <div className="flex-1 p-4 bg-[#1f1d26] min-w-0">
+                          <div className="flex-1 p-4 bg-[var(--tb-surface)] min-w-0">
                             <div className="flex items-center justify-between mb-2">
                               <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
                                 <Film className="w-3.5 h-3.5 text-[#f43f5e] flex-shrink-0" />
-                                <span className="text-[11px] uppercase tracking-wider text-[#a8a4b2] font-bold">영상 프롬프트</span>
-                                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#881337]/30 text-[#fb7185] font-bold">
+                                <span className="text-[11px] uppercase tracking-wider text-[var(--tb-text-muted)] font-bold">영상 프롬프트</span>
+                                <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[color-mix(in_srgb,#881337_30%,#1f1d26)] text-[#fb7185] font-bold">
                                   {scene.prompts.video.tool} · {scene.prompts.video.duration}s
                                 </span>
                                 {scene.prompts.video.motion_type && (
-                                  <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#881337]/30 text-[#fda4af] font-bold">
+                                  <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[color-mix(in_srgb,#881337_30%,#1f1d26)] text-[#fda4af] font-bold">
                                     {scene.prompts.video.motion_type}
                                   </span>
                                 )}
                               </div>
                               <button
                                 onClick={() => copyText(scene.prompts.video.prompt)}
-                                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#26242e] hover:bg-[#34323d] border border-[#34323d] text-[11px] font-bold text-[#a8a4b2] tb-press-soft flex-shrink-0"
+                                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] border border-[var(--tb-border)] text-[11px] font-bold text-[var(--tb-text-muted)] tb-press-soft flex-shrink-0"
                               >
                                 <Copy className="w-3 h-3" />
                                 복사
@@ -842,7 +842,7 @@ export default function Step2Page() {
                               value={scene.prompts.video.prompt}
                               onChange={(e) => updateVideoPrompt(scene.id, e.target.value)}
                               rows={5}
-                              className="w-full min-h-[100px] resize-y bg-[#26242e] border border-[#34323d] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[#f5f4f7] focus:outline-none focus:border-[#fb923c] focus:ring-[3px] focus:ring-[#fb923c]/20"
+                              className="w-full min-h-[100px] resize-y bg-[var(--tb-surface-2)] border border-[var(--tb-border)] rounded-xl p-2.5 text-[13px] leading-relaxed font-mono text-[var(--tb-text)] focus:outline-none focus:border-[#fb923c] focus:ring-[3px] focus:ring-[#fb923c]/20"
                             />
                           </div>
                         </div>
@@ -863,36 +863,36 @@ export default function Step2Page() {
           onClick={() => setUploadOpen(false)}
         >
           <div
-            className="bg-[#1f1d26] rounded-2xl border border-[#34323d] shadow-[0_24px_60px_rgba(0,0,0,0.6)] w-[640px] max-w-[95vw] max-h-[80vh] flex flex-col"
+            className="bg-[var(--tb-surface)] rounded-2xl border border-[var(--tb-border)] shadow-[0_24px_60px_rgba(0,0,0,0.6)] w-[640px] max-w-[95vw] max-h-[80vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#34323d]">
-              <span className="text-base font-bold text-[#f5f4f7] uppercase tracking-wider">스토리보드 JSON 업로드</span>
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--tb-border)]">
+              <span className="text-base font-bold text-[var(--tb-text)] uppercase tracking-wider">스토리보드 JSON 업로드</span>
               <button
                 onClick={() => setUploadOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#26242e] hover:bg-[#34323d] text-[#a8a4b2] tb-press-soft"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] text-[var(--tb-text-muted)] tb-press-soft"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-5 space-y-3 min-h-0">
-              <p className="text-sm text-[#a8a4b2] leading-relaxed">
-                스토리보드 JSON을 붙여넣으세요. <code className="bg-[#7c2d12]/30 px-1.5 py-0.5 rounded text-[#f97316] font-mono text-[12px]">scenes</code> 배열이 포함되어야 합니다.
-                마크다운 코드블록(```) 래핑과 <code className="bg-[#7c2d12]/30 px-1.5 py-0.5 rounded text-[#f97316] font-mono text-[12px]">{`{ "storyboard": ... }`}</code> 래퍼도 자동 처리됩니다.
+              <p className="text-sm text-[var(--tb-text-muted)] leading-relaxed">
+                스토리보드 JSON을 붙여넣으세요. <code className="bg-[color-mix(in_srgb,#7c2d12_30%,#1f1d26)] px-1.5 py-0.5 rounded text-[#f97316] font-mono text-[12px]">scenes</code> 배열이 포함되어야 합니다.
+                마크다운 코드블록(```) 래핑과 <code className="bg-[color-mix(in_srgb,#7c2d12_30%,#1f1d26)] px-1.5 py-0.5 rounded text-[#f97316] font-mono text-[12px]">{`{ "storyboard": ... }`}</code> 래퍼도 자동 처리됩니다.
               </p>
               <textarea
                 value={jsonInput}
                 onChange={(e) => setJsonInput(e.target.value)}
-                className="w-full h-[260px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[#26242e] border border-[#34323d] text-[#f5f4f7] focus:outline-none focus:border-[#fb923c] focus:ring-[3px] focus:ring-[#fb923c]/20"
+                className="w-full h-[260px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[var(--tb-surface-2)] border border-[var(--tb-border)] text-[var(--tb-text)] focus:outline-none focus:border-[#fb923c] focus:ring-[3px] focus:ring-[#fb923c]/20"
                 placeholder='{"title": "...", "meta": {...}, "scenes": [...]}'
               />
               {uploadError && (
-                <div className="text-sm text-[#fca5a5] bg-[#7f1d1d]/30 border border-[#b91c1c] rounded-xl px-3 py-2 font-semibold">
+                <div className="text-sm text-[#fca5a5] bg-[color-mix(in_srgb,#7f1d1d_30%,#1f1d26)] border border-[#b91c1c] rounded-xl px-3 py-2 font-semibold">
                   {uploadError}
                 </div>
               )}
             </div>
-            <div className="flex justify-end gap-2 px-5 py-3 border-t border-[#34323d]">
+            <div className="flex justify-end gap-2 px-5 py-3 border-t border-[var(--tb-border)]">
               <button
                 onClick={() => setUploadOpen(false)}
                 className="px-4 py-1.5 rounded-full tb-pill-ghost text-sm font-bold transition"

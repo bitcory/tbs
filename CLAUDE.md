@@ -171,6 +171,47 @@ Vercel이 자동 배포함.
 `translateY(1px) scale(0.94)` + `inset 0 2px 4px rgba(0,0,0,0.12)` 정도의 눌림
 shadow를 직접 CSS 로 넣는다.
 
+## 테마 시스템 (Light/Dark) + 화이트 디자인 방향
+
+### 토큰 시스템 (`app/globals.css`)
+다크가 기본(`:root`), 라이트는 `:root[data-theme="light"]` 오버라이드. **모든 중립 색은
+시맨틱 토큰을 쓰고 하드코딩 hex 금지** (테마 전환의 단일 진실 원천).
+
+| 토큰 | Dark | Light(애플 톤) | 용도 |
+|------|------|------|------|
+| `--tb-bg` | `#15141a` | `#f5f5f7` | 페이지 배경(오프화이트) |
+| `--tb-surface` | `#1f1d26` | `#ffffff` | 카드(순백) |
+| `--tb-surface-2` | `#26242e` | `#f0f0f2` | 입력/필드/서브 알약 |
+| `--tb-border` | `#34323d` | `#e4e4e7` | 헤어라인 보더 |
+| `--tb-text` | `#f5f4f7` | `#1d1d1f` | 본문(near-black) |
+| `--tb-text-muted` | `#a8a4b2` | `#56565b` | 흐린 텍스트(읽기 가능 톤) |
+| `--tb-text-2` | `#c8c4d2` | `#3a3a3d` | 보조 텍스트 |
+
+- 글라스(styled-jsx pill/bar): `rgba(var(--tb-glass-bar-rgb), α)` / `rgba(var(--tb-ghost-rgb), α)` — 알파 보존하며 라이트에서 흰 글라스로 전환.
+- 투명도 모디파이어가 필요한 토큰색은 `color-mix(in_srgb,var(--token)_NN%,transparent)` 사용 (Tailwind `bg-[var(--x)]/NN` 은 작동 안 함).
+
+### 토글 & 동기화
+- **토글은 메인 헤더(main.html)의 갤러리 버튼 옆 단 하나** (`.header-theme-btn`, `toggleTheme()`). 해/달 아이콘은 `data-theme` 기준 CSS 로 전환. `localStorage('tb-theme')` 저장. (앱 내부 페이지엔 토글 없음 — 랜딩에서 설정 후 persists.)
+- `app/layout.js` `<head>` 에 no-flash 인라인 스크립트(FOUC 방지). `colorScheme: 'dark light'`. 내부 페이지는 로드 시 localStorage 읽어 적용.
+- `public/toolblab/main.html` — 자체 no-flash 스크립트 + `storage` 이벤트 동기화. 다크 오버라이드 블록은 `[data-theme="light"]` 라이트 블록과 짝. `?theme=light|dark` 쿼리 오버라이드(저장 안 함).
+
+### 화이트 디자인 방향 (애플/Linear 톤 — 진행 중, UP 1-1 이 레퍼런스)
+"색을 칠하지 않는다" 원칙. 큰 면적에 진한 색 금지, 흰 카드 + 헤어라인 + 옅은 그림자로 깊이.
+- **카드**: `bg-[var(--tb-surface)]` + `border-[var(--tb-border)]` + 소프트 섀도(`shadow-[0_10px_30px_-14px_rgba(0,0,0,0.18)]`, 작은 카드는 `0_1px_3px_rgba(0,0,0,0.05)`). 무거운 다크 섀도(`rgba(0,0,0,0.3~0.4)`) 금지.
+- **도구 버튼**: 중성 회색 알약 `text-[var(--tb-text)] bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)]`.
+- **브랜드/가이드 버튼**: 흰 알약(`bg-[var(--tb-surface)] border ... shadow-[0_1px_2px_rgba(0,0,0,0.04)]`) + **색은 작은 아이콘에만**(`text-[#브랜드색]`). 솔리드 컬러 채움 금지.
+- **`tb-pill-primary`**: globals 라이트 오버라이드로 흰색+옅은 주황 보더+주황 글씨 아웃라인 알약. (가이드 열기/활성 탭 공용)
+- **틴트 칩/버튼**(컬러 글씨 유지해야 할 때): 배경을 `color-mix(in_srgb,#hue_NN%,#1f1d26)` 로 고정 → **다크 모드 픽셀 동일, 라이트에서도 컬러 칩으로 가시**.
+- **중립 배경 위 틴트 글씨**(예전 `text-[#93c5fd] bg-[var(--tb-surface-2)]`): `text-[color-mix(in_srgb,#tint_62%,var(--tb-text))]` 로 테마 적응(라이트에서 진해짐).
+
+### 적용 현황 (2026-06-09 기준)
+- ✅ 전 페이지 토큰화(중립색 1299곳) + 토글 + main.html 라이트.
+- ✅ 전 강의 페이지 **사이드바 버튼 통일**(도구 중성 알약 / 브랜드·가이드 흰 알약+아이콘).
+- ✅ UP 1-1(`Step1Client.js`) 메인 콘텐츠 애플 톤 완성(이미지프롬프트 카드/탭 고스트/카드 헤더/텍스트창).
+- ⬜ 미완: 다른 페이지 **본문 카드**(씬 카드·칩 `감정/핵심/조명`, `grok_imagine` 등)·탭 고스트화·step1 핑크 CTA(`말하는 프롬프트`) 정리. UP 1-1 패턴을 따라 확장 예정.
+
+> **dev 주의**: `next dev` 실행 중에 `npm run build` 돌리면 `.next` 가 깨져 런타임 `Cannot find module './NNN.js'` 발생. 빌드 시 dev 종료 → build → `rm -rf .next` → dev 재시작.
+
 ## 운영건의함 & 개인정보 노출 규칙
 
 | 영역 | 규칙 |

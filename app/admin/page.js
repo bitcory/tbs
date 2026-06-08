@@ -140,7 +140,7 @@ export default async function AdminPage({ searchParams }) {
   const visibleRows = tab === "staff" ? staffUsers : userRows;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#15141a", color: "#f5f4f7" }} className="auth-scroll">
+    <div style={{ minHeight: "100vh", background: "var(--tb-bg)", color: "var(--tb-text)" }} className="auth-scroll">
       <section style={S.hero}>
         <div style={{ position: "relative", zIndex: 2 }}>
           <span style={S.heroEyebrow}>ADMIN</span>
@@ -152,7 +152,7 @@ export default async function AdminPage({ searchParams }) {
         </div>
       </section>
 
-      <div style={{ ...S.pageWrap, maxWidth: "100%", padding: "20px 16px 80px", marginTop: 0, position: "relative", color: "#f5f4f7" }}>
+      <div style={{ ...S.pageWrap, maxWidth: "100%", padding: "20px 16px 80px", marginTop: 0, position: "relative", color: "var(--tb-text)" }}>
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginBottom: 16, flexWrap: "wrap" }}>
           <Link href="/admin/schedule" className="glass-hoverable" style={S.ghostBtn}>강의 일정</Link>
           {canViewSuggestions && (
@@ -171,7 +171,7 @@ export default async function AdminPage({ searchParams }) {
             display: "flex",
             gap: 4,
             marginBottom: 14,
-            borderBottom: "1px solid #34323d",
+            borderBottom: "1px solid var(--tb-border)",
           }}
         >
           {[
@@ -187,7 +187,7 @@ export default async function AdminPage({ searchParams }) {
                   padding: "12px 20px",
                   fontSize: 14,
                   fontWeight: 700,
-                  color: active ? "#f97316" : "#a8a4b2",
+                  color: active ? "#f97316" : "var(--tb-text-muted)",
                   borderBottom: active ? "3px solid #f97316" : "3px solid transparent",
                   marginBottom: -1,
                   textDecoration: "none",
@@ -203,8 +203,8 @@ export default async function AdminPage({ searchParams }) {
                     fontWeight: 700,
                     padding: "2px 8px",
                     borderRadius: 999,
-                    background: active ? "rgba(249,115,22,0.18)" : "#26242e",
-                    color: active ? "#fb923c" : "#a8a4b2",
+                    background: active ? "rgba(249,115,22,0.18)" : "var(--tb-surface-2)",
+                    color: active ? "#fb923c" : "var(--tb-text-muted)",
                   }}
                 >
                   {t.count}
@@ -229,16 +229,16 @@ export default async function AdminPage({ searchParams }) {
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
               <thead>
                 {/* Group header row */}
-                <tr style={{ background: "#1f1d26", color: "#f5f4f7", fontSize: 11 }}>
-                  <th colSpan={tab === "staff" ? 5 : 4} style={groupTh("#a8a4b2")}>기본 정보</th>
-                  <th colSpan={1} style={groupTh("#a8a4b2")}>ZERO CLASS</th>
+                <tr style={{ background: "var(--tb-surface)", color: "var(--tb-text)", fontSize: 11 }}>
+                  <th colSpan={tab === "staff" ? 5 : 4} style={groupTh("var(--tb-text-muted)")}>기본 정보</th>
+                  <th colSpan={1} style={groupTh("var(--tb-text-muted)")}>ZERO CLASS</th>
                   <th colSpan={1 + SINGLE_STEPS.length} style={groupTh("#f97316")}>UP CLASS</th>
-                  <th colSpan={PRO_STEPS.length} style={groupTh("#f5f4f7")}>PRO CLASS</th>
+                  <th colSpan={PRO_STEPS.length} style={groupTh("var(--tb-text)")}>PRO CLASS</th>
                   <th colSpan={MASTER_STEPS.length} style={groupTh("#fb7185")}>MASTER CLASS</th>
                   <th colSpan={1} style={groupTh("#22d3ee")}>CAPCUT SRT</th>
-                  <th colSpan={isSuper ? 2 : 1} style={groupTh("#a8a4b2")}>메타</th>
+                  <th colSpan={isSuper ? 2 : 1} style={groupTh("var(--tb-text-muted)")}>메타</th>
                 </tr>
-                <tr style={{ background: "#26242e", color: "#a8a4b2" }}>
+                <tr style={{ background: "var(--tb-surface-2)", color: "var(--tb-text-muted)" }}>
                   <th style={th}>닉네임</th>
                   <th style={th}>이메일</th>
                   <th style={th}>전화번호</th>
@@ -268,13 +268,13 @@ export default async function AdminPage({ searchParams }) {
                   const canEditSteps = u.role === "USER";
 
                   return (
-                    <tr key={u.id} style={{ borderTop: "1px solid #34323d" }}>
+                    <tr key={u.id} style={{ borderTop: "1px solid var(--tb-border)" }}>
                       <td style={td}>
                         <b>{u.nickname ?? "-"}</b>
-                        {isSelf && <span style={{ marginLeft: 6, fontSize: 11, color: "#a8a4b2" }}>(나)</span>}
+                        {isSelf && <span style={{ marginLeft: 6, fontSize: 11, color: "var(--tb-text-muted)" }}>(나)</span>}
                       </td>
-                      <td style={{ ...td, color: "#a8a4b2" }}>{u.email ?? "-"}</td>
-                      <td style={{ ...td, color: "#a8a4b2" }}>
+                      <td style={{ ...td, color: "var(--tb-text-muted)" }}>{u.email ?? "-"}</td>
+                      <td style={{ ...td, color: "var(--tb-text-muted)" }}>
                         {isSuper || isSelf ? (u.phone ?? "-") : maskPhone(u.phone)}
                       </td>
                       <td style={td}>
@@ -531,7 +531,7 @@ export default async function AdminPage({ searchParams }) {
                         );
                       })()}
 
-                      <td style={{ ...td, color: "#a8a4b2", fontSize: 12 }}>
+                      <td style={{ ...td, color: "var(--tb-text-muted)", fontSize: 12 }}>
                         {new Date(u.createdAt).toLocaleDateString("ko-KR")}
                       </td>
                       {isSuper && (
@@ -551,7 +551,7 @@ export default async function AdminPage({ searchParams }) {
                   <tr>
                     <td
                       colSpan={(isSuper ? 15 : 14) + (tab === "staff" ? 1 : 0)}
-                      style={{ padding: "40px 12px", textAlign: "center", color: "#a8a4b2", fontSize: 14, borderTop: "1px solid #34323d" }}
+                      style={{ padding: "40px 12px", textAlign: "center", color: "var(--tb-text-muted)", fontSize: 14, borderTop: "1px solid var(--tb-border)" }}
                     >
                       {q
                         ? `"${q}" 검색 결과가 없습니다.`
@@ -588,11 +588,11 @@ export default async function AdminPage({ searchParams }) {
 
             {pageNumbers(page, totalPages).map((p, i) =>
               p === "…" ? (
-                <span key={`gap-${i}`} style={{ padding: "0 6px", color: "#a8a4b2" }}>…</span>
+                <span key={`gap-${i}`} style={{ padding: "0 6px", color: "var(--tb-text-muted)" }}>…</span>
               ) : p === page ? (
                 <span
                   key={p}
-                  style={{ ...pageBtn, background: "#f97316", color: "#15141a", fontWeight: 800, border: "1px solid #f97316" }}
+                  style={{ ...pageBtn, background: "#f97316", color: "#1a1206", fontWeight: 800, border: "1px solid #f97316" }}
                 >
                   {p}
                 </span>
@@ -639,16 +639,16 @@ const pageBtn = {
   height: 36,
   padding: "0 12px",
   borderRadius: 8,
-  border: "1px solid #34323d",
-  background: "#1f1d26",
-  color: "#f5f4f7",
+  border: "1px solid var(--tb-border)",
+  background: "var(--tb-surface)",
+  color: "var(--tb-text)",
   fontSize: 13,
   fontWeight: 600,
   textDecoration: "none",
 };
 
-const th = { textAlign: "left", padding: "14px 12px", fontWeight: 700, fontSize: 12, letterSpacing: "0.05em", textTransform: "uppercase", color: "#a8a4b2", whiteSpace: "nowrap" };
-const td = { padding: "14px 12px", verticalAlign: "middle", color: "#f5f4f7", whiteSpace: "nowrap" };
+const th = { textAlign: "left", padding: "14px 12px", fontWeight: 700, fontSize: 12, letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--tb-text-muted)", whiteSpace: "nowrap" };
+const td = { padding: "14px 12px", verticalAlign: "middle", color: "var(--tb-text)", whiteSpace: "nowrap" };
 
 function groupTh(color) {
   return {

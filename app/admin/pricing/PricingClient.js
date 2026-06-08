@@ -68,7 +68,7 @@ export default function PricingClient({ initial }) {
           gap: 6,
           padding: 4,
           marginBottom: 18,
-          background: "#26242e",
+          background: "var(--tb-surface-2)",
           borderRadius: 12,
         }}
       >
@@ -93,7 +93,7 @@ export default function PricingClient({ initial }) {
                 fontWeight: 800,
                 letterSpacing: "0.04em",
                 background: active ? c.bg : "transparent",
-                color: active ? c.fg : "#a8a4b2",
+                color: active ? c.fg : "var(--tb-text-muted)",
                 boxShadow: active ? "0 1px 3px rgba(0,0,0,0.35)" : "none",
                 display: "flex",
                 alignItems: "center",
@@ -126,7 +126,7 @@ export default function PricingClient({ initial }) {
           const sumOk = Math.abs(sum - 1) < 0.001;
           return (
             <div key={`${r.classType}_${r.stepLevel}`} style={{
-              border: "1px solid #34323d", borderRadius: 12, padding: 16,
+              border: "1px solid var(--tb-border)", borderRadius: 12, padding: 16,
             }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                 <span style={{

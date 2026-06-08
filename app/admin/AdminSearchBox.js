@@ -53,11 +53,11 @@ export default function AdminSearchBox({ initialQ = "", resultLabel = "" }) {
             width: "100%",
             padding: "10px 38px 10px 14px",
             borderRadius: 10,
-            border: "1px solid #34323d",
-            background: "#26242e",
+            border: "1px solid var(--tb-border)",
+            background: "var(--tb-surface-2)",
             fontSize: 14,
             fontFamily: "inherit",
-            color: "#f5f4f7",
+            color: "var(--tb-text)",
             outline: "none",
           }}
         />
@@ -76,9 +76,9 @@ export default function AdminSearchBox({ initialQ = "", resultLabel = "" }) {
               height: 26,
               padding: 0,
               borderRadius: 13,
-              border: "1px solid #34323d",
-              background: "#26242e",
-              color: "#a8a4b2",
+              border: "1px solid var(--tb-border)",
+              background: "var(--tb-surface-2)",
+              color: "var(--tb-text-muted)",
               fontSize: 14,
               cursor: "pointer",
               lineHeight: 1,
@@ -88,7 +88,7 @@ export default function AdminSearchBox({ initialQ = "", resultLabel = "" }) {
           </button>
         )}
       </div>
-      <div style={{ marginLeft: "auto", fontSize: 13, color: "#a8a4b2" }}>
+      <div style={{ marginLeft: "auto", fontSize: 13, color: "var(--tb-text-muted)" }}>
         {pending ? "검색 중..." : resultLabel}
       </div>
     </div>

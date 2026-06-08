@@ -109,7 +109,7 @@ export default async function AdminSuggestionsPage({ searchParams }) {
           )}
         </form>
 
-        <div style={{ marginBottom: 12, fontSize: 13, color: "#64748b" }}>
+        <div style={{ marginBottom: 12, fontSize: 13, color: "var(--tb-text-muted)" }}>
           {q ? `"${q}" 검색 결과 ${items.length}건` : `최근 건의 ${items.length}건`}
           {items.length === 200 && " (최대 200건 표시)"}
         </div>
@@ -119,7 +119,7 @@ export default async function AdminSuggestionsPage({ searchParams }) {
             style={{
               padding: "48px 16px",
               textAlign: "center",
-              color: "#94a3b8",
+              color: "var(--tb-text-muted)",
               fontSize: 14,
               background: "#fff",
               borderRadius: 14,
@@ -163,7 +163,7 @@ export default async function AdminSuggestionsPage({ searchParams }) {
                     >
                       {it.nickname}
                     </span>
-                    <span style={{ fontSize: 12, color: "#94a3b8" }}>
+                    <span style={{ fontSize: 12, color: "var(--tb-text-muted)" }}>
                       {fmtDate(it.createdAt)}
                       {new Date(it.updatedAt).getTime() !== new Date(it.createdAt).getTime() && (
                         <span style={{ marginLeft: 6 }}>· 수정 {fmtDate(it.updatedAt)}</span>

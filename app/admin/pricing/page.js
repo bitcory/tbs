@@ -25,7 +25,7 @@ export default async function PricingPage() {
   });
 
   return (
-    <div style={{ minHeight: "100vh", background: "#15141a", color: "#f5f4f7" }} className="auth-scroll">
+    <div style={{ minHeight: "100vh", background: "var(--tb-bg)", color: "var(--tb-text)" }} className="auth-scroll">
       <section style={S.hero}>
         <div style={{ position: "relative", zIndex: 2 }}>
           <span style={S.heroEyebrow}>PRICING</span>

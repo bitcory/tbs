@@ -86,7 +86,7 @@ export default function ProfileEditor({
           required
           minLength={2}
           maxLength={20}
-          style={{ ...S.input, padding: "9px 12px", fontSize: 14, background: editing ? "#26242e" : "#201f27", cursor: editing ? "text" : "default" }}
+          style={{ ...S.input, padding: "9px 12px", fontSize: 14, background: editing ? "var(--tb-surface-2)" : "var(--tb-surface)", cursor: editing ? "text" : "default" }}
         />
       </div>
 
@@ -98,7 +98,7 @@ export default function ProfileEditor({
           onChange={(e) => setEmail(e.target.value)}
           disabled={!editing}
           required
-          style={{ ...S.input, padding: "9px 12px", fontSize: 14, background: editing ? "#26242e" : "#201f27", cursor: editing ? "text" : "default" }}
+          style={{ ...S.input, padding: "9px 12px", fontSize: 14, background: editing ? "var(--tb-surface-2)" : "var(--tb-surface)", cursor: editing ? "text" : "default" }}
         />
       </div>
 
@@ -113,7 +113,7 @@ export default function ProfileEditor({
           inputMode="tel"
           pattern="[0-9+\-\s]*"
           maxLength={20}
-          style={{ ...S.input, padding: "9px 12px", fontSize: 14, background: editing ? "#26242e" : "#201f27", cursor: editing ? "text" : "default" }}
+          style={{ ...S.input, padding: "9px 12px", fontSize: 14, background: editing ? "var(--tb-surface-2)" : "var(--tb-surface)", cursor: editing ? "text" : "default" }}
         />
       </div>
 
@@ -181,8 +181,8 @@ function ConsentBlock({
 
   const wrap = {
     marginTop: 8,
-    background: "#1f1d26",
-    border: "1px solid #34323d",
+    background: "var(--tb-surface)",
+    border: "1px solid var(--tb-border)",
     borderRadius: 12,
     overflow: "hidden",
   };
@@ -197,17 +197,17 @@ function ConsentBlock({
     width: "100%",
     textAlign: "left",
     fontFamily: "inherit",
-    color: "#f5f4f7",
+    color: "var(--tb-text)",
   };
   const body = {
     padding: "0 16px 14px",
     display: "flex",
     flexDirection: "column",
     gap: 10,
-    borderTop: "1px solid #34323d",
+    borderTop: "1px solid var(--tb-border)",
     paddingTop: 14,
   };
-  const row = { display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13, lineHeight: 1.55, color: "#f5f4f7" };
+  const row = { display: "flex", alignItems: "flex-start", gap: 10, fontSize: 13, lineHeight: 1.55, color: "var(--tb-text)" };
   const cb = { marginTop: 3, width: 16, height: 16, accentColor: "#f97316", cursor: editing ? "pointer" : "default" };
   const miniBadge = (ok) => ({
     display: "inline-flex",
@@ -217,8 +217,8 @@ function ConsentBlock({
     borderRadius: 100,
     fontSize: 11,
     fontWeight: 700,
-    background: ok ? "rgba(249,115,22,0.18)" : "#26242e",
-    color: ok ? "#fb923c" : "#a8a4b2",
+    background: ok ? "rgba(249,115,22,0.18)" : "var(--tb-surface-2)",
+    color: ok ? "#fb923c" : "var(--tb-text-muted)",
   });
 
   return (
@@ -229,7 +229,7 @@ function ConsentBlock({
         style={summary}
       >
         <span style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: "#f5f4f7" }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--tb-text)" }}>
             동의 내역
           </span>
           <span style={miniBadge(hasAgreedPrivacy)}>
@@ -242,7 +242,7 @@ function ConsentBlock({
         <span
           style={{
             fontSize: 12,
-            color: "#a8a4b2",
+            color: "var(--tb-text-muted)",
             transition: "transform 0.2s",
             transform: open ? "rotate(180deg)" : "rotate(0deg)",
             display: "inline-block",
@@ -263,7 +263,7 @@ function ConsentBlock({
                   height: 18,
                   borderRadius: 5,
                   background: "linear-gradient(135deg, #fb923c, #f97316)",
-                  color: "#f5f4f7",
+                  color: "var(--tb-text)",
                   display: "inline-flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -275,9 +275,9 @@ function ConsentBlock({
                 ✓
               </span>
               <span>
-                <strong style={{ color: "#f5f4f7" }}>개인정보 수집·이용 동의 완료</strong>
+                <strong style={{ color: "var(--tb-text)" }}>개인정보 수집·이용 동의 완료</strong>
                 <br />
-                <span style={{ color: "#a8a4b2", fontSize: 12 }}>
+                <span style={{ color: "var(--tb-text-muted)", fontSize: 12 }}>
                   동의일자: {new Date(privacyAgreedAt).toLocaleDateString("ko-KR")} · 수집 항목: 닉네임, 이메일, 핸드폰번호 · 보관 기간: 회원 탈퇴 시까지
                   <br />
                   동의 철회는 회원 탈퇴를 통해서만 가능합니다.
@@ -294,9 +294,9 @@ function ConsentBlock({
                 style={cb}
               />
               <span>
-                <strong style={{ color: "#f5f4f7" }}>[필수]</strong> 개인정보 수집·이용에 동의합니다.
+                <strong style={{ color: "var(--tb-text)" }}>[필수]</strong> 개인정보 수집·이용에 동의합니다.
                 <br />
-                <span style={{ color: "#a8a4b2", fontSize: 12 }}>
+                <span style={{ color: "var(--tb-text-muted)", fontSize: 12 }}>
                   수집 항목: 닉네임, 이메일, 핸드폰번호 · 이용 목적: 강의 제공 및 회원 관리 · 보관 기간: 회원 탈퇴 시까지
                 </span>
               </span>
@@ -312,9 +312,9 @@ function ConsentBlock({
               style={cb}
             />
             <span>
-              <strong style={{ color: "#f5f4f7" }}>[선택]</strong> TOOLB의 강의 일정, AI 정보 등 마케팅 정보 수신에 동의합니다.
+              <strong style={{ color: "var(--tb-text)" }}>[선택]</strong> TOOLB의 강의 일정, AI 정보 등 마케팅 정보 수신에 동의합니다.
               <br />
-              <span style={{ color: "#a8a4b2", fontSize: 12 }}>
+              <span style={{ color: "var(--tb-text-muted)", fontSize: 12 }}>
                 이메일·문자로 발송되며 언제든지 수신 거부할 수 있습니다.
               </span>
             </span>

@@ -49,7 +49,7 @@ export default function BankInfoEditor({
 
   const inputStyle = (on) => ({
     ...S.input,
-    background: on ? "#26242e" : "#201f27",
+    background: on ? "var(--tb-surface-2)" : "var(--tb-surface)",
     cursor: on ? "text" : "default",
   });
 

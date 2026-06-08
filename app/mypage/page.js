@@ -42,7 +42,7 @@ export default async function MyPage() {
   });
 
   return (
-    <div style={{ minHeight: "100vh", background: "#15141a", color: "#f5f4f7" }} className="auth-scroll">
+    <div style={{ minHeight: "100vh", background: "var(--tb-bg)", color: "var(--tb-text)" }} className="auth-scroll">
       <section style={S.hero}>
         <div style={{ position: "relative", zIndex: 2 }}>
           <h1 style={S.heroTitle}>{me.nickname}님의 마이페이지</h1>
@@ -108,7 +108,7 @@ export default async function MyPage() {
               <div style={{ ...S.sectionTitle, marginBottom: 0 }}>내 권한</div>
               <span style={S.badge(ROLE_BADGE[me.role])}>{ROLE_LABEL[me.role]}</span>
             </div>
-            <div style={{ color: "#8c8898", fontSize: 12.5, marginBottom: 18 }}>
+            <div style={{ color: "var(--tb-text-muted)", fontSize: 12.5, marginBottom: 18 }}>
               가입일 {new Date(me.createdAt).toLocaleDateString("ko-KR")}
             </div>
 

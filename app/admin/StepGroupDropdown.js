@@ -69,17 +69,17 @@ export default function StepGroupDropdown({
   const badgeBg = allOn
     ? "rgba(249,115,22,0.18)"
     : noneOn
-    ? "#26242e"
+    ? "var(--tb-surface-2)"
     : "rgba(245,158,11,0.18)";
   const badgeColor = allOn
     ? "#fb923c"
     : noneOn
-    ? "#a8a4b2"
+    ? "var(--tb-text-muted)"
     : "#fcd34d";
   const badgeBorder = allOn
     ? "rgba(249,115,22,0.45)"
     : noneOn
-    ? "#34323d"
+    ? "var(--tb-border)"
     : "rgba(245,158,11,0.45)";
 
   const onToggle = (step, nextEnabled) => {
@@ -135,8 +135,8 @@ export default function StepGroupDropdown({
             minWidth: 220,
             maxHeight: menuPos.maxHeight,
             overflowY: "auto",
-            background: "#1f1d26",
-            border: "1px solid #34323d",
+            background: "var(--tb-surface)",
+            border: "1px solid var(--tb-border)",
             borderRadius: 12,
             boxShadow: "0 14px 36px rgba(0,0,0,0.45)",
             padding: 6,
@@ -155,11 +155,11 @@ export default function StepGroupDropdown({
                   borderRadius: 8,
                   cursor: pending ? "wait" : "pointer",
                   fontSize: 13,
-                  color: "#f5f4f7",
+                  color: "var(--tb-text)",
                   background: checked ? "rgba(249,115,22,0.12)" : "transparent",
                 }}
                 onMouseEnter={(e) => {
-                  if (!checked) e.currentTarget.style.background = "#26242e";
+                  if (!checked) e.currentTarget.style.background = "var(--tb-surface-2)";
                 }}
                 onMouseLeave={(e) => {
                   if (!checked) e.currentTarget.style.background = "transparent";

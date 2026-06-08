@@ -5,6 +5,35 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TOOLB LAB</title>
+  <script>
+    /* Theme bootstrap — runs before paint to avoid a flash.
+       Dark is the default; light is opt-in. Stays in sync with the parent
+       app's toggle via the same-origin localStorage "storage" event. */
+    (function () {
+      function apply(t) {
+        document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+      }
+      var override = null;
+      try { override = new URLSearchParams(location.search).get('theme'); } catch (e) {}
+      if (override === 'light' || override === 'dark') {
+        apply(override);
+      } else {
+        try { apply(localStorage.getItem('tb-theme')); } catch (e) { apply('dark'); }
+      }
+      window.addEventListener('storage', function (e) {
+        if (e.key === 'tb-theme') apply(e.newValue);
+      });
+      window.addEventListener('message', function (e) {
+        if (e.data && e.data.type === 'tb-theme') apply(e.data.theme);
+      });
+    })();
+    function toggleTheme() {
+      var cur = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+      var next = cur === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('tb-theme', next); } catch (e) {}
+    }
+  </script>
   <style>
     @font-face {
       font-family: 'Paperlogy';
@@ -242,6 +271,44 @@
       width: 15px;
       height: 15px;
     }
+
+    /* ── Theme toggle (sits left of the gallery button) ── */
+    .header-actions {
+      grid-column: 3;
+      justify-self: end;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .header-theme-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: #cbc8d2;
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 2.2), box-shadow 0.25s, border-color 0.25s, color 0.25s, background 0.25s;
+    }
+    .header-theme-btn:hover { transform: translateY(-1px) scale(1.04); border-color: #f97316; color: #fb923c; }
+    .header-theme-btn:active { transform: translateY(1px) scale(0.94); box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.18); }
+    .header-theme-btn svg { width: 18px; height: 18px; }
+    .header-theme-btn .theme-icon-moon { display: none; }
+
+    html[data-theme="light"] .header-theme-btn {
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      color: #334155;
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
+    }
+    html[data-theme="light"] .header-theme-btn:hover { border-color: #f97316; color: #ea580c; }
+    html[data-theme="light"] .header-theme-btn .theme-icon-sun { display: none; }
+    html[data-theme="light"] .header-theme-btn .theme-icon-moon { display: block; }
 
     @media (max-width: 640px) {
       .site-header {
@@ -1063,6 +1130,63 @@
     .access-modal-close:hover { background: #34323d; }
     .access-modal-submit { background: linear-gradient(135deg, #fb923c, #f97316); color: #1a1206; }
 
+    /* ════════════════════════════════════════════
+       LIGHT THEME — opt-in override (html[data-theme="light"]).
+       Restores the original light palette; dark stays the default.
+       Higher specificity (attribute) + later source order beats the
+       dark block above. Accent gradients / media panels are shared.
+    ════════════════════════════════════════════ */
+    html[data-theme="light"] { background: #f8fafc; }
+    html[data-theme="light"] body { background: #f8fafc; color: #0f172a; }
+
+    html[data-theme="light"] .site-header {
+      background: rgba(255, 255, 255, 0.82);
+      border-bottom: 1px solid #e2e8f0;
+      box-shadow: 0 4px 22px rgba(15, 23, 42, 0.06);
+    }
+    html[data-theme="light"] .site-header-wordmark { color: #0f172a; }
+    html[data-theme="light"] .header-gallery-btn {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+    }
+    html[data-theme="light"] .header-gallery-btn:hover { border-color: #f97316; color: #ea580c; }
+
+    html[data-theme="light"] .class-tab { color: #64748b; }
+    html[data-theme="light"] .class-tab.active,
+    html[data-theme="light"] .class-tab:hover:not(.active) { color: #1a1206; }
+
+    html[data-theme="light"] .step-card {
+      background: #fff;
+      border: 2px solid #e2e8f0;
+      box-shadow: 0 14px 36px rgba(15, 23, 42, 0.1);
+    }
+    html[data-theme="light"] .step-card:hover {
+      border-color: #f97316;
+      box-shadow: 0 30px 70px rgba(249, 115, 22, 0.25), 0 0 0 3px rgba(251, 146, 60, 0.2);
+    }
+    html[data-theme="light"] .step-card-check { border-color: #cbd5e1; background: #fff; }
+    html[data-theme="light"] .step-card-title { color: #0f172a; }
+    html[data-theme="light"] .step-card-status { background: #f1f5f9; color: #94a3b8; }
+
+    html[data-theme="light"] .sub-modal { background: #fff; box-shadow: 0 30px 70px rgba(15, 23, 42, 0.2); }
+    html[data-theme="light"] .sub-modal-close { background: #f1f5f9; color: #475569; }
+    html[data-theme="light"] .sub-modal-close:hover { background: #e2e8f0; }
+    html[data-theme="light"] .sub-modal-title { color: #0f172a; }
+    html[data-theme="light"] .sub-modal-desc { color: #64748b; }
+    html[data-theme="light"] .sub-option { background: #fff; border: 2px solid #e2e8f0; }
+    html[data-theme="light"] .sub-option-title { color: #0f172a; }
+    html[data-theme="light"] .sub-option-desc { color: #64748b; }
+    html[data-theme="light"] .sub-option-check { background: #fff; border-color: #cbd5e1; }
+
+    html[data-theme="light"] .access-modal { background: #fff; }
+    html[data-theme="light"] .access-modal-title { color: #0f172a; }
+    html[data-theme="light"] .access-modal-desc { color: #64748b; }
+    html[data-theme="light"] .access-modal-input { background: #fff; border-color: #e2e8f0; color: #0f172a; }
+    html[data-theme="light"] .access-modal-close { background: #f1f5f9; color: #475569; }
+    html[data-theme="light"] .access-modal-close:hover { background: #e2e8f0; }
+
   </style>
 </head>
 
@@ -1084,15 +1208,26 @@
           <button type="button" class="class-tab" data-class="master" onclick="selectClass('master')">MASTER</button>
         </nav>
       </div>
-      <a class="header-gallery-btn" href="/gallery" target="_top">
-        <svg viewBox="0 0 24 24" fill="none">
-          <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" />
-          <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" />
-          <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" />
-          <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" />
-        </svg>
-        <span class="gallery-label">갤러리</span>
-      </a>
+      <div class="header-actions">
+        <button type="button" class="header-theme-btn" onclick="toggleTheme()" aria-label="테마 전환" title="라이트/다크 전환">
+          <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+          </svg>
+          <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+        </button>
+        <a class="header-gallery-btn" href="/gallery" target="_top">
+          <svg viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" />
+            <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" />
+            <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" />
+            <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" />
+          </svg>
+          <span class="gallery-label">갤러리</span>
+        </a>
+      </div>
     </header>
 
     <!-- ───────── HERO ───────── -->
