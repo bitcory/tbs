@@ -64,6 +64,117 @@ function parseScript(text) {
   return scenes.join('\n\n');
 }
 
+// 웹툰 스키마(webtoon.schema.json) → 그림책 book 형태로 변환하는 어댑터.
+// 같은 뷰어(캐릭터 / 본문컷)에서 웹툰 JSON도 그대로 펼쳐 보이게 한다.
+//  - characters: ref_prompt → prompt_en (캐릭터 시트 프롬프트)
+//  - pages → cuts: image_prompt → prompt_en, tone → emotion,
+//    말풍선 화자 → ref(등장인물), 말풍선 텍스트 → dialogue(웹툰 전용 한글 대사, CutCard 가 표시)
+function webtoonToBook(b) {
+  const characters = (b.characters || []).map((c) => ({
+    ...c,
+    name_ko: c.name_ko ?? c.id,
+    prompt_en: c.prompt_en ?? c.ref_prompt ?? '',
+  }));
+  // 화자(speaker)·ref 가 id 로 올 수도, 한글 이름(name_ko/name)으로 올 수도 있어
+  // 둘 다 캐릭터 id 로 정규화한다. (charMap 은 id 기준이라 안 맞으면 등장인물/대사 매칭이 깨짐)
+  const idByKey = {};
+  characters.forEach((c) => {
+    [c.id, c.name_ko, c.name].filter(Boolean).forEach((k) => { idByKey[k] = c.id; });
+  });
+  const toId = (s) => (s === 'narrator' ? 'narrator' : (idByKey[s] || s));
+  const cuts = (b.pages || []).map((p) => {
+    const panels = p.panels || [];
+    // 신스키마: panel.narration[](자막) + panel.bubbles[](대사/속마음) 분리.
+    // 구스키마: bubbles 안에 type:'narration' 혼재 → narration 으로 분류.
+    const bubbles = [];
+    const narration = [];
+    panels.forEach((pn, pi) => {
+      (pn.narration || []).forEach((n, ni) => {
+        narration.push({ id: n.id || `p${p.page}_n${pi}_${ni}`, text: n.text || '' });
+      });
+      (pn.bubbles || []).forEach((bb, bi) => {
+        const id = bb.id || `p${p.page}_b${pi}_${bi}`;
+        if (bb.type === 'narration') {
+          narration.push({ id, text: bb.text || '' });
+        } else {
+          bubbles.push({
+            id,
+            type: bb.type || 'dialogue',
+            speaker: toId(bb.speaker),
+            text: bb.text || '',
+            x: bb.x,
+            y: bb.y,
+          });
+        }
+      });
+    });
+    // 작가가 지정한 page-level ref 를 우선 사용(없으면 말풍선 화자에서 추론).
+    const ref = (Array.isArray(p.ref) && p.ref.length)
+      ? [...new Set(p.ref.map(toId))]
+      : [...new Set(bubbles.map((d) => d.speaker).filter((s) => s && s !== 'narrator'))];
+    return {
+      no: p.page,
+      emotion: p.tone || '',
+      prompt_en: p.image_prompt || '',
+      ref,
+      bubbles,
+      narration,
+    };
+  });
+  return {
+    kind: 'webtoon',
+    meta: { title: b.title, mood: b.theme || '', message: b.logline || '' },
+    characters,
+    cuts,
+    covers: [],
+  };
+}
+
+// 편집된 말풍선 대사·자막을 image_prompt 에 구워넣는다(baked).
+// → 편집 즉시 좌측 프롬프트와 '전체 프롬프트 복사'에 반영된다.
+//   말풍선(bubbles): "draw exactly N empty speech bubbles (no text inside)" → 대사 포함 지시로 치환
+//   자막(narration): "no speech bubbles, leave clean open areas for caption text" 또는
+//                    "leave clean open areas for caption text" → 한글 자막(caption) 지시로 치환
+//   글자 금지 네거티브("no text, no letters")는 제거(번호/워터마크/로고 금지는 유지)
+function bakeImagePrompt(imagePrompt, bubbles, narration) {
+  let p = String(imagePrompt || '');
+  const fb = (bubbles || []).filter((b) => (b.text || '').trim());
+  const fn = (narration || []).filter((n) => (n.text || '').trim());
+  if (!fb.length && !fn.length) return p;
+
+  // 1) 말풍선 대사
+  if (fb.length) {
+    const list = fb.map((b, i) => `bubble ${i + 1}: "${b.text.trim()}"`).join(', ');
+    const directive = `draw exactly ${fb.length} speech bubble${fb.length > 1 ? 's' : ''}, each with the Korean dialogue written inside it (${list})`;
+    const emptyRe = /draw exactly \d+ (?:separate )?empty speech bubbles?\s*\(no text inside\)/i;
+    const noBubRe = /no speech bubbles[^,]*,\s*leave clean open areas for caption text/i;
+    if (emptyRe.test(p)) p = p.replace(emptyRe, directive);
+    else if (noBubRe.test(p)) p = p.replace(noBubRe, directive);
+    else p = p.replace(/\.?\s*$/, '') + '. ' + directive;
+  }
+
+  // 2) 내레이션 자막 (caption)
+  if (fn.length) {
+    const list = fn.map((n, i) => `caption ${i + 1}: "${n.text.trim()}"`).join(', ');
+    const directive = `overlay ${fn.length} Korean narration caption${fn.length > 1 ? 's' : ''} in the clean areas (${list})`;
+    const capRe = /no speech bubbles[^,]*,\s*leave clean open areas for caption text/i;
+    const capRe2 = /leave clean open areas for caption text/i;
+    if (capRe.test(p)) p = p.replace(capRe, directive);
+    else if (capRe2.test(p)) p = p.replace(capRe2, directive);
+    else p = p.replace(/\.?\s*$/, '') + '. ' + directive;
+  }
+
+  p = p.replace(/,?\s*no text,\s*no letters/gi, '');
+  p = p.replace(/\s{2,}/g, ' ').replace(/\s+,/g, ',').trim();
+  return p + ', render the Korean text clearly and legibly';
+}
+
+// 컷의 '복사용' 프롬프트 — 웹툰이면 baked(대사·자막 반영), 그림책이면 기존 buildPrompt.
+function cutEffectivePrompt(book, cut) {
+  if (book && book.kind === 'webtoon') return bakeImagePrompt(cut.prompt_en || '', cut.bubbles || [], cut.narration || []);
+  return buildPrompt(book, cut.prompt_en || '', 'scene');
+}
+
 export default function Step8Client() {
   const [lib, setLib] = useState(null);
   const [bookIdx, setBookIdx] = useState(0);
@@ -137,6 +248,8 @@ export default function Step8Client() {
   //  - 등장 인물(ref): 없으면 컷 텍스트에서 캐릭터 id·이름을 스캔해 추론
   function normalizeBook(b) {
     if (!b || typeof b !== 'object') return b;
+    // 웹툰 스키마(pages 보유 · cuts 없음)면 그림책 book 형태로 먼저 변환.
+    if (Array.isArray(b.pages) && !Array.isArray(b.cuts)) b = webtoonToBook(b);
     const characters = (b.characters || []).map((c) => ({
       ...c,
       name_ko: c.name_ko ?? c.name ?? c.id,
@@ -183,6 +296,25 @@ export default function Step8Client() {
     setCutFilter('all');
     try { localStorage.setItem(CACHE_KEY, JSON.stringify(norm)); } catch {}
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // 말풍선/자막 텍스트 편집 → lib 상태(및 캐시) 즉시 갱신. baked 프롬프트에 바로 반영된다.
+  function updateBubbleText(cutNo, kind, id, text) {
+    setLib((prev) => {
+      if (!prev) return prev;
+      const books = (prev.books || []).map((bk, bi) => {
+        if (bi !== bookIdx) return bk;
+        const cuts = (bk.cuts || []).map((c) => {
+          if (c.no !== cutNo) return c;
+          const arr = (c[kind] || []).map((it) => (it.id === id ? { ...it, text } : it));
+          return { ...c, [kind]: arr };
+        });
+        return { ...bk, cuts };
+      });
+      const next = { ...prev, books };
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
   }
 
   function showToast(msg = '복사됐어요!') {
@@ -526,6 +658,21 @@ export default function Step8Client() {
                 <section className="sec-pane">
                   <div className="sec-title">
                     본문 컷
+                    {book?.kind === 'webtoon' && cuts.some((c) => (c.narration || []).some((n) => (n.text || '').trim())) && (
+                      <button
+                        type="button"
+                        className="mini sec-action ghost match-btn"
+                        title="모든 장면의 나레이션(자막)만 — 장면별로 빈 줄(엔터 두 번)로 구분해 한 번에 복사"
+                        onClick={() => copyText(
+                          cuts
+                            .map((c) => (c.narration || []).map((n) => n.text).filter((t) => (t || '').trim()).join('\n'))
+                            .filter(Boolean)
+                            .join('\n\n')
+                        )}
+                      >
+                        <AudioLines size={14} /> 나레이션
+                      </button>
+                    )}
                     <button
                       type="button"
                       className="mini sec-action ghost match-btn"
@@ -548,9 +695,9 @@ export default function Step8Client() {
                     <button
                       type="button"
                       className="mini"
-                      title="모든 컷·표지 프롬프트(본문+add+네거티브)를 빈 줄로 구분해 한 번에 복사"
+                      title="모든 컷·표지 프롬프트(웹툰은 편집된 말풍선 대사가 반영된 baked 프롬프트)를 빈 줄로 구분해 한 번에 복사"
                       onClick={() => copyText([
-                        ...cuts.map((c) => buildPrompt(book, c.prompt_en || '', 'scene')),
+                        ...cuts.map((c) => cutEffectivePrompt(book, c)),
                         ...covers.map((c) => buildPrompt(book, c.prompt_en || '', 'cover')),
                       ].join('\n\n'))}
                     >
@@ -590,9 +737,11 @@ export default function Step8Client() {
                       <CutCard
                         key={cut.no}
                         cut={cut}
+                        book={book}
                         charMap={charMap}
                         onCopy={(t) => copyText(t)}
                         onJumpChar={jumpToChar}
+                        onEditBubble={updateBubbleText}
                         buildPromptFor={(base) => buildPrompt(book, base, 'scene')}
                       />
                     ))}
@@ -639,7 +788,7 @@ export default function Step8Client() {
             </div>
             <div className="modal-body">
               <div className="hint">
-                아래에 JSON 내용을 붙여넣고 <b>적용</b>을 누르세요. 또는 좌측 하단 <b>파일 선택</b>으로 .json 파일을 불러올 수 있어요.
+                아래에 JSON 내용을 붙여넣고 <b>적용</b>을 누르세요. 또는 좌측 하단 <b>파일 선택</b>으로 .json 파일을 불러올 수 있어요. <b>그림책 서재</b> JSON과 <b>웹툰</b>(webtoon.schema) JSON 모두 인식해요 — 웹툰은 페이지가 본문컷으로, 말풍선이 한글 대사로 펼쳐집니다.
               </div>
               <textarea
                 value={jsonText}
@@ -1164,6 +1313,30 @@ export default function Step8Client() {
         .picbook-root .reftag .dot{width:11px;height:11px;border-radius:50%;border:1px solid rgba(0,0,0,.15);
           box-shadow:inset 0 -1.5px 2px rgba(0,0,0,.18), inset 0 1.5px 2px rgba(255,255,255,.4);}
         .picbook-root .cut-body{padding:13px 17px 15px;}
+        .picbook-root .cut-body.webtoon{display:grid;grid-template-columns:1fr minmax(240px,300px);gap:16px;align-items:start;}
+        .picbook-root .cut-main{min-width:0;}
+        .picbook-root .bubble-editor{display:flex;flex-direction:column;gap:9px;
+          background:color-mix(in srgb,var(--paper) 55%,var(--card));border:1.3px solid var(--line);
+          border-radius:12px;padding:12px 13px;}
+        .picbook-root .be-head{font-family:'Gaegu',cursive;font-size:.95rem;color:var(--ink);
+          display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+        .picbook-root .be-head.sub{margin-top:4px;padding-top:9px;border-top:1px dashed var(--line);font-size:.88rem;color:var(--ink-soft);}
+        .picbook-root .be-note{font-family:'Gaegu',cursive;font-size:.7rem;color:var(--ink-soft);
+          background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:1px 8px;}
+        .picbook-root .be-empty{font-family:'Gaegu',cursive;font-size:.82rem;color:var(--ink-soft);font-style:italic;}
+        .picbook-root .be-field{display:flex;flex-direction:column;gap:4px;}
+        .picbook-root .be-tag{align-self:flex-start;font-family:'Gaegu',cursive;font-size:.74rem;
+          color:#fff;background:var(--leaf);border-radius:999px;padding:1px 10px;}
+        .picbook-root .be-tag.be-thought{background:var(--lavender);}
+        .picbook-root .be-tag.be-narration{background:var(--sky);}
+        .picbook-root .be-field textarea{width:100%;resize:vertical;min-height:38px;
+          font-family:'Nanum Myeongjo',serif;font-size:.92rem;line-height:1.45;color:var(--ink);
+          background:var(--card);border:1.2px solid var(--line);border-radius:9px;padding:7px 10px;}
+        .picbook-root .be-field textarea:focus{outline:none;border-color:var(--gold);
+          box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 22%,transparent);}
+        @media (max-width: 720px){
+          .picbook-root .cut-body.webtoon{grid-template-columns:1fr;}
+        }
 
         .picbook-root .cover-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;}
         .picbook-root .cover-grid .cut{
@@ -1371,7 +1544,13 @@ function RefTags({ refs, charMap, onJumpChar }) {
   });
 }
 
-function CutCard({ cut, charMap, onCopy, onJumpChar, buildPromptFor }) {
+function CutCard({ cut, book, charMap, onCopy, onJumpChar, onEditBubble, buildPromptFor }) {
+  const isWebtoon = book && book.kind === 'webtoon';
+  const bubbles = cut.bubbles || [];
+  const narration = cut.narration || [];
+  // 웹툰은 편집된 말풍선이 반영된 baked 프롬프트, 그림책은 기존 buildPrompt.
+  const promptText = isWebtoon ? bakeImagePrompt(cut.prompt_en || '', bubbles, narration) : buildPromptFor(cut.prompt_en || '');
+  const hasEditor = isWebtoon && (bubbles.length > 0 || narration.length > 0);
   return (
     <div className="cut">
       <div className="cut-top">
@@ -1381,18 +1560,56 @@ function CutCard({ cut, charMap, onCopy, onJumpChar, buildPromptFor }) {
           <RefTags refs={cut.ref} charMap={charMap} onJumpChar={onJumpChar} />
         </div>
       </div>
-      <div className="cut-body">
-        <div className="prompt">{buildPromptFor(cut.prompt_en || '')}</div>
-        <div className="actions">
-          <button
-            type="button"
-            className="mini"
-            title="본문 + scene_add + 네거티브를 합쳐 복사"
-            onClick={() => onCopy(buildPromptFor(cut.prompt_en || ''))}
-          >
-            프롬프트 복사
-          </button>
+      <div className={`cut-body${hasEditor ? ' webtoon' : ''}`}>
+        <div className="cut-main">
+          <div className="prompt">{promptText}</div>
+          <div className="actions">
+            <button
+              type="button"
+              className="mini"
+              title={isWebtoon ? '편집된 말풍선 대사가 반영된(baked) 이미지 프롬프트를 복사' : '본문 + scene_add + 네거티브를 합쳐 복사'}
+              onClick={() => onCopy(promptText)}
+            >
+              프롬프트 복사
+            </button>
+          </div>
         </div>
+
+        {hasEditor && (
+          <aside className="bubble-editor">
+            <div className="be-head">💬 말풍선 편집 <span className="be-note">→ 프롬프트에 반영</span></div>
+            {bubbles.length === 0 && <div className="be-empty">이 컷은 말풍선이 없어요</div>}
+            {bubbles.map((b) => (
+              <label className="be-field" key={b.id}>
+                <span className={`be-tag be-${b.type || 'dialogue'}`}>
+                  {charMap[b.speaker]?.name_ko || b.speaker}{b.type === 'thought' ? ' · 속마음' : ''}
+                </span>
+                <textarea
+                  rows={2}
+                  value={b.text}
+                  onChange={(e) => onEditBubble(cut.no, 'bubbles', b.id, e.target.value)}
+                  placeholder="말풍선 대사"
+                />
+              </label>
+            ))}
+            {narration.length > 0 && (
+              <>
+                <div className="be-head sub">📝 자막(내레이션) <span className="be-note">→ caption 으로 프롬프트에 반영</span></div>
+                {narration.map((n) => (
+                  <label className="be-field" key={n.id}>
+                    <span className="be-tag be-narration">자막</span>
+                    <textarea
+                      rows={2}
+                      value={n.text}
+                      onChange={(e) => onEditBubble(cut.no, 'narration', n.id, e.target.value)}
+                      placeholder="내레이션 자막"
+                    />
+                  </label>
+                ))}
+              </>
+            )}
+          </aside>
+        )}
       </div>
     </div>
   );
