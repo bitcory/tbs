@@ -1,118 +1,243 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Upload, Copy, Clipboard, ExternalLink, Gem, X, Layers, List, Info, Film, Droplets, Wrench, Mic, Languages, FileText } from 'lucide-react';
+import { ArrowLeft, Copy, ExternalLink, Gem, X, Film, Droplets, Wrench, Mic, Languages, FileText, FileJson, MessageSquare } from 'lucide-react';
 import dynamic from 'next/dynamic';
 const FrameExtractor = dynamic(() => import('@/app/components/FrameExtractor'), { ssr: false });
 const WatermarkRemover = dynamic(() => import('@/app/components/WatermarkRemover'), { ssr: false });
 
-const COMP_MAP = {
-  comp_character: '캐릭터', comp_landscape: '풍경', comp_object: '사물',
-  comp_creature: '생물', comp_env: '환경', comp_camera: '카메라',
-  comp_style: '스타일', comp_outfit: '복장', comp_props: '소품',
-  comp_background: '배경', comp_lighting: '조명',
-  comp_camera_settings: '카메라 설정', comp_render: '렌더링 스타일',
-};
+const CACHE_KEY = 'toolb_step1_json_';
 
-const TAB_COLORS = [
-  { dot: '#22c55e' },
-  { dot: '#3b82f6' },
-  { dot: '#f59e0b' },
-  { dot: '#a855f7' },
-  { dot: '#ef4444' },
-];
-
-const CACHE_KEY = 'toolb_step1_template';
-
-function normalize(tpl) {
-  if (!tpl.meta_data) tpl.meta_data = {};
-  if (!tpl.global_settings) tpl.global_settings = { prompt_separator: ', ', section_separator: ', ', auto_capitalize: false, remove_duplicates: true };
-  if (!Array.isArray(tpl.prompt_sections)) tpl.prompt_sections = [];
-  for (const s of tpl.prompt_sections) {
-    if (s.is_active === undefined) s.is_active = true;
-    if (!s.section_label_ko) s.section_label_ko = s.section_label || s.section_id;
-    for (const c of s.components || []) {
-      if (c.is_active === undefined) c.is_active = true;
-      if (!c.component_label_ko) c.component_label_ko = COMP_MAP[c.component_id] || c.component_label || c.component_id;
-      for (const a of c.attributes || []) {
-        if (a.is_active === undefined) a.is_active = true;
-        if (!a.type) a.type = 'textarea';
-      }
+// talking(AI 인플루언서) variant 기본 예시 JSON
+const DEFAULT_TALKING_JSON = `{
+  "project_title": "AI INFLUENCER LECTURE VLOG",
+  "duration": "10 seconds",
+  "format": "vertical 9:16 short-form video",
+  "reference_image_usage": {
+    "use_reference_image": true,
+    "preserve_identity": true,
+    "preserve_core_features": [
+      "round face shape",
+      "short black hair",
+      "mature professional appearance",
+      "middle-aged age impression",
+      "formal business fashion"
+    ],
+    "style_transformation": "realistic educational vlog style"
+  },
+  "subject": {
+    "gender": "male",
+    "age_range": "middle-aged",
+    "appearance": "Professional Korean male lecturer with a round face, neatly styled short black hair, confident and approachable presence",
+    "outfit": "navy business suit, white dress shirt, patterned tie, formal shoes",
+    "expression": "confident, friendly, knowledgeable"
+  },
+  "visual_style": {
+    "style": "realistic classroom vlog",
+    "camera": "26mm phone lens",
+    "color": "natural and neutral",
+    "lighting": "bright classroom lighting",
+    "texture": "realistic skin texture",
+    "grading": "clean educational content look",
+    "avoid": [
+      "cinematic grading",
+      "heavy motion blur",
+      "lens flare",
+      "overly dramatic lighting",
+      "beauty filter"
+    ]
+  },
+  "location": {
+    "place": "AI education classroom",
+    "atmosphere": "modern lecture room with projector screen, desks, students, laptops and AI presentation materials"
+  },
+  "timeline": [
+    {
+      "time": "0:00-0:01",
+      "scene_title": "Classroom Introduction",
+      "camera": "wide shot",
+      "action": "The lecturer stands at the front of the classroom preparing to begin.",
+      "background": "Students seated facing a presentation screen.",
+      "expression": "welcoming smile",
+      "lighting": "bright classroom lighting",
+      "dialogue": "안녕하세요!",
+      "transition": "hard cut"
+    },
+    {
+      "time": "0:01-0:02",
+      "scene_title": "AI Topic Reveal",
+      "camera": "medium shot",
+      "action": "The lecturer points toward a slide displaying AI Influencer concepts.",
+      "background": "Large presentation screen.",
+      "expression": "confident",
+      "lighting": "even indoor lighting",
+      "dialogue": "오늘은 AI 인플루언서를 배워봅니다.",
+      "transition": "quick cut"
+    },
+    {
+      "time": "0:02-0:03",
+      "scene_title": "Student Perspective",
+      "camera": "over-the-shoulder shot",
+      "action": "The camera shows the lecturer from a student's viewpoint.",
+      "background": "Rows of desks and notebooks.",
+      "expression": "engaged",
+      "lighting": "natural classroom light",
+      "dialogue": "",
+      "transition": "cut"
+    },
+    {
+      "time": "0:03-0:04",
+      "scene_title": "Explaining AI Tools",
+      "camera": "medium close-up",
+      "action": "The lecturer gestures while explaining AI content creation.",
+      "background": "AI workflow slide.",
+      "expression": "focused",
+      "lighting": "bright indoor light",
+      "dialogue": "누구나 AI 크리에이터가 될 수 있습니다.",
+      "transition": "cut on gesture"
+    },
+    {
+      "time": "0:04-0:05",
+      "scene_title": "Screen Demonstration",
+      "camera": "close-up",
+      "action": "Presentation screen displays AI influencer examples.",
+      "background": "Projected visuals.",
+      "expression": "professional",
+      "lighting": "screen and room lighting",
+      "dialogue": "",
+      "transition": "snap cut"
+    },
+    {
+      "time": "0:05-0:06",
+      "scene_title": "Audience Reaction",
+      "camera": "wide classroom shot",
+      "action": "Students pay attention and take notes.",
+      "background": "Lecture room environment.",
+      "expression": "encouraging",
+      "lighting": "balanced classroom lighting",
+      "dialogue": "",
+      "transition": "quick cut"
+    },
+    {
+      "time": "0:06-0:07",
+      "scene_title": "Key Point Emphasis",
+      "camera": "medium shot",
+      "action": "The lecturer raises a finger while emphasizing a key idea.",
+      "background": "Presentation slide.",
+      "expression": "confident",
+      "lighting": "bright indoor lighting",
+      "dialogue": "핵심은 꾸준한 콘텐츠입니다.",
+      "transition": "cut"
+    },
+    {
+      "time": "0:07-0:08",
+      "scene_title": "Interactive Moment",
+      "camera": "handheld vlog style shot",
+      "action": "The lecturer looks directly into the camera.",
+      "background": "Classroom and students.",
+      "expression": "friendly",
+      "lighting": "natural indoor lighting",
+      "dialogue": "여러분도 할 수 있습니다.",
+      "transition": "fast cut"
+    },
+    {
+      "time": "0:08-0:09",
+      "scene_title": "Lecture Wrap-up",
+      "camera": "medium-wide shot",
+      "action": "The lecturer concludes the main explanation.",
+      "background": "AI Influencer title slide.",
+      "expression": "satisfied",
+      "lighting": "clean classroom lighting",
+      "dialogue": "",
+      "transition": "cut"
+    },
+    {
+      "time": "0:09-0:10",
+      "scene_title": "Closing Greeting",
+      "camera": "close-up",
+      "action": "The lecturer smiles and gives a small wave toward the camera.",
+      "background": "Lecture room.",
+      "expression": "warm and approachable",
+      "lighting": "bright indoor lighting",
+      "dialogue": "강의에서 만나요!",
+      "transition": "fade out"
     }
-  }
-  return tpl;
+  ],
+  "music_direction": {
+    "mood": "upbeat professional educational vlog",
+    "editing_rhythm": "fast-paced short-form cuts with clean transitions"
+  },
+  "final_output_instruction": "Generate a realistic 10-second vertical vlog featuring the same person as the reference image while preserving core facial structure, hairstyle, age impression, body type, professional appearance and business suit style."
+}`;
+
+// 캐릭터시트 버튼 복사용 프롬프트
+const CHARACTER_SHEET_PROMPT = `Cinematic character reference sheet, split-frame layout, photorealistic.
+Left panel — facial close-up: a [AGE]-year-old [ORIGIN/ETHNICITY] [GENDER], [SKIN TONE] skin tone, the entire head fully inside the frame including all the hair, nothing cropped, [HAIR: length/texture/color], [FACE DETAILS: freckles/scars/facial hair/glasses—or "clean features"], real skin texture with subtle pores, [EXPRESSION] expression, looking straight into lens. Shot on 85mm portrait lens, shallow depth of field, soft cinematic key light with gentle fill.
+Right panel — full-body front and back views side by side: the same [GENDER] shown twice within this panel — on the left, a full-body front view facing the camera; on the right, a full-body back view photographed from directly behind. In both, the figure stands in [POSE], full height in frame head-to-toe, [BUILD] build ([HEIGHT]), [SKIN TONE] skin, [HAIR], same [OUTFIT]. The front view shows the face and the front of the garment; the back view shows the back of the head, hair, shoulders, garment seams and the rear of the pants and shoes. Both figures matched in framing, scale and lighting for consistency. Shot on 35mm lens, even full-length lighting.
+Look: clean studio character sheet, plain solid [BG COLOR] background, consistent character across all views, soft diffused cinematic lighting, [COLOR GRADE], fine detail, true-to-life skin tones, vertical divider lines separating each view.`;
+
+// key → 사람이 읽기 좋은 라벨
+function humanize(key) {
+  return String(key).replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-function generatePromptString(tpl) {
-  if (!tpl || !Array.isArray(tpl.prompt_sections)) return '';
-  const parts = [], params = [];
-  const sep = tpl.global_settings?.prompt_separator || ', ';
-  const secSep = tpl.global_settings?.section_separator || ', ';
+function renderValue(v) {
+  if (Array.isArray(v)) {
+    return v.map((x) => (x && typeof x === 'object' ? JSON.stringify(x) : String(x))).join(', ');
+  }
+  return String(v);
+}
 
-  const sorted = [...tpl.prompt_sections]
-    .filter(s => s && s.is_active !== false)
-    .sort((a, b) => (a.order || 0) - (b.order || 0));
+// JSON 프롬프트를 "구조"가 아니라 값 중심의 읽기 좋은 프롬프트 텍스트로 변환
+function renderPrompt(obj) {
+  if (!obj || typeof obj !== 'object') return '';
+  const lines = [];
+  for (const [key, val] of Object.entries(obj)) {
+    if (val === '' || val == null) continue;
 
-  for (const section of sorted) {
-    if (section.is_midjourney_params) {
-      for (const comp of section.components || []) {
-        if (comp.is_active === false) continue;
-        for (const attr of comp.attributes || []) {
-          if (attr.is_active === false || !attr.value) continue;
-          params.push((attr.prefix || '') + attr.value);
+    if (key === 'timeline' && Array.isArray(val)) {
+      lines.push('');
+      lines.push('■ Timeline');
+      val.forEach((sc, i) => {
+        if (!sc || typeof sc !== 'object') return;
+        const time = sc.time || `#${i + 1}`;
+        const title = sc.scene_title ? ` ${sc.scene_title}` : '';
+        lines.push('');
+        lines.push(`[${time}]${title}`);
+        for (const [k, v] of Object.entries(sc)) {
+          if (k === 'time' || k === 'scene_title') continue;
+          if (v === '' || v == null) continue;
+          lines.push(`  · ${humanize(k)}: ${renderValue(v)}`);
         }
+      });
+      continue;
+    }
+
+    if (typeof val === 'object' && !Array.isArray(val)) {
+      lines.push('');
+      lines.push(`■ ${humanize(key)}`);
+      for (const [k, v] of Object.entries(val)) {
+        if (v === '' || v == null) continue;
+        lines.push(`  · ${humanize(k)}: ${renderValue(v)}`);
       }
       continue;
     }
-    const sp = [];
-    for (const comp of section.components || []) {
-      if (comp.is_active === false) continue;
-      for (const attr of comp.attributes || []) {
-        if (attr.is_active === false || (!attr.value && attr.value !== 0)) continue;
-        const _v = String(attr.value).trim().toLowerCase();
-        if (['none', '없음', 'n/a', '-', ''].includes(_v)) continue;
-        let v = Array.isArray(attr.value) ? attr.value.join(', ') : String(attr.value);
-        if (attr.weight?.enabled && attr.weight.value !== 1) v += '::' + attr.weight.value;
-        sp.push(v);
-      }
-    }
-    if (sp.length) parts.push(sp.join(sep));
-  }
 
-  let prompt = parts.join(secSep);
-  if (tpl.global_settings?.remove_duplicates) {
-    const words = prompt.split(',').map(s => s.trim()).filter(Boolean);
-    prompt = [...new Set(words)].join(', ');
+    lines.push(`${humanize(key)}: ${renderValue(val)}`);
   }
-  if (params.length) prompt += ' ' + params.join(' ');
-  return prompt;
-}
-
-function getDisplayValue(attr) {
-  if (attr.value_ko) return attr.value_ko;
-  const v = Array.isArray(attr.value) ? attr.value.join(', ') : String(attr.value || '');
-  if (!attr.options) return v;
-  const opt = attr.options.find(o => typeof o === 'string' ? o === v : o.value === v);
-  if (!opt) return v;
-  if (typeof opt === 'string') return opt;
-  return opt.label_ko || opt.label || opt.value;
+  return lines.join('\n').trim();
 }
 
 export default function Step1Client({ variant = 'talking' }) {
-  const [template, setTemplate] = useState({
-    meta_data: {},
-    global_settings: { prompt_separator: ', ', section_separator: ', ', remove_duplicates: true },
-    prompt_sections: [],
-  });
-  const [activeTab, setActiveTab] = useState(0);
-  const [uploadOpen, setUploadOpen] = useState(false);
-  const [jsonInput, setJsonInput] = useState('');
-  const [uploadError, setUploadError] = useState('');
+  const [rawJson, setRawJson] = useState('');
   const [toast, setToast] = useState('');
   const [hydrated, setHydrated] = useState(false);
   const [toolView, setToolView] = useState(null);
   const [speakPromptOpen, setSpeakPromptOpen] = useState(false);
+  const [pasteOpen, setPasteOpen] = useState(false);
+  const [pasteInput, setPasteInput] = useState('');
+  const [pasteError, setPasteError] = useState('');
 
   const VARIANTS = {
     talking: {
@@ -236,50 +361,64 @@ Subtitles, title, text is strictly prohibited.`,
 
   const currentVariant = VARIANTS[variant] || VARIANTS.talking;
   const SPEAK_PROMPT = currentVariant.prompt;
-  const promptRef = useRef(null);
 
-  // Load cache on mount
+  // Load cache on mount (per-variant)
   useEffect(() => {
+    let initial = '';
     try {
-      const raw = localStorage.getItem(CACHE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed.prompt_sections)) {
-          setTemplate(normalize(parsed));
-        }
-      }
-    } catch (e) { }
+      const raw = localStorage.getItem(CACHE_KEY + variant);
+      if (raw != null) initial = raw;
+      else if (variant === 'talking') initial = DEFAULT_TALKING_JSON;
+    } catch (e) {
+      if (variant === 'talking') initial = DEFAULT_TALKING_JSON;
+    }
+    setRawJson(initial);
     setHydrated(true);
-  }, []);
+  }, [variant]);
 
-  // Auto-save
+  // Auto-save (per-variant)
   useEffect(() => {
     if (!hydrated) return;
-    try { localStorage.setItem(CACHE_KEY, JSON.stringify(template)); } catch (e) { }
-  }, [template, hydrated]);
+    try { localStorage.setItem(CACHE_KEY + variant, rawJson); } catch (e) { }
+  }, [rawJson, hydrated, variant]);
 
-  // Auto-resize prompt textarea
-  useEffect(() => {
-    if (promptRef.current) {
-      promptRef.current.style.height = 'auto';
-      promptRef.current.style.height = promptRef.current.scrollHeight + 'px';
+  // Parse JSON from the left editor
+  const { parsed, parseError } = useMemo(() => {
+    const raw = (rawJson || '').trim();
+    if (!raw) return { parsed: null, parseError: '' };
+    const cleaned = raw.replace(/^```(?:json|JSON)?\s*\n?/, '').replace(/\n?```\s*$/, '').trim();
+    for (const cand of [raw, cleaned]) {
+      try {
+        const o = JSON.parse(cand);
+        if (o && typeof o === 'object') return { parsed: o, parseError: '' };
+      } catch (e) { }
     }
-  }, [template, activeTab]);
+    return { parsed: null, parseError: 'JSON 형식이 올바르지 않습니다.' };
+  }, [rawJson]);
+
+  // Extract editable dialogue lines from timeline
+  const dialogues = useMemo(() => {
+    const tl = parsed && Array.isArray(parsed.timeline) ? parsed.timeline : [];
+    const out = [];
+    tl.forEach((e, i) => {
+      if (e && typeof e === 'object' && 'dialogue' in e) {
+        out.push({
+          index: i,
+          time: e.time || `#${i + 1}`,
+          scene_title: e.scene_title || '',
+          dialogue: typeof e.dialogue === 'string' ? e.dialogue : String(e.dialogue ?? ''),
+        });
+      }
+    });
+    return out;
+  }, [parsed]);
+
+  // 왼쪽에 표시할 값 중심 프롬프트 텍스트
+  const promptText = useMemo(() => renderPrompt(parsed), [parsed]);
 
   const showToast = (msg) => {
     setToast(msg);
     setTimeout(() => setToast(''), 2000);
-  };
-
-  const updateAttr = (sectionId, compId, attrId, newVal) => {
-    setTemplate(prev => {
-      const tpl = JSON.parse(JSON.stringify(prev));
-      const s = tpl.prompt_sections.find(s => s.section_id === sectionId);
-      const c = s?.components.find(c => c.component_id === compId);
-      const a = c?.attributes.find(a => a.attr_id === attrId);
-      if (a) a.value = newVal;
-      return tpl;
-    });
   };
 
   const copyText = (text) => {
@@ -287,43 +426,31 @@ Subtitles, title, text is strictly prohibited.`,
     navigator.clipboard.writeText(text).then(() => showToast('복사됨!')).catch(() => showToast('복사 실패'));
   };
 
-  const pasteText = async (sectionId, compId, attrId) => {
-    try {
-      const text = await navigator.clipboard.readText();
-      if (text) updateAttr(sectionId, compId, attrId, text);
-    } catch (e) {
-      showToast('클립보드 접근 불가');
+  // Edit a dialogue on the right → reflect back into the left JSON
+  const onDialogueChange = (index, val) => {
+    if (!parsed) return;
+    const next = JSON.parse(JSON.stringify(parsed));
+    if (Array.isArray(next.timeline) && next.timeline[index]) {
+      next.timeline[index].dialogue = val;
+      setRawJson(JSON.stringify(next, null, 2));
     }
   };
 
-  const loadJson = () => {
-    const raw = jsonInput.trim();
-    if (!raw) { setUploadError('JSON을 입력하세요.'); return; }
-    const cleaned = raw.replace(/^```(?:json|JSON)?\s*\n?/gm, '').replace(/\n?```\s*$/gm, '').trim();
-    let parsed;
-    try { parsed = JSON.parse(cleaned); }
-    catch (e) { setUploadError(`JSON 파싱 오류: ${e.message}`); return; }
-    if (!parsed || typeof parsed !== 'object') {
-      setUploadError('유효한 JSON 객체가 아닙니다.');
-      return;
+  const loadPaste = () => {
+    const raw = (pasteInput || '').trim();
+    if (!raw) { setPasteError('JSON을 붙여넣으세요.'); return; }
+    const cleaned = raw.replace(/^```(?:json|JSON)?\s*\n?/, '').replace(/\n?```\s*$/, '').trim();
+    let obj = null;
+    for (const cand of [raw, cleaned]) {
+      try { const o = JSON.parse(cand); if (o && typeof o === 'object') { obj = o; break; } } catch (e) { }
     }
-    if (!Array.isArray(parsed.prompt_sections)) {
-      setUploadError('"prompt_sections" 배열이 없습니다.');
-      return;
-    }
-    setTemplate(normalize(parsed));
-    setActiveTab(0);
-    setUploadOpen(false);
-    setUploadError('');
-    setJsonInput('');
-    showToast('템플릿 로드 완료!');
+    if (!obj) { setPasteError('유효한 JSON이 아닙니다.'); return; }
+    setRawJson(JSON.stringify(obj, null, 2));
+    setPasteOpen(false);
+    setPasteError('');
+    setPasteInput('');
+    showToast('불러오기 완료!');
   };
-
-  const sections = template.prompt_sections || [];
-  const promptString = generatePromptString(template);
-  const palette = template.color_palette;
-  const hasPalette = palette && (palette.primary || palette.secondary || palette.accent);
-  const currentSection = sections[activeTab];
 
   return (
     <div className="min-h-screen md:h-screen md:flex md:flex-col md:overflow-hidden bg-[var(--tb-bg)] text-[var(--tb-text)]">
@@ -466,7 +593,7 @@ Subtitles, title, text is strictly prohibited.`,
         <div className="tb-hero-glow" />
         <div className="tb-hero-row">
           <span className="tb-hero-eyebrow">TB STUDY · {currentVariant.sub}</span>
-          <h1 className="tb-hero-title">영상기초다지기</h1>
+          <h1 className="tb-hero-title">AI영상기초다지기</h1>
         </div>
       </section>
 
@@ -479,11 +606,11 @@ Subtitles, title, text is strictly prohibited.`,
         <span className="text-[11px] font-bold tracking-[0.18em] text-[#f97316] uppercase hidden sm:inline">TOOLB LAB</span>
         <div className="ml-auto flex items-center gap-2">
           <button
-            onClick={() => { setUploadOpen(true); setUploadError(''); setJsonInput(''); }}
+            onClick={() => { setPasteOpen(true); setPasteError(''); setPasteInput(''); }}
             className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full tb-pill-primary text-xs sm:text-sm font-bold transition"
           >
-            <Upload className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">JSON </span>업로드
+            <FileJson className="w-3.5 h-3.5" />
+            JSON <span className="hidden sm:inline">붙여넣기</span>
           </button>
         </div>
       </div>
@@ -491,25 +618,6 @@ Subtitles, title, text is strictly prohibited.`,
       <div className="flex flex-col md:flex-row md:flex-1 md:min-h-0 w-full px-4 pt-6 pb-4 gap-4 2xl:px-6">
         {/* Sidebar */}
         <aside className="w-full md:w-[300px] flex-shrink-0 bg-[var(--tb-surface)] border border-[var(--tb-border)] rounded-2xl shadow-[0_10px_30px_-14px_rgba(0,0,0,0.18)] md:overflow-y-auto">
-          {/* Template info */}
-          <div className="p-4 border-b border-[var(--tb-border)]">
-            <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[var(--tb-text-muted)]">
-              <Info className="w-3 h-3" />
-              템플릿 정보
-            </div>
-            <div className="space-y-1.5">
-              <div className="flex items-start gap-2">
-                <span className="text-sm text-[var(--tb-text-muted)] font-medium w-12 pt-0.5">이름</span>
-                <span className="text-sm text-[var(--tb-text)] font-bold flex-1 break-all">{template.meta_data?.template_name || '—'}</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <span className="text-sm text-[var(--tb-text-muted)] font-medium w-12 pt-0.5">버전</span>
-                <span className="text-sm text-[var(--tb-text)] font-bold flex-1">{template.meta_data?.version || '—'}</span>
-              </div>
-            </div>
-          </div>
-
-
           {/* Tools */}
           <div className="p-4 border-b border-[var(--tb-border)]">
             <div className="flex items-center gap-1.5 mb-2.5 text-[12px] font-bold uppercase tracking-wider text-[var(--tb-text-muted)]">
@@ -565,13 +673,13 @@ Subtitles, title, text is strictly prohibited.`,
               젬 가이드
             </div>
             <a
-              href="https://gemini.google.com/gem/13HOLZGAzOKloWSBnxejnMvWDOJHNvdyu?usp=sharing"
+              href="https://chatgpt.com/g/g-6a44d63463988191ae075e76e10e5bfa-ai-inpeulrueonseo-mandeulgi-gicogwajeong"
               target="_blank"
               rel="noreferrer"
               className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[var(--tb-surface)] border border-[var(--tb-border)] hover:bg-[var(--tb-surface-2)] text-[var(--tb-text)] text-sm font-bold shadow-[0_1px_2px_rgba(0,0,0,0.04)] tb-press-soft"
             >
               <ExternalLink className="w-3.5 h-3.5 text-[#f97316]" />
-              1단계 젬 가이드 열기
+              지침열기
             </a>
             <a
               href="https://kr.pinterest.com/"
@@ -606,7 +714,25 @@ Subtitles, title, text is strictly prohibited.`,
             </a>
           </div>
 
+          {/* Character sheet (talking) */}
+          {variant === 'talking' && (
+            <div className="p-4 border-t border-[var(--tb-border)]">
+              <button
+                onClick={() => copyText(CHARACTER_SHEET_PROMPT)}
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-full text-sm font-bold text-white hover:opacity-90 tb-press"
+                style={{
+                  background: 'linear-gradient(112.34deg, #fb7185 -38.67%, #f43f5e 99.56%)',
+                  boxShadow: '0 10px 24px rgba(244, 63, 94, 0.3)',
+                }}
+              >
+                <Copy className="w-4 h-4" />
+                캐릭터시트
+              </button>
+            </div>
+          )}
+
           {/* Variant prompt */}
+          {variant !== 'talking' && (
           <div className="p-4 border-t border-[var(--tb-border)]">
             {currentVariant.promptUrl ? (
               <a
@@ -636,6 +762,7 @@ Subtitles, title, text is strictly prohibited.`,
               </button>
             )}
           </div>
+          )}
         </aside>
 
         {/* Main */}
@@ -645,166 +772,101 @@ Subtitles, title, text is strictly prohibited.`,
           ) : toolView === 'watermark-remover' ? (
             <WatermarkRemover accentColor="#f97316" />
           ) : (
-            <>
-              {sections.length > 0 && (
-                <div className="flex-shrink-0 px-4 py-3 border-b border-[var(--tb-border)] bg-[var(--tb-surface)] rounded-t-2xl">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[12px] font-bold uppercase tracking-wider text-[var(--tb-text)] flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#f97316]" />
-                      이미지 프롬프트
-                    </span>
-                    <button
-                      onClick={() => copyText(promptString)}
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] border border-[var(--tb-border)] text-[12px] font-bold text-[var(--tb-text)] tb-press-soft"
-                    >
-                      <Copy className="w-3 h-3" />
-                      복사
-                    </button>
-                  </div>
-                  <textarea
-                    ref={promptRef}
-                    value={promptString}
-                    readOnly
-                    placeholder="템플릿을 로드하면 자동으로 생성됩니다..."
-                    className="w-full min-h-[60px] resize-none bg-[var(--tb-surface-2)] border border-[var(--tb-border)] rounded-xl p-2.5 text-[13px] leading-relaxed text-[var(--tb-text)] focus:outline-none focus:border-[#f97316] focus:ring-[3px] focus:ring-[#f97316]/20"
-                  />
-                </div>
-              )}
-
-              {sections.length === 0 ? (
-                <div className="flex-1 flex flex-col items-center justify-center text-center p-10">
-                  <h3 className="text-lg font-bold text-[var(--tb-text)] mb-2">템플릿을 로드하세요</h3>
-                  <p className="text-sm text-[var(--tb-text-muted)] mb-5 leading-relaxed">
-                    JSON 업로드 버튼을 클릭하여 템플릿을 불러오거나,<br />
-                    기본 샘플이 자동으로 로드됩니다.
-                  </p>
+            <div className="flex-1 min-h-0 flex flex-col lg:flex-row">
+              {/* Left: rendered prompt values (not raw JSON) */}
+              <section className="flex flex-col min-h-0 lg:w-1/2 border-b lg:border-b-0 lg:border-r border-[var(--tb-border)]">
+                <div className="flex-shrink-0 flex items-center justify-between gap-2 px-4 py-3 border-b border-[var(--tb-border)]">
+                  <span className="text-[12px] font-bold uppercase tracking-wider text-[var(--tb-text)] flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-[#f97316]" />
+                    프롬프트
+                  </span>
                   <button
-                    onClick={() => { setUploadOpen(true); setUploadError(''); }}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-full tb-pill-primary text-sm font-bold transition"
+                    onClick={() => copyText(promptText)}
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] border border-[var(--tb-border)] text-[12px] font-bold text-[var(--tb-text)] tb-press-soft"
                   >
-                    <Upload className="w-3.5 h-3.5" />
-                    JSON 업로드 시작
+                    <Copy className="w-3 h-3" />
+                    복사
                   </button>
                 </div>
-              ) : (
-                <>
-                  {/* Tab bar */}
-                  <div className="flex-shrink-0 flex gap-1.5 p-3 border-b border-[var(--tb-border)] bg-[var(--tb-surface)] overflow-x-auto">
-                    {sections.map((s, i) => {
-                      const tc = TAB_COLORS[i % TAB_COLORS.length];
-                      const isActive = i === activeTab;
-                      return (
-                        <button
-                          key={i}
-                          onClick={() => setActiveTab(i)}
-                          className={`flex items-center gap-1.5 px-3.5 py-1.5 text-sm font-bold whitespace-nowrap rounded-full transition ${isActive
-                            ? 'tb-pill-primary'
-                            : 'text-[var(--tb-text-muted)] hover:bg-[var(--tb-surface-2)] tb-press-soft'
-                            }`}
-                        >
-                          <span
-                            className="w-1.5 h-1.5 rounded-full"
-                            style={{ background: tc.dot, opacity: isActive ? 1 : 0.55 }}
-                          />
-                          {s.section_label_ko || s.section_id}
-                        </button>
-                      );
-                    })}
-                  </div>
+                <div className="flex-1 min-h-0 overflow-y-auto p-4">
+                  {promptText ? (
+                    <div className="whitespace-pre-wrap break-words text-[13px] leading-relaxed text-[var(--tb-text)] select-text">
+                      {promptText}
+                    </div>
+                  ) : (
+                    <div className="h-full flex items-center justify-center text-center text-[var(--tb-text-muted)] text-sm px-6 leading-relaxed">
+                      {parseError
+                        ? 'JSON 형식이 올바르지 않습니다. 다시 붙여넣어 주세요.'
+                        : '상단 “JSON 붙여넣기” 로 프롬프트를 불러오세요.'}
+                    </div>
+                  )}
+                </div>
+              </section>
 
-                  {/* Tab content */}
-                  <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                    {currentSection && (currentSection.components || []).filter(c => c.is_active !== false).map(comp => {
-                      const tc = TAB_COLORS[activeTab % TAB_COLORS.length];
-                      return (
-                        <div key={comp.component_id} className="space-y-2">
-                          <div className="flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-wider text-[var(--tb-text-muted)] px-1">
-                            <Layers className="w-3 h-3" />
-                            {comp.component_label_ko || comp.component_id}
-                          </div>
-                          <div className="space-y-1.5">
-                            {(comp.attributes || []).map(attr => {
-                              const displayVal = getDisplayValue(attr);
-                              const engVal = Array.isArray(attr.value) ? attr.value.join(', ') : (attr.value || '');
-                              const isInactive = attr.is_active === false;
-                              const isNoneVal = ['none', '없음', 'n/a', '-', ''].includes(String(attr.value || '').trim().toLowerCase());
-                              const opacity = isInactive ? 0.55 : isNoneVal ? 0.5 : 1;
-                              return (
-                                <div
-                                  key={attr.attr_id}
-                                  className="bg-[var(--tb-surface)] border border-[var(--tb-border)] rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.05)]"
-                                  style={{ opacity }}
-                                >
-                                  <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-[var(--tb-border)] bg-[var(--tb-surface)]">
-                                    <div className="flex items-center gap-1.5 text-sm font-bold text-[var(--tb-text)] min-w-0">
-                                      <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: tc.dot }} />
-                                      <span className="truncate">{attr.label_ko || attr.label || attr.attr_id}</span>
-                                      {attr.is_locked && (
-                                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#422006] border border-[#a16207] text-[#fbbf24] flex-shrink-0">고정</span>
-                                      )}
-                                      {isInactive && (
-                                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#450a0a] border border-[#7f1d1d] text-[#fca5a5] flex-shrink-0">비활성</span>
-                                      )}
-                                    </div>
-                                    <div className="flex items-center gap-1 flex-shrink-0">
-                                      <button
-                                        onClick={() => copyText(engVal)}
-                                        className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] border border-[var(--tb-border)] text-[12px] font-bold text-[var(--tb-text-muted)] tb-press-soft"
-                                      >
-                                        <Copy className="w-3 h-3" />
-                                        복사
-                                      </button>
-                                      <button
-                                        onClick={() => pasteText(currentSection.section_id, comp.component_id, attr.attr_id)}
-                                        className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] border border-[var(--tb-border)] text-[12px] font-bold text-[var(--tb-text-muted)] tb-press-soft"
-                                      >
-                                        <Clipboard className="w-3 h-3" />
-                                        붙여넣기
-                                      </button>
-                                    </div>
-                                  </div>
-                                  <div className="flex gap-2 p-3 items-stretch">
-                                    <div className="flex-1 min-w-0 text-sm font-semibold text-[var(--tb-text)] leading-relaxed py-1.5 px-2.5 rounded-xl bg-[var(--tb-surface-2)] border border-[var(--tb-border)]">
-                                      {displayVal}
-                                    </div>
-                                    <div className="w-px bg-[var(--tb-border)] self-stretch" />
-                                    <textarea
-                                      rows={2}
-                                      value={engVal}
-                                      placeholder="영문 값 입력..."
-                                      onChange={(e) => updateAttr(currentSection.section_id, comp.component_id, attr.attr_id, e.target.value)}
-                                      className="flex-1 min-w-0 resize-none text-[13px] leading-relaxed text-[var(--tb-text)] py-1.5 px-2.5 rounded-xl bg-[var(--tb-surface-2)] border border-[var(--tb-border)] focus:outline-none focus:border-[#f97316] focus:ring-[3px] focus:ring-[#f97316]/20"
-                                    />
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
+              {/* Right: dialogue editor */}
+              <section className="flex flex-col min-h-0 lg:w-1/2">
+                <div className="flex-shrink-0 px-4 py-3 border-b border-[var(--tb-border)]">
+                  <span className="text-[12px] font-bold uppercase tracking-wider text-[var(--tb-text)] flex items-center gap-1.5">
+                    <MessageSquare className="w-3.5 h-3.5 text-[#f97316]" />
+                    대사 수정
+                  </span>
+                  <p className="text-[12px] text-[var(--tb-text-muted)] mt-0.5">
+                    대사를 수정하면 왼쪽 JSON 에 자동 반영됩니다.
+                  </p>
+                </div>
+                <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3">
+                  {dialogues.length === 0 ? (
+                    <div className="h-full flex flex-col items-center justify-center text-center text-[var(--tb-text-muted)] text-sm px-6 leading-relaxed">
+                      {parseError
+                        ? 'JSON 을 올바르게 입력하면 대사가 여기에 표시됩니다.'
+                        : '대사(dialogue) 가 포함된 timeline 이 없습니다.'}
+                    </div>
+                  ) : (
+                    dialogues.map((d) => (
+                      <div
+                        key={d.index}
+                        className="bg-[var(--tb-surface)] border border-[var(--tb-border)] rounded-2xl p-3 shadow-[0_1px_3px_rgba(0,0,0,0.05)]"
+                      >
+                        <div className="flex items-center gap-2 mb-1.5 text-[11px] font-bold text-[var(--tb-text-muted)]">
+                          <span className="px-2 py-0.5 rounded-full bg-[var(--tb-surface-2)] border border-[var(--tb-border)] text-[#f97316] flex-shrink-0">
+                            {d.time}
+                          </span>
+                          <span className="truncate">{d.scene_title}</span>
                         </div>
-                      );
-                    })}
-                  </div>
-                </>
-              )}
-            </>
+                        <textarea
+                          rows={2}
+                          value={d.dialogue}
+                          placeholder="대사 입력..."
+                          onChange={(e) => onDialogueChange(d.index, e.target.value)}
+                          className="w-full resize-none text-[14px] leading-relaxed text-[var(--tb-text)] py-2 px-3 rounded-xl bg-[var(--tb-surface-2)] border border-[var(--tb-border)] focus:outline-none focus:border-[#f97316] focus:ring-[3px] focus:ring-[#f97316]/20"
+                        />
+                      </div>
+                    ))
+                  )}
+                </div>
+              </section>
+            </div>
           )}
         </main>
       </div>
 
-      {/* Upload Modal */}
-      {uploadOpen && (
+      {/* Paste JSON Modal */}
+      {pasteOpen && (
         <div
           className="fixed inset-0 z-[300] flex items-center justify-center bg-[#0f172a]/60 backdrop-blur-md"
-          onClick={() => setUploadOpen(false)}
+          onClick={() => setPasteOpen(false)}
         >
           <div
             className="bg-[var(--tb-surface)] rounded-2xl border border-[var(--tb-border)] shadow-[0_24px_60px_rgba(0,0,0,0.6)] w-[560px] max-w-[95vw] max-h-[80vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--tb-border)]">
-              <span className="text-base font-bold text-[var(--tb-text)] uppercase tracking-wider">JSON 템플릿 업로드</span>
+              <span className="text-base font-bold text-[var(--tb-text)] uppercase tracking-wider flex items-center gap-2">
+                <FileJson className="w-4 h-4 text-[#f97316]" />
+                JSON 붙여넣기
+              </span>
               <button
-                onClick={() => setUploadOpen(false)}
+                onClick={() => setPasteOpen(false)}
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-[var(--tb-surface-2)] hover:bg-[var(--tb-border)] text-[var(--tb-text-muted)] tb-press-soft"
               >
                 <X className="w-4 h-4" />
@@ -812,33 +874,44 @@ Subtitles, title, text is strictly prohibited.`,
             </div>
             <div className="flex-1 overflow-y-auto p-5 space-y-3 min-h-0">
               <p className="text-sm text-[var(--tb-text-muted)] leading-relaxed">
-                TB_V5 Lite 형식의 JSON을 붙여넣으세요. <code className="bg-[color-mix(in_srgb,#7c2d12_30%,#1f1d26)] px-1.5 py-0.5 rounded text-[#fb923c] font-mono text-[12px]">prompt_sections</code> 배열이 포함되어야 합니다.
+                JSON 프롬프트를 붙여넣으세요. 왼쪽에는 값이 읽기 좋게 표시되고, 오른쪽에서 대사만 수정할 수 있습니다.
               </p>
               <textarea
-                value={jsonInput}
-                onChange={(e) => setJsonInput(e.target.value)}
-                className="w-full h-[220px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[var(--tb-surface-2)] border border-[var(--tb-border)] text-[var(--tb-text)] focus:outline-none focus:border-[#f97316] focus:ring-[3px] focus:ring-[#f97316]/20"
-                placeholder='{"meta_data": {...}, "prompt_sections": [...]}'
+                value={pasteInput}
+                onChange={(e) => setPasteInput(e.target.value)}
+                spellCheck={false}
+                className="w-full h-[240px] resize-y font-mono text-[13px] leading-relaxed p-3 rounded-xl bg-[var(--tb-surface-2)] border border-[var(--tb-border)] text-[var(--tb-text)] focus:outline-none focus:border-[#f97316] focus:ring-[3px] focus:ring-[#f97316]/20"
+                placeholder='{"project_title": "...", "timeline": [ ... ]}'
               />
-              {uploadError && (
+              {pasteError && (
                 <div className="text-sm text-[#fca5a5] bg-[#450a0a] border border-[#7f1d1d] rounded-xl px-3 py-2 font-semibold">
-                  {uploadError}
+                  {pasteError}
                 </div>
               )}
             </div>
-            <div className="flex justify-end gap-2 px-5 py-3 border-t border-[var(--tb-border)]">
-              <button
-                onClick={() => setUploadOpen(false)}
-                className="px-4 py-1.5 rounded-full tb-pill-ghost text-sm font-bold transition"
-              >
-                취소
-              </button>
-              <button
-                onClick={loadJson}
-                className="px-4 py-1.5 rounded-full tb-pill-primary text-sm font-bold transition"
-              >
-                불러오기
-              </button>
+            <div className="flex justify-between gap-2 px-5 py-3 border-t border-[var(--tb-border)]">
+              {variant === 'talking' ? (
+                <button
+                  onClick={() => { setPasteInput(DEFAULT_TALKING_JSON); setPasteError(''); }}
+                  className="px-4 py-1.5 rounded-full tb-pill-ghost text-sm font-bold transition"
+                >
+                  예시 채우기
+                </button>
+              ) : <span />}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setPasteOpen(false)}
+                  className="px-4 py-1.5 rounded-full tb-pill-ghost text-sm font-bold transition"
+                >
+                  취소
+                </button>
+                <button
+                  onClick={loadPaste}
+                  className="px-4 py-1.5 rounded-full tb-pill-primary text-sm font-bold transition"
+                >
+                  불러오기
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -6,7 +6,7 @@ import KakaoInAppGuard from "./KakaoInAppGuard";
 export default async function LoginPage() {
   const session = await auth();
   if (session?.user) {
-    redirect(session.user.onboarded ? "/mypage" : "/onboarding");
+    redirect(session.user.onboarded ? "/" : "/onboarding");
   }
 
   return (

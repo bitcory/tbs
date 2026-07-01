@@ -10,7 +10,7 @@ export default async function OnboardingPage() {
   if (!session?.user) redirect("/login");
 
   const me = await prisma.user.findUnique({ where: { id: session.user.id } });
-  if (me?.onboarded) redirect("/mypage");
+  if (me?.onboarded) redirect("/");
 
   async function save(formData) {
     "use server";
