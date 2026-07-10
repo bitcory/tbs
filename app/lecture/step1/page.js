@@ -1,17 +1,9 @@
 import { requireStepAccess } from "@/lib/access";
 import Step1Client from "./Step1Client";
 
-const VARIANT_STEP = {
-  talking: 11,
-  dance: 12,
-  fly: 13,
-  interview: 14,
-};
-
-export default async function Step1Page({ searchParams }) {
-  const sp = (await searchParams) || {};
-  const v = typeof sp.v === "string" && VARIANT_STEP[sp.v] ? sp.v : "talking";
-  const stepCode = VARIANT_STEP[v];
-  await requireStepAccess([stepCode, 1]);
-  return <Step1Client variant={v} />;
+// UP 1단계 · AI영상기초다지기 (말하는 영상 통합).
+// 하위 변형(춤추는/날아가는/동물 인터뷰)은 폐지됐고, 접근은 단일 코드 1 로 통일.
+export default async function Step1Page() {
+  await requireStepAccess(1);
+  return <Step1Client variant="talking" />;
 }

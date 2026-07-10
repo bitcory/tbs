@@ -4,7 +4,6 @@ import { prisma } from "@/lib/prisma";
 import { toggleStepAccess, toggleSuggestionViewer, toggleCapsrtAccess } from "./actions";
 import RoleSelect from "./RoleSelect";
 import DeleteUserButton from "./DeleteUserButton";
-import StepGroupDropdown from "./StepGroupDropdown";
 import MembersTable from "./MembersTable";
 import * as S from "@/lib/uiStyles";
 import { maskPhone } from "@/lib/format";
@@ -17,13 +16,7 @@ const ROLE_BADGE = {
 };
 
 const ZERO_STEP = 100;
-
-const STEP1_OPTIONS = [
-  { step: 11, label: "UP 1-1 · 말하는" },
-  { step: 12, label: "UP 1-2 · 춤추는" },
-  { step: 13, label: "UP 1-3 · 날아가는" },
-  { step: 14, label: "UP 1-4 · 동물 인터뷰" },
-];
+const UP1_STEP = 1;
 
 const SINGLE_STEPS = [
   { step: 2, label: "UP 2" },
@@ -305,19 +298,43 @@ export default async function AdminPage({ searchParams }) {
                         );
                       })()}
 
-                      {/* UP CLASS - Step 1 variants dropdown */}
-                      <td style={td}>
-                        {canEditSteps ? (
-                          <StepGroupDropdown
-                            userId={u.id}
-                            options={STEP1_OPTIONS}
-                            currentSteps={u.stepAccess}
-                            accent="#f97316"
-                          />
-                        ) : (
-                          <span style={{ ...S.badge(S.badgeGreen), opacity: 0.6 }}>자동</span>
-                        )}
-                      </td>
+                      {/* UP CLASS - Step 1 (AI영상기초다지기, 단일 토글) */}
+                      {(() => {
+                        const hasAccess = u.role !== "USER" || u.stepAccess.includes(UP1_STEP);
+                        return (
+                          <td style={td}>
+                            {canEditSteps ? (
+                              <form
+                                action={async () => {
+                                  "use server";
+                                  await toggleStepAccess(u.id, UP1_STEP, !hasAccess);
+                                }}
+                              >
+                                <button
+                                  className="tb-press-soft"
+                                  style={{
+                                    ...S.badge(hasAccess ? S.badgeGreen : S.badgeGray),
+                                    border: "none",
+                                    cursor: "pointer",
+                                    fontFamily: "inherit",
+                                  }}
+                                >
+                                  {hasAccess ? "✓ 허용" : "✕ 차단"}
+                                </button>
+                              </form>
+                            ) : (
+                              <span
+                                style={{
+                                  ...S.badge(hasAccess ? S.badgeGreen : S.badgeGray),
+                                  opacity: 0.6,
+                                }}
+                              >
+                                {hasAccess ? "자동" : "-"}
+                              </span>
+                            )}
+                          </td>
+                        );
+                      })()}
 
                       {/* UP CLASS - single-toggle steps */}
                       {SINGLE_STEPS.map(({ step }) => {

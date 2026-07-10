@@ -77,10 +77,7 @@ Vercel이 자동 배포함.
 | 단계 | 라우트 | `stepAccess` 값 | 설명 |
 |------|--------|----------------|------|
 | ZERO CLASS 전체 | `/zero/*` | `100` | 5개 루트 공용 (구글/FLOW/AI사진/AI영상/캡컷) |
-| Step 1-1 | `/lecture/step1?v=talking` | `11` | 영상기초다지기 · 말하는 프롬프트 |
-| Step 1-2 | `/lecture/step1?v=dance` | `12` | 영상기초다지기 · 춤추는 영상 프롬프트 |
-| Step 1-3 | `/lecture/step1?v=fly` | `13` | 영상기초다지기 · 날아가는 영상 프롬프트 |
-| Step 1-4 | `/lecture/step1?v=interview` | `14` | 영상기초다지기 · 동물 인터뷰 프롬프트 |
+| Step 1 | `/lecture/step1` | `1` | UP 1 · AI영상기초다지기 (구 말하는 프롬프트 통합) |
 | Step 2 | `/lecture/step2` | `2` | 뮤직 영상 만들기 |
 | Step 2-1 | `/lecture/step2-1` | `21` | 인트로 영상 만들기 (Step 2 하위) |
 | Step 6 | `/lecture/step6` | `6` | PRO 1 · 시네마틱 5컷 다이얼로그 (캐릭터 A/B + S01~S05) |
@@ -90,7 +87,7 @@ Vercel이 자동 배포함.
 | Step 4 | `/lecture/step4` | `4` | MASTER 1 · 광고영상 만들기 (Hook/Build/Climax/CTA) |
 | Step 3 | `/lecture/step3` | `3` | MASTER 2 · 프리프로덕션 (구 스토리 영상 · 기/승/전/결) |
 
-> **Step 1 구조**: `/lecture/step1/page.js` 는 서버 컴포넌트 게이트로, `?v=` 쿼리를 읽어 `requireStepAccess([11|12|13|14, 1])` 로 variant별 접근을 강제한 뒤 `Step1Client` 에 `variant` prop 으로 전달한다. 레거시 `1` 을 보유한 사용자는 네 variant 모두 접근 가능(하위 호환).
+> **Step 1 구조**: UP 1 은 단일 과정(AI영상기초다지기)으로 통합됐다. `/lecture/step1/page.js` 는 `requireStepAccess(1)` 로 접근을 강제하고 `Step1Client` 에 `variant="talking"` 을 고정 전달한다. 구 하위 변형(춤추는/날아가는/동물 인터뷰, 코드 12/13/14)과 서브 코드 11 은 폐지됐고, 기존 보유자는 마이그레이션으로 코드 `1` 로 이전됨. Step1Client 내부에 dance/fly/interview 예시 데이터는 남아 있으나 도달 불가(dead).
 >
 > **ZERO CLASS 인코딩**: 3자리 (10N). 하위 스텝이 생겨도 동일 prefix 유지.
 
@@ -101,7 +98,7 @@ Vercel이 자동 배포함.
 | 슬롯 (classType_stepLevel) | stepAccess 코드 | 강의 |
 |---|---|---|
 | `ZERO_0` | `100` | ZERO CLASS 전체 |
-| `UP_1` (sub: `UP_11~14`) | `1` (sub: `11~14`) | UP 1 · 영상기초다지기 |
+| `UP_1` | `1` | UP 1 · AI영상기초다지기 (구 11~14 통합) |
 | `UP_2` | `2` | UP 2 · 뮤직영상 |
 | `UP_3` | `21` | UP 3 · 인트로영상 |
 | `PRO_1` | `6` | PRO 1 · 시네마틱 5컷 |
@@ -128,10 +125,10 @@ Vercel이 자동 배포함.
    ```
 2. `stepAccess` 는 `prisma/schema.prisma` 의 `Int[]` 이다.
    - UP CLASS 메인 단계는 한자리 정수 (2, 3, 4, 5)
-   - **UP CLASS 하위 단계는 두 자리 인코딩** (예: Step 1-2 → `12`, Step 2-1 → `21`, Step 3-2 → `32`)
+   - **UP CLASS 하위 단계는 두 자리 인코딩** (예: Step 2-1 → `21`, Step 3-2 → `32`)
    - **ZERO CLASS 는 단일 코드 `100`** (5개 루트가 공유 — 허용 시 전체 접근)
    - 새 서브스텝을 만들 때 같은 규칙을 따른다.
-3. `app/admin/page.js` 의 `ZERO_STEP` / `STEP1_OPTIONS` / `SINGLE_STEPS` / `PRO_STEPS` / `MASTER_STEPS`
+3. `app/admin/page.js` 의 `ZERO_STEP` / `UP1_STEP` / `SINGLE_STEPS` / `PRO_STEPS` / `MASTER_STEPS`
    값·배열을 수정하면 자동으로 드롭다운·토글 컬럼이 노출된다.
    (`STAFF` / `SUPER_ADMIN` 은 `requireStepAccess` 에서 자동 통과.)
 4. 권한 없는 사용자는 `/no-access?step=<값>` 으로 리디렉션된다.

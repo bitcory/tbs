@@ -11,8 +11,7 @@ const STATUSES = ["APPLIED", "ATTENDED", "CANCELLED"];
 
 const VALID_SLOTS = new Set([
   "ZERO_0",
-  "UP_1", "UP_11", "UP_12", "UP_13", "UP_14",
-  "UP_2", "UP_3",
+  "UP_1", "UP_2", "UP_3",
   "PRO_1", "PRO_2", "PRO_3", "PRO_4",
   "MASTER_1", "MASTER_2",
 ]);
