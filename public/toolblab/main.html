@@ -106,12 +106,6 @@
       padding: 0;
     }
 
-    :root {
-      /* Page color the hero's top edge fades into (see .hero-section::before/::after) */
-      --hero-fade: #15141a;
-      --hero-fade-0: rgba(21, 20, 26, 0);
-    }
-
     html,
     body {
       width: 100%;
@@ -125,6 +119,14 @@
       overflow-x: hidden;
       overflow-y: auto;
       -webkit-font-smoothing: antialiased;
+    }
+
+    /* Column shell so .hero-section can claim the leftover viewport height */
+    .page {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      min-height: 100svh;
     }
 
     /* ════════════════════════════
@@ -239,18 +241,18 @@
       box-shadow: 0 8px 18px rgba(244, 63, 94, 0.32);
     }
 
-    /* ── Gallery button (right side of header) ── */
-    .header-gallery-btn {
-      grid-column: 3;
-      justify-self: end;
+    /* ── Gallery pill (sits in the class nav, right of MASTER — green so it
+          reads as a destination rather than another class tab) ── */
+    .gallery-tab {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      padding: 10px 16px;
+      gap: 6px;
+      margin-left: 4px;
+      padding: 9px 15px;
       border-radius: 100px;
-      border: 1px solid #e2e8f0;
-      background: #fff;
-      color: #334155;
+      border: 1px solid transparent;
+      background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+      color: #052e23;
       font-family: inherit;
       font-size: 12px;
       font-weight: 800;
@@ -258,27 +260,27 @@
       text-transform: uppercase;
       text-decoration: none;
       cursor: pointer;
-      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
-      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 2.2), box-shadow 0.25s, border-color 0.25s, color 0.25s;
+      box-shadow: 0 8px 18px rgba(16, 185, 129, 0.32);
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 2.2), box-shadow 0.25s, background 0.25s;
     }
 
-    .header-gallery-btn:hover {
-      transform: translateY(-1px) scale(1.02);
-      border-color: #00B380;
-      color: #00996D;
+    .gallery-tab:hover {
+      transform: translateY(-1px) scale(1.03);
+      background: linear-gradient(135deg, #6ee7b7 0%, #10b981 100%);
+      box-shadow: 0 10px 22px rgba(16, 185, 129, 0.42);
     }
 
-    .header-gallery-btn:active {
-      transform: translateY(1px) scale(0.96);
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    .gallery-tab:active {
+      transform: translateY(1px) scale(0.94);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
     }
 
-    .header-gallery-btn svg {
-      width: 15px;
-      height: 15px;
+    .gallery-tab svg {
+      width: 14px;
+      height: 14px;
     }
 
-    /* ── Theme toggle (sits left of the gallery button) ── */
+    /* ── Theme toggle (header right side) ── */
     .header-actions {
       grid-column: 3;
       justify-self: end;
@@ -321,8 +323,9 @@
         padding: 10px 64px 10px 16px;
       }
       .header-center { gap: 7px; }
-      .header-gallery-btn { font-size: 11px; padding: 9px 11px; }
-      .header-gallery-btn .gallery-label { display: none; }
+      /* The nav wraps here, so the pill sits on its own row — keep the label
+         so it reads as a deliberate item rather than a stray icon. */
+      .gallery-tab { font-size: 10px; padding: 8px 12px; letter-spacing: 0.04em; margin-left: 0; }
       .site-header-logo {
         width: 36px;
         height: 36px;
@@ -335,14 +338,27 @@
     /* ════════════════════════════
        HERO
     ════════════════════════════ */
+    /* Fills whatever the sticky header leaves of the viewport, and grows past it
+       if the stacked content needs more room (so nothing gets clipped). */
     .hero-section {
       position: relative;
-      min-height: clamp(360px, 52vh, 470px);
+      flex: 1;
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      justify-content: center;
+      padding: 20px 0 44px;
       overflow: hidden;
       isolation: isolate;
       background: #07110e;
+    }
+
+    .hero-stage {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: clamp(20px, 4.5vh, 52px);
+      width: 100%;
     }
 
     .hero-image {
@@ -355,31 +371,23 @@
       z-index: -3;
     }
 
-    /* The hero sits below the cards, so its blend-into-the-page edge is on TOP. */
+    /* Two scrims: the original left-to-right wash that anchors the copy, plus a
+       vertical one darkened at both ends — the top carries the headline, the
+       bottom keeps the white cards from sitting on the photo's bright area. */
     .hero-section::before {
       content: '';
       position: absolute;
       inset: 0;
       z-index: -2;
       background:
-        linear-gradient(90deg, rgba(3, 16, 12, 0.94) 0%, rgba(3, 16, 12, 0.78) 34%, rgba(3, 16, 12, 0.28) 68%, rgba(3, 16, 12, 0.12) 100%),
-        linear-gradient(0deg, var(--hero-fade-0) 76%, var(--hero-fade) 100%);
-    }
-
-    .hero-section::after {
-      content: '';
-      position: absolute;
-      inset: 0 0 auto;
-      height: 130px;
-      z-index: -1;
-      background: linear-gradient(0deg, var(--hero-fade-0), var(--hero-fade));
-      pointer-events: none;
+        linear-gradient(90deg, rgba(3, 16, 12, 0.92) 0%, rgba(3, 16, 12, 0.74) 36%, rgba(3, 16, 12, 0.30) 70%, rgba(3, 16, 12, 0.16) 100%),
+        linear-gradient(180deg, rgba(3, 16, 12, 0.72) 0%, rgba(3, 16, 12, 0.32) 42%, rgba(3, 16, 12, 0.52) 100%);
     }
 
     .hero-content {
       width: min(1180px, 100%);
       margin: 0 auto;
-      padding: 54px 24px 74px;
+      padding: 0 24px;
       color: #fff;
     }
 
@@ -644,8 +652,7 @@
 
     @media (max-width: 640px) {
       .hero-section {
-        min-height: 410px;
-        align-items: flex-end;
+        padding: 12px 0 32px;
       }
 
       .hero-image {
@@ -653,13 +660,11 @@
       }
 
       .hero-section::before {
-        background:
-          linear-gradient(180deg, rgba(3, 16, 12, 0.22) 0%, rgba(3, 16, 12, 0.82) 48%, rgba(3, 16, 12, 0.94) 100%),
-          linear-gradient(0deg, var(--hero-fade-0) 78%, var(--hero-fade) 100%);
+        background: linear-gradient(180deg, rgba(3, 16, 12, 0.80) 0%, rgba(3, 16, 12, 0.62) 42%, rgba(3, 16, 12, 0.86) 100%);
       }
 
       .hero-content {
-        padding: 160px 18px 62px;
+        padding: 0 18px;
       }
 
       .hero-eyebrow {
@@ -1048,17 +1053,6 @@
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       box-shadow: 0 4px 22px rgba(0, 0, 0, 0.4);
     }
-    .header-gallery-btn {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #cbc8d2;
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
-    }
-    .header-gallery-btn:hover {
-      border-color: #f97316;
-      color: #fb923c;
-    }
-
     .step-card {
       background: #1f1d26;
       border: 2px solid transparent;
@@ -1138,11 +1132,7 @@
        Higher specificity (attribute) + later source order beats the
        dark block above. Accent gradients / media panels are shared.
     ════════════════════════════════════════════ */
-    html[data-theme="light"] {
-      background: #f8fafc;
-      --hero-fade: #f8fafc;
-      --hero-fade-0: rgba(248, 250, 252, 0);
-    }
+    html[data-theme="light"] { background: #f8fafc; }
     html[data-theme="light"] body { background: #f8fafc; color: #0f172a; }
 
     html[data-theme="light"] .site-header {
@@ -1151,13 +1141,9 @@
       box-shadow: 0 4px 22px rgba(15, 23, 42, 0.06);
     }
     html[data-theme="light"] .site-header-wordmark { color: #0f172a; }
-    html[data-theme="light"] .header-gallery-btn {
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      color: #334155;
-      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
-    }
-    html[data-theme="light"] .header-gallery-btn:hover { border-color: #f97316; color: #ea580c; }
+    /* The green pill is self-colored — it reads the same in both themes,
+       only the drop shadow softens on the light page. */
+    html[data-theme="light"] .gallery-tab { box-shadow: 0 8px 18px rgba(16, 185, 129, 0.28); }
 
     html[data-theme="light"] .class-tab { color: #64748b; }
     html[data-theme="light"] .class-tab.active,
@@ -1212,6 +1198,15 @@
           <button type="button" class="class-tab active" data-class="up" onclick="selectClass('up')">UP</button>
           <button type="button" class="class-tab" data-class="pro" onclick="selectClass('pro')">PRO</button>
           <button type="button" class="class-tab" data-class="master" onclick="selectClass('master')">MASTER</button>
+          <a class="gallery-tab" href="/gallery" target="_top">
+            <svg viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" />
+              <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" />
+              <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" />
+              <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" />
+            </svg>
+            <span class="gallery-label">갤러리</span>
+          </a>
         </nav>
       </div>
       <div class="header-actions">
@@ -1224,17 +1219,22 @@
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
           </svg>
         </button>
-        <a class="header-gallery-btn" href="/gallery" target="_top">
-          <svg viewBox="0 0 24 24" fill="none">
-            <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" />
-            <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" />
-            <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" />
-            <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" />
-          </svg>
-          <span class="gallery-label">갤러리</span>
-        </a>
       </div>
     </header>
+
+    <!-- ───────── HERO STAGE (fills the viewport; cards sit on top of it) ───────── -->
+    <section class="hero-section" aria-labelledby="heroTitle">
+      <img class="hero-image" src="/images/brand/tb-study-hero.webp" alt="" width="1672" height="941" />
+      <div class="hero-stage">
+
+        <div class="hero-content">
+          <span class="hero-eyebrow">AI VIDEO CURRICULUM</span>
+          <h1 class="hero-title" id="heroTitle"><span class="hero-line">AI 영상 제작을 단계별로</span><span class="hero-line">완성하는 학습실</span></h1>
+          <p class="hero-subtitle">
+            계정 준비부터 이미지, 영상, 인트로, 광고, 뮤직비디오, 그림책 제작까지
+            실습 중심 커리큘럼으로 필요한 흐름만 빠르게 익힙니다.
+          </p>
+        </div>
 
     <!-- ───────── ZERO CLASS VIEW ───────── -->
     <div class="class-view" id="view-zero">
@@ -1463,17 +1463,7 @@
 
     </div><!-- /#view-up -->
 
-    <!-- ───────── HERO (sits below the class cards) ───────── -->
-    <section class="hero-section" aria-labelledby="heroTitle">
-      <img class="hero-image" src="/images/brand/tb-study-hero.webp" alt="" width="1672" height="941" />
-      <div class="hero-content">
-        <span class="hero-eyebrow">AI VIDEO CURRICULUM</span>
-        <h1 class="hero-title" id="heroTitle"><span class="hero-line">AI 영상 제작을 단계별로</span><span class="hero-line">완성하는 학습실</span></h1>
-        <p class="hero-subtitle">
-          계정 준비부터 이미지, 영상, 인트로, 광고, 뮤직비디오, 그림책 제작까지
-          실습 중심 커리큘럼으로 필요한 흐름만 빠르게 익힙니다.
-        </p>
-      </div>
+      </div><!-- /.hero-stage -->
     </section>
 
   </main>
