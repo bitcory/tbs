@@ -292,8 +292,9 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 40px;
-      height: 40px;
+      /* 44px matches the host page's avatar so the two circles read as a pair */
+      width: 44px;
+      height: 44px;
       flex-shrink: 0;
       border-radius: 50%;
       border: 1px solid rgba(255, 255, 255, 0.12);
@@ -320,7 +321,16 @@
 
     @media (max-width: 640px) {
       .site-header {
-        padding: 10px 64px 10px 16px;
+        /* Right reserve = host page's avatar (fixed, right:20 + 44 wide = 64)
+           plus breathing room, so the theme toggle never butts against it. */
+        padding: 12px 84px 12px 14px;
+      }
+
+      /* The nav wraps to two rows here, growing the header. The host avatar is
+         fixed to the top, so pin the side items to the first row to match it. */
+      .site-header-brand,
+      .header-actions {
+        align-self: start;
       }
       .header-center { gap: 7px; }
       /* The nav wraps here, so the pill sits on its own row — keep the label
@@ -346,7 +356,9 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 20px 0 44px;
+      /* Still centered, but the heavy bottom padding biases the stack upward so
+         the headline sits high in frame instead of mid-screen. */
+      padding: 20px 0 130px;
       overflow: hidden;
       isolation: isolate;
       background: #07110e;
@@ -652,7 +664,7 @@
 
     @media (max-width: 640px) {
       .hero-section {
-        padding: 12px 0 32px;
+        padding: 12px 0 92px;
       }
 
       .hero-image {

@@ -61,8 +61,9 @@ export default async function Home({ searchParams }) {
         title="TB STUDY"
         className="w-full h-full border-0 block"
       />
-      {/* Vertically centered against the iframe's ~58px sticky header */}
-      <div style={{ position: "fixed", top: 8, right: 20, zIndex: 999 }}>
+      {/* Sits on the same axis as the iframe header's 44px theme toggle:
+          both are 44 tall with 12px of header padding above them. */}
+      <div style={{ position: "fixed", top: 12, right: 20, zIndex: 999 }}>
         {me ? (
           <Link href="/mypage" className="glass-hoverable" style={avatarWrap} title={me.nickname ?? ""}>
             {me.image ? (
