@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 
 // 카카오톡 인앱브라우저(웹뷰)에서는 카카오 OAuth 콜백 도중 쿠키가 끊기거나 콜백이 두 번 처리되어
-// 회원가입이 실패/중복되는 경우가 있다. 인앱브라우저로 진입한 경우 외부 브라우저로 강제 오픈한다.
+// 회원가입이 실패/중복되는 경우가 있다. 구글은 한술 더 떠 인앱 웹뷰를 disallowed_useragent 로
+// 아예 거부한다. 인앱브라우저로 진입한 경우 외부 브라우저로 강제 오픈한다.
 export default function KakaoInAppGuard() {
   const [isInApp, setIsInApp] = useState(false);
 
@@ -53,7 +54,7 @@ export default function KakaoInAppGuard() {
           외부 브라우저로 열어주세요
         </h2>
         <p style={{ fontSize: 14, lineHeight: 1.6, color: "#475569", marginBottom: 18 }}>
-          카카오톡 안에서는 카카오 로그인이 정상 동작하지 않습니다.
+          카카오톡 안에서는 로그인이 정상 동작하지 않습니다.
           <br />
           아래 버튼으로 Chrome / Safari 에서 열어주세요.
         </p>

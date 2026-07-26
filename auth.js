@@ -1,7 +1,35 @@
 import NextAuth from "next-auth";
 import Kakao from "next-auth/providers/kakao";
+import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
+
+const GOOGLE_ID = process.env.GOOGLE_CLIENT_ID ?? process.env.AUTH_GOOGLE_ID;
+const GOOGLE_SECRET = process.env.GOOGLE_CLIENT_SECRET ?? process.env.AUTH_GOOGLE_SECRET;
+
+// 구글은 자격증명이 있을 때만 등록한다. 없는 환경(로컬/프리뷰)에서 provider 를
+// 무조건 끼워 넣으면 /login 진입 자체가 실패한다.
+export const googleEnabled = Boolean(GOOGLE_ID && GOOGLE_SECRET);
+
+const providers = [
+  Kakao({
+    clientId: process.env.KAKAO_CLIENT_ID,
+    clientSecret: process.env.KAKAO_CLIENT_SECRET ?? "",
+  }),
+];
+
+if (googleEnabled) {
+  providers.push(
+    Google({
+      clientId: GOOGLE_ID,
+      clientSecret: GOOGLE_SECRET,
+      // 기존 카카오 회원이 같은 이메일로 구글 로그인하면 새 User 를 만들지 않고
+      // 기존 계정에 연결한다(권한·역할 유지). 이게 없으면 OAuthAccountNotLinked
+      // 에러로 로그인이 막힌다. 두 provider 모두 이메일을 검증하므로 허용.
+      allowDangerousEmailAccountLinking: true,
+    })
+  );
+}
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
@@ -11,12 +39,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   // 어느 이름이든 명시적으로 주입해 인스턴스 간 일관성을 보장한다.
   secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
   adapter: PrismaAdapter(prisma),
-  providers: [
-    Kakao({
-      clientId: process.env.KAKAO_CLIENT_ID,
-      clientSecret: process.env.KAKAO_CLIENT_SECRET ?? "",
-    }),
-  ],
+  providers,
   session: { strategy: "database" },
   events: {
     async createUser({ user }) {
