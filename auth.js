@@ -82,5 +82,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   pages: {
     signIn: "/login",
+    // 계정 연결 실패(OAuthAccountNotLinked 등)도 여기로 온다. /login 이 세션 유무를
+    // 보고 로그인 중인 사용자는 /mypage 로 안내 메시지와 함께 되돌린다.
+    error: "/login",
   },
 });

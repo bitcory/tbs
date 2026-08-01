@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/access";
 import { prisma } from "@/lib/prisma";
-import { toggleStepAccess, toggleSuggestionViewer, toggleCapsrtAccess } from "./actions";
+import { toggleStepAccess, toggleSuggestionViewer, toggleCapsrtAccess, mergeAccounts } from "./actions";
 import RoleSelect from "./RoleSelect";
 import DeleteUserButton from "./DeleteUserButton";
 import MembersTable from "./MembersTable";
+import MergeAccountsCard from "./MergeAccountsCard";
 import * as S from "@/lib/uiStyles";
 import { maskPhone } from "@/lib/format";
 
@@ -67,6 +68,41 @@ export default async function AdminPage({ searchParams }) {
         }),
   ]);
 
+  // 병합 후보 = 권한·수강이력·건의글이 하나도 없는 껍데기 계정.
+  // (기존 회원이 다른 이메일로 구글 재가입한 경우가 여기 잡힌다.)
+  const mergeCandidates = isSuper
+    ? (
+        await prisma.user.findMany({
+          where: {
+            role: "USER",
+            stepAccess: { isEmpty: true },
+            enrollments: { none: {} },
+            suggestions: { none: {} },
+            desktopTokens: { none: {} },
+            accounts: { some: {} },
+          },
+          select: {
+            id: true, nickname: true, name: true, email: true, createdAt: true,
+            accounts: { select: { provider: true } },
+          },
+          orderBy: { createdAt: "desc" },
+        })
+      ).map((u) => ({
+        id: u.id,
+        nickname: u.nickname,
+        name: u.name,
+        email: u.email,
+        providers: u.accounts.map((a) => a.provider),
+      }))
+    : [];
+
+  const mergeTargets = isSuper
+    ? await prisma.user.findMany({
+        select: { id: true, nickname: true, name: true, email: true },
+        orderBy: [{ nickname: "asc" }, { createdAt: "asc" }],
+      })
+    : [];
+
   // 검색용 메타 텍스트 (소문자). 전화번호 검색은 슈퍼 관리자만.
   const searchMeta = visibleRows.map((u) =>
     [u.nickname, u.name, u.email, isSuper ? u.phone : ""]
@@ -105,6 +141,14 @@ export default async function AdminPage({ searchParams }) {
           <Link href="/mypage" className="glass-hoverable" style={S.ghostBtn}>마이페이지</Link>
           <Link href="/" className="glass-hoverable" style={S.ghostBtn}>← 홈으로</Link>
         </div>
+
+        {isSuper && (
+          <MergeAccountsCard
+            candidates={mergeCandidates}
+            allUsers={mergeTargets}
+            mergeAction={mergeAccounts}
+          />
+        )}
 
         {/* Tabs */}
         <div

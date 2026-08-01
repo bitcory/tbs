@@ -1,11 +1,12 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { auth, signOut } from "@/auth";
+import { auth, signIn, signOut, googleEnabled } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import * as S from "@/lib/uiStyles";
 import ProfileEditor from "./ProfileEditor";
 import BankInfoEditor from "./BankInfoEditor";
 import CapsrtConnectCard from "./CapsrtConnectCard";
+import LinkedAccountsCard from "./LinkedAccountsCard";
 import { updateProfile, updateBankInfo, issueDesktopToken, revokeDesktopToken } from "./actions";
 import {
   Camera, Search, Film, MessagesSquare, ArrowUpRight, MessageSquarePlus,
@@ -23,7 +24,7 @@ const ROLE_BADGE = {
   SUPER_ADMIN: S.badgePurple,
 };
 
-export default async function MyPage() {
+export default async function MyPage({ searchParams }) {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
@@ -32,6 +33,15 @@ export default async function MyPage() {
   if (!me.onboarded) redirect("/onboarding");
 
   const isAdmin = me.role === "STAFF" || me.role === "SUPER_ADMIN";
+
+  const sp = (await searchParams) ?? {};
+  const linkStatus = typeof sp.status === "string" ? sp.status : null;
+  const linkedProviders = (
+    await prisma.account.findMany({
+      where: { userId: me.id },
+      select: { provider: true },
+    })
+  ).map((a) => a.provider);
 
   // 캡컷SRT 앱: 사용 권한 + 발급된 연결코드
   const capsrtAllowed = me.capsrtAccess || isAdmin;
@@ -247,8 +257,20 @@ export default async function MyPage() {
           />
         </div>
 
-        {/* 회원정보 + 정산정보 — 한 줄 2개 */}
+        {/* 로그인 수단 + 회원정보 + 정산정보 */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: 18, alignItems: "start" }}>
+          <LinkedAccountsCard
+            providers={linkedProviders}
+            googleEnabled={googleEnabled}
+            status={linkStatus}
+            linkAction={async () => {
+              "use server";
+              // 이미 세션이 있으므로 Auth.js 가 현재 계정에 구글을 "연결"한다
+              // (신규 가입이 아니라 linkAccount 경로). 이메일이 달라도 붙는다.
+              await signIn("google", { redirectTo: "/mypage?status=linked" });
+            }}
+          />
+
           <ProfileEditor
             initialNickname={me.nickname}
             initialEmail={me.email}

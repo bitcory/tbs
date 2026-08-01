@@ -26,9 +26,18 @@ function GoogleMark() {
   );
 }
 
-export default async function LoginPage() {
+export default async function LoginPage({ searchParams }) {
+  const sp = (await searchParams) ?? {};
+  const error = typeof sp.error === "string" ? sp.error : null;
+
   const session = await auth();
   if (session?.user) {
+    // 마이페이지에서 구글 연결을 시도했다가 실패하면 여기로 떨어진다.
+    // 이미 로그인된 사용자이므로 로그인 화면이 아니라 마이페이지로 돌려보낸다.
+    if (error) {
+      const status = error === "OAuthAccountNotLinked" ? "already-linked" : "error";
+      redirect(`/mypage?status=${status}`);
+    }
     redirect(session.user.onboarded ? "/" : "/onboarding");
   }
 
