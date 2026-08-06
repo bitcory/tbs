@@ -69,17 +69,10 @@ export default function GalleryPage() {
         <span className="w-[76px]" />
       </header>
 
-      {/* Intro */}
-      <div className="max-w-[1600px] mx-auto px-5 sm:px-8 pt-10 pb-2 text-center">
-        <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#f97316]">TB STUDY GALLERY</p>
-        <h2 className="mt-2 text-2xl sm:text-4xl font-black tracking-tight">수강생 작업물 모아보기</h2>
-        <p className="mt-3 text-sm sm:text-base text-[var(--tb-text-muted)]">
-          클래스별 단계에서 만들어진 영상과 이미지를 한 화면에서 확인하세요.
-        </p>
-      </div>
-
-      {/* Class tabs — sticky under the header, horizontally scrollable on mobile */}
-      <nav className="sticky top-14 z-40 bg-[color-mix(in_srgb,var(--tb-bg)_82%,transparent)] backdrop-blur-xl border-b border-[var(--tb-border)] mt-6">
+      {/* Class tabs — sticky under the header, horizontally scrollable on mobile.
+          No intro block above them: entering from the landing page should land
+          straight on the default class (UP) and its first section. */}
+      <nav className="sticky top-14 z-40 bg-[color-mix(in_srgb,var(--tb-bg)_82%,transparent)] backdrop-blur-xl border-b border-[var(--tb-border)]">
         <div className="max-w-[1600px] mx-auto px-5 sm:px-8">
           <div className="flex gap-2 overflow-x-auto py-3 justify-start sm:justify-center [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {GALLERY.map((c) => {
