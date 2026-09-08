@@ -223,12 +223,20 @@ function MediaTile({ media, mediaKey, playing, onPlay, onOpenImage }) {
     const id = youtubeId(media.src);
     if (!id) return null;
 
-    // Shorts need a 9:16 frame; `oardefault` is the untrimmed vertical thumbnail
-    // (hqdefault would center-crop it to 4:3).
+    // Shorts need a 9:16 frame; the `oar*` variants are the untrimmed vertical
+    // thumbnails (hqdefault would center-crop them to 4:3). Not every short has
+    // every variant - a missing one returns YouTube's grey placeholder instead of
+    // a 404, so walk the list on error and land on the 16:9 frame as last resort.
     const ratio = media.portrait ? "aspect-[9/16]" : "aspect-video";
-    const thumb = media.portrait
-      ? `https://i.ytimg.com/vi/${id}/oardefault.jpg`
-      : `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+    const thumbs = media.portrait
+      ? [
+          `https://i.ytimg.com/vi/${id}/oar2.jpg`,
+          `https://i.ytimg.com/vi/${id}/oardefault.jpg`,
+          `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`,
+          `https://img.youtube.com/vi/${id}/hqdefault.jpg`,
+        ]
+      : [`https://img.youtube.com/vi/${id}/hqdefault.jpg`];
+    const thumb = thumbs[0];
 
     if (playing) {
       return (
@@ -253,6 +261,11 @@ function MediaTile({ media, mediaKey, playing, onPlay, onOpenImage }) {
           src={thumb}
           alt={media.title || "video"}
           loading="lazy"
+          onError={(e) => {
+            const el = e.currentTarget;
+            const next = thumbs[thumbs.indexOf(el.src) + 1];
+            if (next) el.src = next;
+          }}
           className="w-full h-full object-cover transition duration-300 group-hover:scale-[1.04]"
         />
         <span className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-black/10 transition group-hover:from-black/75" />
