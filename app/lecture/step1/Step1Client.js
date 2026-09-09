@@ -673,7 +673,7 @@ Subtitles, title, text is strictly prohibited.`,
               통합툴
             </div>
             <a
-              href="https://chatgpt.com/g/g-6a6ddb87eca88191bea109d550a06b8a-aiyeongsanggicodajigi"
+              href="https://chatgpt.com/g/g-6a5399179e1881919fa2a64d46dd10a2-aiyeongsanggicodajigi"
               target="_blank"
               rel="noreferrer"
               className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-full bg-[var(--tb-surface)] border border-[var(--tb-border)] hover:bg-[var(--tb-surface-2)] text-[var(--tb-text)] text-sm font-bold shadow-[0_1px_2px_rgba(0,0,0,0.04)] tb-press-soft"
